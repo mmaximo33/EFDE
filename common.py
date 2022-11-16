@@ -61,10 +61,10 @@ def checkYesNo(message, default='y'):
         checkYesNo(message)
 
 
-def menu_print(data, menuName='undefined', showHelper=False):
+def menu_print(data, menuData=[], showHelper=False):
     print(
         msgColor(
-            f'------------------------\n{menuName.upper()}\n------------------------',
+            f"-------------------------------\n{menuData['name'].upper()}\n{menuData['description']}\n-------------------------------",
             'OKCYAN'
         )
     )
