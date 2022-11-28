@@ -2,13 +2,14 @@ import os
 import sys
 from dotenv import load_dotenv
 from pathlib import Path
+import subprocess
 
 dataFile = {'name': 'common',
             'description': 'Contains elements to reuse in other files'}
 
 configEnv = {
     'pathBin': './bin/',
-    'fileEnv': '.env'
+    'fileEnv': '.efde'
 }
 
 
@@ -65,7 +66,7 @@ def menu_print(data, menuData=[], showHelper=False):
     print(
         msgColor(
             f"-------------------------------\n{menuData['name'].upper()}\n{menuData['description']}\n-------------------------------",
-            'OKCYAN'
+            'INFO_CYAN'
         )
     )
     print('Select an option \n')
@@ -86,22 +87,25 @@ def cli(command, show=False):  # ToDo: Detect operating system and apply replace
         print(msgColor(
             msgColor(
                 f'RUN Command \n{command}\n________________________',
-                'OKCYAN'
+                'INFO_CYAN'
             ), 'BOLD')
         )
     os.system(command)
 
+def cliReturn(command, show=False):
+    return subprocess.check_output(command, shell=True)
 
-def filePathEnv(): return (configEnv['pathBin'] + configEnv['fileEnv'])
+def filePathEnv(): return (configEnv['fileEnv'])
 
 
 def fileEnvExists(view=True):
     exists = os.path.exists(filePathEnv())
-    if (exists and view):
-        confirm = checkYesNo(
-            f"Desea ver el contenido del archivo {configEnv['fileEnv']}?", 'n')
-        if confirm:
-            fileEnvGet()
+    # ToDo: check utility
+    #if (exists and view):
+        #confirm = checkYesNo(
+        #    f"Desea ver el contenido del archivo {configEnv['fileEnv']}?", 'n')
+        #if confirm:
+        #    fileEnvGet()
 
     return exists
 

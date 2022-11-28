@@ -92,7 +92,7 @@
     if [ -f $BIN_FILE ]; then
       rm $BIN_FILE
     fi
-    echo "python3 ~/.efde/run.py" >$BIN_FILE
+    echo "python3 ~/.efde/start.py" >$BIN_FILE
     chmod +x $BIN_FILE
   }
 
