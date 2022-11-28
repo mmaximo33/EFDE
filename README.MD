@@ -6,7 +6,7 @@ EFDE is a project designed to facilitate the management of local development env
 
 The objective of the project is to be able to manage implementations with docker such as
 
-- Symphony
+- Symfony
 - Magento
 - Wordpress
 - WooCommerce
