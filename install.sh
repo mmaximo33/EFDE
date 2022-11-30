@@ -96,6 +96,8 @@
   }
 
   efde_create_bin() {
+    local INSTALL_DIR
+    INSTALL_DIR="$(efde_install_dir)"
     local BIN_FILE
     BIN_FILE="$HOME/bin/efde"
 
@@ -103,7 +105,7 @@
     if [ -f $BIN_FILE ]; then
       rm $BIN_FILE
     fi
-    cp ./efde.sh $BIN_FILE
+    cp "$INSTALL_DIR/efde.sh" $BIN_FILE
     chmod +x $BIN_FILE
   }
 
