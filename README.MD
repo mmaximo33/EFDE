@@ -31,7 +31,7 @@ wget -qO- https://gitlab.com/dockerizations/efde/-/raw/main/install.sh | bash
 Once installed, you can run EFDE from any directory
 
 ```sh
-$ efde
+$ efde --help
 ```
 
 ### Captures

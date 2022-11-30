@@ -1,4 +1,15 @@
 #!/usir/bin/env bash
+#
+# EFDE             : Easy and fast development environment
+# Author           : Marucci Maximo (https://mmaximo33.github.io/cv/)
+# Created On       : 2022-11-01
+# Last Modified By : Marucci Maximo
+# Last Modified On : 2022-11-27
+# Status           : construction
+# GitLab           : https://gitlab.com/dockerizations/efde
+# GitHub           : https://github.com/mmaximo33/efde
+# Description      :
+
 
 { # this ensures the entire script is downloaded #
 
@@ -92,7 +103,7 @@
     if [ -f $BIN_FILE ]; then
       rm $BIN_FILE
     fi
-    echo "python3 ~/.efde/start.py" >$BIN_FILE
+    cp ./efde.sh $BIN_FILE
     chmod +x $BIN_FILE
   }
 
