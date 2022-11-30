@@ -109,9 +109,11 @@
 
   efde_project_install_from_git() {
     if ! efde_has git; then
-      efde_echo "debe instalar git para descargar ${PROJECT_NAME}"
-      efde_input_yes_no 'Desea instalar git ahora?' efde_git_install
+      efde_echo "You must install git to download ${PROJECT_NAME}"
+      efde_input_yes_no 'Do you want to install git now?' efde_git_install
     fi
+
+    efde_echo "#######################################################################"
 
     local INSTALL_DIR
     INSTALL_DIR="$(efde_install_dir)"
@@ -177,10 +179,11 @@
     #
     efde_create_bin
 
-    efde_echo "########################################################"
+    efde_echo "#######################################################################"
     efde_echo "$PROJECT_NAME is successfully installed and configured."
-    efde_echo "From the directory that your project created, run "
-    efde_echo "$ efde"
+    efde_echo "Select the directory and create your new project by running '$ efde'"
+    efde_echo "-----------------------------------------------------------------------"
+    efde --help
   }
 
   efde_project_install_from_script() {
@@ -281,11 +284,10 @@
       efde_input_response efde_source efde_input_yes_no
   }
 
-  [ "_$NVM_ENV" = "_testing" ] || efde_do_install
+  [ "_$EFDE_ENV" = "_testing" ] || efde_do_install
 
 } # this ensures the entire script is downloaded #
 
 #Reference
 #https://bioinf.comav.upv.es/courses/unix/scripts_bash.html
 #https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
-#https://raw.githubusercontent.com/creationix/nvm/master/install.sh
