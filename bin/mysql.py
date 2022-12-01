@@ -49,19 +49,12 @@ def switchOption(code):
         print(codecs.decode(bytelist, 'UTF-8'))
         #for f in a:
             #print(f)
-            
-        
-
-
-
-
-
-        
     else:
         print('You must select an option')
 
 
 if __name__ == '__main__':
+    
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
@@ -69,9 +62,9 @@ if __name__ == '__main__':
 
         if opt == 'q': exit()
         elif opt == 'r': 
-            common.cli('clear')
+            common.cli('clear') 
             exit()
-        elif opt == 'h':
+        elif opt == 'h': 
             showHelper = not(showHelper)
             common.cli('clear')
         elif opt.isnumeric() and (int(opt) in range(0,len(menu_option))):

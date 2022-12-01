@@ -22,6 +22,7 @@ def switchOption(code):
         print('You must select an option')
 
 def configureCheck():
+    print("test")
     
 if __name__ == '__main__':
     showHelper = False

@@ -1,34 +1,37 @@
 import os, sys
 sys.path.append(os.path.dirname(__file__))
 import common as common
-dataFile = {'name': 'Composer', 'description': 'Help managing composer elements'}
+
+dataFile = {'name': '+Symfony', 'description': 'Help managing Symfony elements'}
 
 pathDokerCompose = 'cd .. && '
 pathDokerCompose = ''
 menuReturn =  ''
 menu_option = [
-    {"code": "rmvendor", "title": "Remove vendor", 'description': 'Remove vendor'},
-    {"code": "install", "title": "Install dependency", 'description': 'Composer install'},
-    {"code": "update", "title": "Update dependency", 'description': 'update dependencys'},
-    {"code": "runscripts", "title": "Run scripts", 'description': 'Run Scripts'},
+    {"code": "createapp",   "title": "Create app", 'description': 'Create a new symfony application'},
+    {"code": "console",   "title": "Console", 'description': 'Work with the symfony console'},
+    {"code": "fixpermissions",   "title": "Fix permissions", 'description': 'Fix Permissions'},
 ]
 
 def switchOption(code):
     if code in ['createapp','console','fixpermissions']: 
-        managementContainer(code)
+        runCommands(code)
     else:
         print('You must select an option')
 
-def managementContainer(action, command = ''):
+def runCommands(action, command = ''):
     commandDockerCompose = pathDokerCompose + "docker-compose run --rm app "    
 
-    if action == 'createapp' : 
+    if action == 'createapp' :
+        if(os.path.exists('./app')): 
+            common.cli('cd ./app && ls')
+            print(common.msgColor('Verify that the app directory exists','DANGER'))
         command = 'composer create-project symfony/website-skeleton .'
     elif action == 'console':
+        values = ''
         command = 'bin/console'
         questionCommand = input(common.msgColor('Enter the command or press enter for more info: ','WARNING'))
         if questionCommand == '': 
-            values = ''
             while True:
                 search = input(common.msgColor('Enter what you are looking for or press enter for the full list: ','WARNING'))
                 if search == '': 
@@ -40,26 +43,20 @@ def managementContainer(action, command = ''):
                     else:
                         values = search
                     continue
-            if not values =='': questionCommand = questionCommand + ' | egrep --color=always "' + values + '"'
+            if not(values ==''): questionCommand = questionCommand + ' | egrep --color=always "' + values + '"'
         command = command + ' ' + questionCommand
     elif action == 'fixpermissions':
         fixPermissions()
         return
 
-    common.cli(commandDockerCompose + ' ' + command,True)
+    common.cli(commandDockerCompose + ' ' + command)
 
+#ToDo: Review oficial documentation
 def fixPermissions():
     common.cli('sudo chown -R $USER:$USER ./app')
 
 if __name__ == '__main__':
-    print(
-        common.msgColor(
-            f"-------------------------------\nIn construction\n-------------------------------",
-            'INFO_CYAN'
-        )
-    )
-    input(common.msgColor('\nPress enter to return to the menu','OKGREEN'))
-    common.cli('clear')
+    
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)

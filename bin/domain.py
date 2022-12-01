@@ -83,6 +83,15 @@ def configureLocalDomain():
 
 
 if __name__ == '__main__':
+    print(
+        common.msgColor(
+            f"-------------------------------\nIn construction\n-------------------------------",
+            'INFO_CYAN'
+        )
+    )
+    input(common.msgColor('\nPress enter to return to the menu','OKGREEN'))
+    common.cli('clear')
+
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
@@ -90,17 +99,17 @@ if __name__ == '__main__':
 
         if opt == 'q': exit()
         elif opt == 'r': 
-            common.cli("clear")
+            common.cli('clear') 
             exit()
-        elif opt == 'h':
+        elif opt == 'h': 
             showHelper = not(showHelper)
-            common.cli("clear")
+            common.cli('clear')
         elif opt.isnumeric() and (int(opt) in range(0,len(menu_option))):
             code = menu_option[int(opt)]['code']
             switchOption(code)
 
             input(common.msgColor('\nPress enter to return to the menu','OKGREEN'))
-            common.cli("clear")
+            common.cli('clear')
         else:
             input(common.msgColor(f'The option "{opt}" is not in the list. Press enter to continue','DANGER'))
             common.cli('clear')

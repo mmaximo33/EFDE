@@ -16,7 +16,7 @@ menu_option = [
     {"code": "logs",    "title": "Logs", 'description': 'Monitor and search for values in the container logs'},
     {"code": "entry",   "title": "Entry container", 'description': 'Enter the indicated container'},
     {"code": "command", "title": "Run command", 'description': 'Run command in container. Example: bash, cp, rm'},
-    {"code": "apache",  "title": "Stop Apache:80", 'description': 'Shutdown local apache service'},
+    {"code": "apache",  "title": "Stop Apache", 'description': 'Shutdown local apache service'},
     {"code": "stopAll", "title": "Stop all containers", 'description': 'Shutdown all containers on my computer'},
     {'code': 'down',    'title': "Down", 'description': 'Shutdown and destroy container and network'},
 
@@ -87,7 +87,7 @@ def modeInstance():
     else: return 'exec'
 
 if __name__ == '__main__':
-    
+
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
