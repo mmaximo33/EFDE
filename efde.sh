@@ -64,7 +64,7 @@ showVersion(){
 }
 
 openMoreInfo(){
-  url="https://gitlab.com/dockerizations/efde"
+  url="https://github.com/mmaximo33/efde"
   xdg-open $url
 }
 
@@ -76,7 +76,7 @@ removeEfde(){
   echo "We remove all elements related to ${project_run^^}"
   sleep 6s
   echo -e "\nRemember that you can reinstall it by following these steps\n"
-  sleep 10s
+  sleep 3s
   openMoreInfo
 }
 

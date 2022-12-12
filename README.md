@@ -23,7 +23,7 @@ I realized that today there are several elements (services, tools, systems, othe
 
 EFDE aims to standardize, automate and simplify the deployment or preparation of local development environments for different projects. Without losing the flexibility that they can be customized or adjusted according to the need or complexity of the project.
 
-EFDE is not the definitive solution to your problems, sooner or later you will have to understand exactly what is happening behind the things, but you will acquire the answers of what, when, where, for what and why, as you use it. .
+EFDE is not the definitive solution to your problems, sooner or later you will have to understand exactly what is happening behind the things, but you will acquire the answers of what, when, where, for what and why, as you use it.
 
 Who is it for?
 It originally arises to help understand and expedite the induction process for those new members of a project or those people who are starting out in the world of programming and are not entirely clear about some knowledge, concepts or bases of services, applications or implementations. .
@@ -83,6 +83,7 @@ Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - m
 
 ## Contributing
 
+There is still a lot to do with this small project if you are invited to join.
 Please see [CONTRIBUTING](./documentation/CONTRIBUTING.md) for details.
 
 ## License

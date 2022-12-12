@@ -4,9 +4,7 @@ import common as common
 
 dataFile = {'name': '+Symfony', 'description': 'Help managing Symfony elements'}
 
-pathDokerCompose = 'cd .. && '
 pathDokerCompose = ''
-menuReturn =  ''
 menu_option = [
     {"code": "createapp",   "title": "Create app", 'description': 'Create a new symfony application'},
     {"code": "console",   "title": "Console", 'description': 'Work with the symfony console'},
@@ -60,7 +58,7 @@ if __name__ == '__main__':
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
-        opt=input(common.msgColor('\nEnter your option: ','OKGREEN'))
+        opt=input(common.msgColor('\nEnter your option: ','SUCCESS'))
 
         if opt == 'q': exit()
         elif opt == 'r': 
@@ -73,7 +71,7 @@ if __name__ == '__main__':
             code = menu_option[int(opt)]['code']
             switchOption(code)
 
-            input(common.msgColor('\nPress enter to return to the menu','OKGREEN'))
+            input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
             common.cli('clear')
         else:
             input(common.msgColor(f'The option "{opt}" is not in the list. Press enter to continue','DANGER'))

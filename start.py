@@ -18,8 +18,11 @@ menu_option_start = [
     {"code": "moreInfo",  "title": "More Info", 'description': 'More Info'},
     {"code": "symfony",  "title": "Install Symfony", 'description': 'More Info'},
     {"code": "magento",  "title": "Coming soon - Install Magento", 'description': 'Coming soon'},
-    {"code": "wordpress",  "title": "Coming soon - Install wordpress", 'description': 'Coming soon'},
-    {"code": "prestashop",  "title": "Coming soon - Install prestashop", 'description': 'Coming soon'},
+    {"code": "wordpress",  "title": "Coming soon - Install Wordpress", 'description': 'Coming soon'},
+    {"code": "wocommerce",  "title": "Coming soon - Install WooCommerce", 'description': 'Coming soon'},
+    {"code": "prestashop",  "title": "Coming soon - Install Prestashop", 'description': 'Coming soon'},
+    {"code": "drupal",  "title": "Coming soon - Install Drupal", 'description': 'Coming soon'},
+    {"code": "react",  "title": "Coming soon - Install React", 'description': 'Coming soon'},
 ]
 
 menu_option_implement = [
@@ -55,7 +58,14 @@ def checkEnvironment():
 def checkUpdate():
     response = codecs.decode(common.cliReturn('cd ~/.efde;git pull'),'UTF-8')
     if not response == 'Already up to date.\n':
-        print("ACTUALIZAR REPO")
+        confirm = common.checkYesNo(common.msgColor('There is a new version, do you want to update EFDE?','WARNING'),'n')
+        if confirm: EfdeUpdate()
+
+def EfdeUpdate():
+    print(common.msgColor('Updating...','INFO_CYAN'))
+    common.cli(f'cd ~/.efde; git checkout main;git reset --hard origin/main;git pull origin main')
+    exit()
+
 
 def setNameProject():
     while True:
@@ -78,21 +88,10 @@ def switchOption(code):
     elif code == 'symfony':
         installSymfony()
     else: 
-        print('Coming soon')
-
-def prepareEnvironment(type):
-
-    # Preguntar nombre del directorio
-    # Descargar la dockerizacion
-    # Descargar el bin/ del proyecto/branch
-    print('prepare')
-
-#def checkUpdate():
-#    print(common.msgColor('Check Update','INFO_CYAN'))
-#    common.cli(f'git checkout master;git reset --hard origin/master;git pull origin master')
+        print(common.msgColor('Coming soon...','DANGER'))
 
 def moreInfo():
-    url = 'https://gitlab.com/dockerizations/efde'
+    url = "https://github.com/mmaximo33/efde"
     if sys.platform == 'darwin':    # in case of OS X
         subprocess.Popen(['open', url])
     else:
@@ -100,12 +99,14 @@ def moreInfo():
 
 
 if __name__ == '__main__':
-#    help(checkEfdeEnv)
+    checkUpdate()
+
+    menu_current = menu_option_start # default menu
+
     efdeConfigExists = checkConfigEfdeEnv()
     if efdeConfigExists:
-        menu_current = checkEnvironment()
-    else:
-        menu_current = menu_option_start
+        menu_current = checkEnvironment() # environment menu
+        
 
     showHelper = False
     while True:
@@ -122,14 +123,13 @@ if __name__ == '__main__':
         elif opt.isnumeric() and (int(opt) in range(0,len(menu_current))):
             code = menu_current[int(opt)]['code']
             if efdeConfigExists:
-                print(common.msgColor('\nYou moved to','OKGREEN'))
+                print(common.msgColor('\nYou moved to','SUCCESS'))
                 common.cli("clear")
                 common.cli(f'python3 {efdePath}/bin/{code}.py')
             else: 
                 switchOption(code)
-                input(common.msgColor('\nPress enter to return to the menu','OKGREEN'))
+                input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
                 common.cli("clear")
-
         else:
             input(common.msgColor(f'The option "{opt}" is not in the list. Press enter to continue','DANGER'))
             common.cli('clear')

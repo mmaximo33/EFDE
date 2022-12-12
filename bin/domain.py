@@ -35,7 +35,7 @@ def configureLocalCheck():
     inEnvExists = common.fileEnvReading(varEnv)
     checkInEnvExists = not inEnvExists == None and not inEnvExists ==''
     if not checkInEnvExists : msgInEnv = common.msgColor(f'\n    The variable was not configured {common.filePathEnv()}:{varEnv}','OKCYAN')
-    if msgInEnv == '': msgInEnv = common.msgColor(f'\n    The project domain is {inEnvExists}','OKGREEN')
+    if msgInEnv == '': msgInEnv = common.msgColor(f'\n    The project domain is {inEnvExists}','SUCCESS')
 
     # check /etc/hosts
     try:
@@ -43,7 +43,7 @@ def configureLocalCheck():
         inEtcHosts = subprocess.check_output(f'cat /etc/hosts | egrep "{inEnvExists}"', shell=True).decode()
         inEtcHostsCheckComment = ''
         if '#' in inEtcHosts: inEtcHostsCheckComment = common.msgColor('\n    But it is commented','DANGER')
-        msgInEtcHost = common.msgColor(f'\n    The domain is registered in /etc/host.','OKGREEN') + inEtcHostsCheckComment + f'\n    {inEtcHosts}'
+        msgInEtcHost = common.msgColor(f'\n    The domain is registered in /etc/host.','SUCCESS') + inEtcHostsCheckComment + f'\n    {inEtcHosts}'
 
     except subprocess.CalledProcessError as e:
         msgInEtcHost = common.msgColor('Local domain not configured in /etc/host','DANGER')
@@ -89,13 +89,13 @@ if __name__ == '__main__':
             'INFO_CYAN'
         )
     )
-    input(common.msgColor('\nPress enter to return to the menu','OKGREEN'))
+    input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
     common.cli('clear')
 
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
-        opt=input(common.msgColor('\nEnter your option: ','OKGREEN'))
+        opt=input(common.msgColor('\nEnter your option: ','SUCCESS'))
 
         if opt == 'q': exit()
         elif opt == 'r': 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
             code = menu_option[int(opt)]['code']
             switchOption(code)
 
-            input(common.msgColor('\nPress enter to return to the menu','OKGREEN'))
+            input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
             common.cli('clear')
         else:
             input(common.msgColor(f'The option "{opt}" is not in the list. Press enter to continue','DANGER'))
