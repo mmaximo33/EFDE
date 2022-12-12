@@ -1,5 +1,5 @@
 # EFDE
-# Easy and fast development environment [![efde version](https://img.shields.io/badge/version-v0.39.2-yellow.svg)][4]
+# Easy and fast development environment [![efde version](https://img.shields.io/badge/version-v1.0.0-yellow.svg)][4]
 
 ## Table of Contents
 
@@ -8,7 +8,6 @@
 - [Installing and Updating](#installing-and-updating)
   - [Install](#install)
   - [Update](#update)
-  - [Verify Installation](#verify-installation)
 - [Usage](#usage)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
