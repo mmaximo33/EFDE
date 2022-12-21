@@ -1,11 +1,12 @@
-# EFDE
-# Easy and fast development environment [efde version](https://img.shields.io/badge/version-v1.0.0-yellow.svg)
+# Easy and fast development environment (EFDE)
+
+![efde version](https://img.shields.io/badge/version-v1.0.0-yellow.svg)
 
 ## Table of Contents
 
 - [Intro](#intro)
 - [About](#about)
-- [Installing and Updating](#installing-and-updating)
+- [Installing and Updating](#install--update)
   - [Install](#install)
   - [Update](#update)
 - [Usage](#usage)
@@ -40,7 +41,9 @@ EFDE is a project designed to facilitate the management of local development env
 
 The objective of the project is to be able to manage implementations with docker such as
 
+### Released ### 
 - Symfony
+### Coming soon ###
 - Magento
 - Wordpress
 - WooCommerce
