@@ -105,7 +105,7 @@
     if [ -f $BIN_FILE ]; then
       rm $BIN_FILE
     fi
-    cp "$INSTALL_DIR/efde.sh" $BIN_FILE
+    cp "$INSTALL_DIR/setup/efde.sh" $BIN_FILE
     chmod +x $BIN_FILE
   }
 

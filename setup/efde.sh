@@ -102,4 +102,4 @@ if [[ $# -gt 0 ]] ; then
   esac
 fi
 
-python3 ~/.efde/start.py
+python3 ~/.efde/bin/start.py

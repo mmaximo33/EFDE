@@ -1,16 +1,11 @@
-import os
-import subprocess
-import webbrowser
-import sys
-import codecs
-#import bin.common as common, bin.environment as environment, bin.composer as composer, bin.domain  as domain, bin.mysql as mysql 
-from bin import common, environment, composer, domain, mysql, symfony
+import os, sys, subprocess, webbrowser, codecs
+import common, environment, composer, domain, mysql, symfony
 
 dataFile = {'name': 'efde', 'description': 'Easy and Fast Developer Enviroment'}
 
 runPath = os.getcwd()
 runPathFolder = os.path.split(os.getcwd())
-efdePath = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/.efde"
+efdePath = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}"
 efdeConfigEnvironment = "app_type"
 
 
