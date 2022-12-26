@@ -1,60 +1,84 @@
-import os, sys
-sys.path.append(os.path.dirname(__file__))
-import common as common
+import common, environment, composer
 
 dataFile = {'name': '+Symfony', 'description': 'Help managing Symfony elements'}
 
 pathDokerCompose = ''
 menu_option = [
-    {"code": "createapp",   "title": "Create app", 'description': 'Create a new symfony application'},
+    {"code": "createapp",   "title": "Create New App", 'description': 'Create a new symfony application'},
+    {"code": "clone",   "title": "Clone My App", 'description': 'Clone from a git MyApp'},
     {"code": "console",   "title": "Console", 'description': 'Work with the symfony console'},
-    {"code": "fixpermissions",   "title": "Fix permissions", 'description': 'Fix Permissions'},
+    {"code": "actionFixpermissions",   "title": "Fix permissions", 'description': 'Fix Permissions'},
 ]
 
 def switchOption(code):
-    if code in ['createapp','console','fixpermissions']: 
-        runCommands(code)
+    if code in ['createapp','clone','console','fixpermissions']: 
+        runCommandsOptions(code)
     else:
         print('You must select an option')
 
-def runCommands(action, command = ''):
-    commandDockerCompose = pathDokerCompose + "docker-compose run --rm app "    
+def runCommandsOptions(action, command = ''):
+    if action == 'createapp': actionCreateApp()
+    elif action == 'clone': actionCloneApp()
+    elif action == 'console': actionConsole()
+    elif action == 'fixpermissions': actionFixPermissions()
 
-    if action == 'createapp' :
-        if(os.path.exists('./app')): 
-            common.cli('cd ./app && ls')
-            print(common.msgColor('Verify that the app directory exists','DANGER'))
-        command = 'composer create-project symfony/website-skeleton .'
-    elif action == 'console':
-        values = ''
-        command = 'bin/console'
-        questionCommand = input(common.msgColor('Enter the command or press enter for more info: ','WARNING'))
-        if questionCommand == '': 
-            while True:
-                search = input(common.msgColor('Enter what you are looking for or press enter for the full list: ','WARNING'))
-                if search == '': 
-                    questionCommand = "list"
-                    break
+def actionCreateApp(): 
+    createAppFolder()
+    if common.isEmptyDirectory('./app', True):
+        runCommand('composer create-project symfony/website-skeleton .')
+        startDocker()
+
+
+def actionCloneApp(): 
+    createAppFolder()
+    if common.isEmptyDirectory('./app', True):
+        repository = input(common.msgColor('Enter the url of your repository: ','WARNING'))
+        common.cli(f'git clone {repository} ./app')
+        startDocker()
+        composer.managementContainer('install')
+
+def actionConsole():
+    values = ''
+    command = 'bin/console'
+    questionCommand = input(common.msgColor('Enter the command or press enter for more info: ','WARNING'))
+    if questionCommand == '': 
+        while True:
+            search = input(common.msgColor('Enter what you are looking for or press enter for the full list: ','WARNING'))
+            if search == '': 
+                break
+            else:
+                if not values == '':
+                    values = values + '|' + search
                 else:
-                    if not(values == ''):
-                        values = values + '|' + search
-                    else:
-                        values = search
-                    continue
-            if not(values ==''): questionCommand = questionCommand + ' | egrep --color=always "' + values + '"'
-        command = command + ' ' + questionCommand
-    elif action == 'fixpermissions':
-        fixPermissions()
-        return
+                    values = search
+                continue
+        
+        if not values =='' :
+            questionCommand = 'list | egrep --color=always "' + values + '"'
+        else:
+            questionCommand = 'list'
 
-    common.cli(commandDockerCompose + ' ' + command)
+    command = command + ' ' + questionCommand
+    runCommand(command)
 
-#ToDo: Review oficial documentation
-def fixPermissions():
+def actionFixPermissions(): 
+    #ToDo: Review oficial documentation
     common.cli('sudo chown -R $USER:$USER ./app')
 
+def runCommand(command):
+    common.cli("docker-compose run --rm app " + command, True)
+
+def createAppFolder():
+    if not common.existsPath('./app',True):
+        common.cli(f'mkdir ./app',True)
+        actionFixPermissions()
+
+def startDocker():
+    environment.switchOption('apache')
+    environment.switchOption('up')
+
 if __name__ == '__main__':
-    
+
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
