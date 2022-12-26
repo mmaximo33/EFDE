@@ -15,7 +15,7 @@
 
   PROJECT_NAME=EFDE
   PROJECT_FOLDER=efde
-  PROJECT_REPO_GIT=https://gitlab.com/dockerizations/efde
+  PROJECT_REPO_GIT=https://github.com/mmaximo33/efde
   PROJECT_REPO_DOWNLOAD=$PROJECT_REPO_GIT/-/archive/main/efde-main.tar.gz
 
   set -- $(locale LC_MESSAGES)

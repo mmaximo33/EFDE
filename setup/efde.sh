@@ -16,7 +16,7 @@ set -e
 # set the version and revision
 project_run="$(basename $0)"
 project_name="Easy and fast development environment"
-project_version='v1.0.0'
+project_version='v1.1.0'
 
 ######################################################################
 ########                                                     #########
