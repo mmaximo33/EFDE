@@ -1,12 +1,8 @@
-import os, sys, subprocess
-sys.path.append(os.path.dirname(__file__))
-import common as common
+import subprocess
+import common
 
 dataFile = {'name': 'Domains LCL', 'description': 'Configure local domain'}
 
-pathDokerCompose = 'cd .. && '
-pathDokerCompose = ''
-menuReturn =  ''
 menu_option = [
     {"code": "configure",  "title": "Configure", 'description': 'configure bin/.env, /etc/hosts, symfony'},
     {"code": "check",  "title": "Checks", 'description': 'Verifica, bin/.env, /etc/hosts, symfony'},

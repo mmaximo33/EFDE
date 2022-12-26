@@ -1,12 +1,7 @@
-import os, sys
-sys.path.append(os.path.dirname(__file__))
-import common as common
+import common
 
 dataFile = {'name': 'Environment', 'description': 'Help managing project containers'}
 
-PathDockerCompose = 'cd .. && '
-PathDockerCompose = ''
-#menuReturn =  ''
 menu_option = [
     {"code": "build",   "title": "Build", 'description': 'Build containers'},
     {"code": "start",   "title": "Start", 'description': 'start containers'},
@@ -33,7 +28,7 @@ def switchOption(code):
         print('You must select an option')
 
 def managementContainer(action, command = ''):
-    commandDockerCompose = PathDockerCompose + "docker-compose"
+    commandDockerCompose = "docker-compose"
     common.cli(commandDockerCompose + " ps")
     
     # Check containers

@@ -1,8 +1,6 @@
-import os
-import sys
-from dotenv import load_dotenv
+import os, sys, subprocess
 from pathlib import Path
-import subprocess
+from dotenv import load_dotenv
 
 dataFile = {'name': 'common',
             'description': 'Contains elements to reuse in other files'}
@@ -11,7 +9,6 @@ configEnv = {
     'pathBin': './bin/',
     'fileEnv': '.efde'
 }
-
 
 class bcolors:
     HEADER = '\033[95m'
@@ -148,4 +145,34 @@ def fileEnvReading(variable=''):
 def fileEnvWrite(name, value):
     with open(filePathEnv(), 'a') as f:
         f.write(f'{name}="{value}"\n')
+
+def existsPath(path, debug = False):
+    result = os.path.exists(path)
+    if not result and debug:
+        print(msgColor(f'The indicated path does not exist\n {path}','DANGER'))
+    return result
+
+def isDirectory(directory, debug = False):
+    result = existsPath(directory, debug)
+    if not result:
+        return result
+
+    result = os.path.isdir(directory) 
+    if not result and debug:
+        print(msgColor(f'The given path is not a directory\n {directory}','DANGER'))
+
+    return result
+
+def isEmptyDirectory(directory, debug = False):
+    
+    result = isDirectory(directory, debug)
+    if not result:
+        return False
+    
+    result = os.listdir(directory)
+    if result and debug:
+        print(msgColor(f'The directory is not empty. \n {directory}\n Content:','DANGER'))
+        cli(f'cd {directory} && ls -la')
+
+    return not result
 

@@ -1,64 +1,36 @@
-import os, sys
-sys.path.append(os.path.dirname(__file__))
-import common as common
+import common
+
 dataFile = {'name': 'Composer', 'description': 'Help managing composer elements'}
 
-pathDokerCompose = 'cd .. && '
-pathDokerCompose = ''
-menuReturn =  ''
 menu_option = [
     {"code": "rmvendor", "title": "Remove vendor", 'description': 'Remove vendor'},
-    {"code": "install", "title": "Install dependency", 'description': 'Composer install'},
-    {"code": "update", "title": "Update dependency", 'description': 'update dependencys'},
     {"code": "runscripts", "title": "Run scripts", 'description': 'Run Scripts'},
+    {"code": "install", "title": "Install", 'description': 'Composer install'},
+    {"code": "update", "title": "Update", 'description': 'update dependencys'},
 ]
 
 def switchOption(code):
-    if code in ['createapp','console','fixpermissions']: 
-        managementContainer(code)
+    if code in ['rmvendor', 'install','update','runscripts']: 
+        runCommandsOptions(code)
     else:
         print('You must select an option')
 
-def managementContainer(action, command = ''):
-    commandDockerCompose = pathDokerCompose + "docker-compose run --rm app "    
+def runCommandsOptions(action, command = ''):
+    if action == 'rmvendor' : runCommand('rm -rf vendor')
+    elif action == 'install': runCommand('composer install')
+    elif action == 'update': runCommand('composer update')
+    elif action == 'runscripts':
+        print(common.msgColor('Composer will run followed by what you type next.','WARNING'))
+        action = input(common.msgColor('Enter the action or properties: ','WARNING'))
+        runCommand(f'composer {action}')
+    else:
+        print('Error command.')
 
-    if action == 'createapp' : 
-        command = 'composer create-project symfony/website-skeleton .'
-    elif action == 'console':
-        command = 'bin/console'
-        questionCommand = input(common.msgColor('Enter the command or press enter for more info: ','WARNING'))
-        if questionCommand == '': 
-            values = ''
-            while True:
-                search = input(common.msgColor('Enter what you are looking for or press enter for the full list: ','WARNING'))
-                if search == '': 
-                    questionCommand = "list"
-                    break
-                else:
-                    if not(values == ''):
-                        values = values + '|' + search
-                    else:
-                        values = search
-                    continue
-            if not values =='': questionCommand = questionCommand + ' | egrep --color=always "' + values + '"'
-        command = command + ' ' + questionCommand
-    elif action == 'fixpermissions':
-        fixPermissions()
-        return
-
-    common.cli(commandDockerCompose + ' ' + command,True)
-
-def fixPermissions():
-    common.cli('sudo chown -R $USER:$USER ./app')
+def runCommand(command):
+    common.cli(f'docker-compose run --rm app {command}', True)
 
 if __name__ == '__main__':
-    print(
-        common.msgColor(
-            f"-------------------------------\nIn construction\n-------------------------------",
-            'INFO_CYAN'
-        )
-    )
-    input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
+
     common.cli('clear')
     showHelper = False
     while True:

@@ -1,8 +1,7 @@
-import os, sys
-from dotenv import load_dotenv
 import codecs
-sys.path.append(os.path.dirname(__file__))
-import common as common
+from dotenv import load_dotenv
+
+import common
 
 dataFile = {'name': 'Mysql', 'description': 'Help managing mysql elements'}
 
@@ -54,7 +53,14 @@ def switchOption(code):
 
 
 if __name__ == '__main__':
-    
+    print(
+        common.msgColor(
+            f"-------------------------------\nIn construction\n-------------------------------",
+            'INFO_CYAN'
+        )
+    )
+    input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
+    common.cli('clear')
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
