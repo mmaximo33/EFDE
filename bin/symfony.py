@@ -7,7 +7,7 @@ menu_option = [
     {"code": "createapp",   "title": "Create New App", 'description': 'Create a new symfony application'},
     {"code": "clone",   "title": "Clone My App", 'description': 'Clone from a git MyApp'},
     {"code": "console",   "title": "Console", 'description': 'Work with the symfony console'},
-    {"code": "actionFixpermissions",   "title": "Fix permissions", 'description': 'Fix Permissions'},
+    {"code": "fixpermissions",   "title": "Fix permissions", 'description': 'Fix Permissions'},
 ]
 
 def switchOption(code):
@@ -74,6 +74,7 @@ def createAppFolder():
         actionFixPermissions()
 
 def startDocker():
+    actionFixPermissions()
     environment.switchOption('apache')
     environment.switchOption('up')
 

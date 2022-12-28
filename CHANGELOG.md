@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed 
 ### Removed
 
+## [1.1.2] AAAA-MM-DD
+### Fixed 
+- (Symfony): #7 Fix permission to folder ./app
+
 ## [1.1.1] 2022-12-27
 ### Fixed 
 - (Symfony): Fix createapp script sequence
