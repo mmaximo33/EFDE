@@ -25,8 +25,8 @@ def runCommandsOptions(action, command = ''):
 def actionCreateApp(): 
     createAppFolder()
     if common.isEmptyDirectory('./app', True):
-        runCommand('composer create-project symfony/website-skeleton .')
         startDocker()
+        runCommand('composer create-project symfony/website-skeleton .')
 
 
 def actionCloneApp(): 
