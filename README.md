@@ -1,6 +1,6 @@
 # Easy and fast development environment (EFDE)
 
-![efde version](https://img.shields.io/badge/version-v1.0.0-yellow.svg)
+![efde version](https://img.shields.io/badge/version-v1.1.1-yellow.svg)
 
 ## Table of Contents
 
