@@ -10,19 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed 
 ### Removed
 
-## [1.1.2] AAAA-MM-DD
+## [1.1.1] 2022-12-28
 ### Fixed 
+- (Symfony): Fix createapp script sequence
 - (Symfony): #7 Fix permission to folder ./app
 - (Symfony): #8 Remove environment variable from docker-compose.yml
 - (Symfony): #9 PMA login as root user
 
-
-## [1.1.1] 2022-12-27
-### Fixed 
-- (Symfony): Fix createapp script sequence
-
 ## [1.1.0] 2022-12-26
-
 ### Added
 - #2 Symfony - Add ability to clone existing project
 ### Changed
