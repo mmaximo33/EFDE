@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.2] AAAA-MM-DD
 ### Fixed 
 - (Symfony): #7 Fix permission to folder ./app
+- (Symfony): #8 Remove environment variable from docker-compose.yml
+
 
 ## [1.1.1] 2022-12-27
 ### Fixed 

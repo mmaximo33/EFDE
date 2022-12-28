@@ -17,9 +17,6 @@ services:
         build:
             context: .
             dockerfile: ./.docker/php/Dockerfile
-        environment:
-            APP_ENV: dev
-            DATABASE_URL: mysql://root:secret@db:3306/symfony
         expose:
             - 9000
         volumes:
