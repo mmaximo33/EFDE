@@ -2,5 +2,5 @@ MYSQL_ROOT_PASSWORD=efderoot
 MYSQL_USER=efdeuser
 MYSQL_PASSWORD=efdepassword
 PMA_HOSTS=db
-PMA_USER=efdeuser
-PMA_PASSWORD=efdepassword
+PMA_USER=root
+PMA_PASSWORD=efderoot
