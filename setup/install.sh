@@ -198,6 +198,12 @@
     sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt-get update
     sudo apt-get install python3.8
+    efde_python_dependecy_install
+  }
+  
+  efde_python_dependecy_install() {
+    sudo apt install python3-pip
+    pip3 install python-dotenv
   }
 
   efde_git_install() {
@@ -282,8 +288,8 @@
   #
   efde_reset() {
     unset -f efde_do_install efde_git_configure efde_git_install efde_python_install \
-      efde_project_install_from_script efde_project_install_from_git efde_create_bin \
-      efde_latest_version efde_install_dir efde_default_install_dir efde_echo efde_has \
+      efde_python_dependecy_install efde_project_install_from_script efde_project_install_from_git \
+      efde_create_bin efde_latest_version efde_install_dir efde_default_install_dir efde_echo efde_has \
       efde_input_response efde_source efde_input_yes_no
   }
 
