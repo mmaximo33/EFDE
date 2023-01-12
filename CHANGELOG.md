@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed 
 ### Removed
 
+
+## [Unreleased] AAAA-MM-DD
+### Changed
+- EFDE: #10 Disable automatic EFDE update - Available by parameter --update
+
 ## [1.1.1] 2022-12-28
 ### Fixed 
 - (Symfony): Fix createapp script sequence

@@ -49,19 +49,6 @@ def checkEnvironment():
     
     return menu_current
 
-
-def checkUpdate():
-    response = codecs.decode(common.cliReturn('cd ~/.efde;git pull'),'UTF-8')
-    if not response == 'Already up to date.\n':
-        confirm = common.checkYesNo(common.msgColor('There is a new version, do you want to update EFDE?','WARNING'),'n')
-        if confirm: EfdeUpdate()
-
-def EfdeUpdate():
-    print(common.msgColor('Updating...','INFO_CYAN'))
-    common.cli(f'cd ~/.efde; git checkout main;git reset --hard origin/main;git pull origin main')
-    exit()
-
-
 def setNameProject():
     while True:
         projectName = input(f'Enter the project name [my-project]\nProject Name: ')
@@ -94,8 +81,6 @@ def moreInfo():
 
 
 if __name__ == '__main__':
-    checkUpdate()
-
     menu_current = menu_option_start # default menu
 
     efdeConfigExists = checkConfigEfdeEnv()
