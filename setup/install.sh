@@ -2,14 +2,12 @@
 #
 # EFDE             : Easy and fast development environment
 # Author           : Marucci Maximo (https://mmaximo33.github.io/cv/)
-# Created On       : 2022-11-01
-# Last Modified By : Marucci Maximo
-# Last Modified On : 2022-11-27
-# Status           : construction
-# GitLab           : https://gitlab.com/dockerizations/efde
 # GitHub           : https://github.com/mmaximo33/efde
-# Description      :
-
+# GitLab           : https://gitlab.com/dockerizations/efde
+# Description:
+#   This script is in charge of carrying out the installation
+# ToDo:
+#   Review instalation processo for ZSH
 
 { # this ensures the entire script is downloaded #
 
@@ -99,12 +97,15 @@
     local INSTALL_DIR
     INSTALL_DIR="$(efde_install_dir)"
     local BIN_FILE
-    BIN_FILE="$HOME/bin/efde"
+    BIN_DIR="$HOME/bin"
+    BIN_FILE="$BIN_DIR/efde"
 
     efde_echo >&2 "=> Creating $BIN_FILE"
     if [ -f $BIN_FILE ]; then
       rm $BIN_FILE
     fi
+
+    mkdir -p $BIN_DIR
     cp "$INSTALL_DIR/setup/efde.sh" $BIN_FILE
     chmod +x $BIN_FILE
   }
@@ -189,7 +190,7 @@
   }
 
   efde_project_install_from_script() {
-    echo "Not available"
+    efde_echo "Not available"
   }
 
   efde_python_install() {

@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] AAAA-MM-DD
 ### Changed
 - EFDE: #10 Disable automatic EFDE update - Available by parameter --update
+### Fixed 
+- EFDE: #11 installation on clean ubuntu - $HOME/bin
 
 ## [1.1.1] 2022-12-28
 ### Fixed 
