@@ -58,14 +58,14 @@ The objective of the project is to be able to manage implementations with docker
 The EFDE installation script. It will check and recommend the installation of the necessary packages for its proper functioning.
 Anyway, if you want to know more, you can see the following list with the official documentation
 
-- For downloads
-  - ![GIT](https://git-scm.com/book/en/Getting-Started-Installing-Git) or ![CURL](https://curl.se/docs/install.html) or ![WGET](https://www.gnu.org/software/wget/)
+- For download
+  - [GIT](https://git-scm.com/book/en/Getting-Started-Installing-Git) or [CURL](https://curl.se/docs/install.html) or [WGET](https://www.gnu.org/software/wget/)
 - For run
-  - ![python3](https://wiki.python.org/moin/BeginnersGuide/Download)
-  - ![pip][https://packaging.python.org/en/latest/guides/installing-using-linux-tools/?highlight=install%20python3-pip#debian-ubuntu]
+  - [python3](https://wiki.python.org/moin/BeginnersGuide/Download)
+  - [pip](https://packaging.python.org/en/latest/guides/installing-using-linux-tools/?highlight=install%20python3-pip#debian-ubuntu)
 - Implement
-  - ![docker](https://docs.docker.com/engine/install/ubuntu/)
-  - ![docker-compose](https://docs.docker.com/compose/install/other/)
+  - [docker](https://docs.docker.com/engine/install/ubuntu/)
+  - [docker-compose](https://docs.docker.com/compose/install/other/)
 
 ### Install
 
