@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased] AAAA-MM-DD
+### Added 
+- EFDE: #14 Installation - Option by script due to lack of git and refactoring of the install.sh scripts
 ### Changed
 - EFDE: #10 Disable automatic EFDE update - Available by parameter --update
 ### Fixed 
@@ -20,10 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.1] 2022-12-28
 ### Fixed 
-- (Symfony): Fix createapp script sequence
-- (Symfony): #7 Fix permission to folder ./app
-- (Symfony): #8 Remove environment variable from docker-compose.yml
-- (Symfony): #9 PMA login as root user
+- Symfony: Fix createapp script sequence
+- Symfony: #7 Fix permission to folder ./app
+- Symfony: #8 Remove environment variable from docker-compose.yml
+- Symfony: #9 PMA login as root user
 
 ## [1.1.0] 2022-12-26
 ### Added

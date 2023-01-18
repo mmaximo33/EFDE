@@ -11,20 +11,13 @@
 
 { # this ensures the entire script is downloaded #
 
+  #######################################################################
+  # INIT section
+  #----------------------------------------------------------------------
   PROJECT_NAME=EFDE
   PROJECT_FOLDER=efde
+  PROJECT_VERSION="1.1.1"
   PROJECT_REPO_GIT=https://github.com/mmaximo33/efde
-  PROJECT_REPO_DOWNLOAD=$PROJECT_REPO_GIT/-/archive/main/efde-main.tar.gz
-
-  set -- $(locale LC_MESSAGES)
-  yesexpr="$1"
-  noexpr="$2"
-  yesword="$3"
-  noword="$4"
-
-  efde_has() {
-    type "$1" >/dev/null 2>&1
-  }
 
   efde_echo() {
     command printf %s\\n "$*" 2>/dev/null
@@ -36,20 +29,136 @@
     exit 1
   fi
 
-  efde_input_yes_no() {
-    while true; do
-      read -p "$1 [${yesword}/${noword}] " yn
-      if [[ "$yn" =~ $yesexpr ]]; then
-        $2
-        break
-      fi
-      if [[ "$yn" =~ $noexpr ]]; then
-        $3
-        break
-      fi
+  #######################################################################
+  # Dialog section
+  #----------------------------------------------------------------------
+
+  # Read a single char from /dev/tty, prompting with "$*"
+  # Note: pressing enter will return a null string. Perhaps a version terminated with X and then remove it in caller?
+  # See https://unix.stackexchange.com/a/367880/143394 for dealing with multi-byte, etc.
+  efde_get_keypress() {
+    local REPLY IFS=
+    printf >/dev/tty '%s' "$*"
+    [[ $ZSH_VERSION ]] && read -rk1 # Use -u0 to read from STDIN
+    # See https://unix.stackexchange.com/q/383197/143394 regarding '\n' -> ''
+    [[ $BASH_VERSION ]] && read </dev/tty -rn1
+    printf '%s' "$REPLY"
+  }
+
+  # Get a y/n from the user, return yes=0, no=1 enter=$2
+  # Prompt using $1.
+  # If set, return $2 on pressing enter, useful for cancel or defualting
+  efde_get_yes_keypress() {
+    local prompt="${1:-Are you sure [y/n]? }"
+    local enter_return=$2
+    local REPLY
+    # [[ ! $prompt ]] && prompt="[y/n]? "
+    while REPLY=$(efde_get_keypress "$prompt"); do
+      [[ $REPLY ]] && printf '\n' # $REPLY blank if user presses enter
+      case "$REPLY" in
+      Y | y) return 0 ;;
+      N | n) return 1 ;;
+      '') [[ $enter_return ]] && return "$enter_return" ;;
+      esac
     done
   }
 
+  # Credit: http://unix.stackexchange.com/a/14444/143394
+  # Prompt to confirm, defaulting to NO on <enter>
+  # Usage: confirm "Dangerous. Are you sure?" && rm *
+  efde_confirm() {
+    local prompt="${*:-Are you sure} [y/N]? "
+    efde_get_yes_keypress "$prompt" 1
+  }
+
+  # Prompt to confirm, defaulting to YES on <enter>
+  efde_confirm_yes() {
+    local prompt="${*:-Are you sure} [Y/n]? "
+    efde_get_yes_keypress "$prompt" 0
+  }
+
+  efde_input_response() {
+    read -p "$1 " RESPONSE
+    echo $RESPONSE
+  }
+
+  # ToDo: Review install for version
+  efde_latest_version() {
+    efde_echo "$PROJECT_VERSION"
+  }
+
+  #######################################################################
+  # Requiriments section
+  #----------------------------------------------------------------------
+  efde_has() {
+    type "$1" >/dev/null 2>&1
+  }
+
+  efde_check_requirements() {
+    local errors
+    efde_print_step requirements
+
+    if ! efde_has git; then
+      efde_echo "\nYou must install GIT to download ${PROJECT_NAME}"
+      if efde_confirm_yes "Do you want to install GIT now?"; then
+        efde_git_install
+      elif ! efde_has curl && ! efde_has wget; then
+        efde_echo "\nYou must install CURL to download ${PROJECT_NAME}"
+        efde_confirm_yes "Do you want to install CURL now?" && efde_curl_install || errors="$errors\n==> You need to have GIT or CURL or WGET installed"
+      fi
+    fi
+
+    if ! efde_has python3; then
+      efde_echo >&2 "$PROJECT_NAME requires having python3 to work"
+      efde_confirm_yes "Do you want to install python3 now?" && efde_python_install || errors="$errors\n==> You need to have python3"
+    elif ! efde_has pip; then
+      efde_echo >&2 "$PROJECT_NAME requires having python3-pip (dependencies) to work"
+      efde_confirm_yes "Do you want to install python3-pip now?" && efde_python_dependecy_install || errors="$errors\n==> You need to have python3-pip (dependencies)"
+    fi
+
+    if [ ! -z "$errors" ]; then
+      efde_echo "=> The following problems were detected:"
+      echo -e "$errors"
+      exit 1
+    fi
+
+    efde_echo "=> Requirements OK"
+  }
+
+  efde_curl_install() {
+    sudo apt install -y curl
+  }
+
+  efde_git_install() {
+    sudo apt install -y git-all
+    efde_git_configure
+  }
+
+  efde_git_configure() {
+    efde_echo >&2 "Let's load the initial configuration for git"
+    git config --global user.email "$(efde_input_response 'Whats is your email?')"
+    git config --global user.name "$(efde_input_response 'Whats is your name?')"
+    git config -l | egrep user.
+    efde_echo >&2 "You can all the configuration with 'git config -l'"
+    efde_input_response 'Press enter to continue'
+  }
+
+  efde_python_install() {
+    sudo apt install -y software-properties-common
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt update
+    sudo apt install -y python3.8
+    efde_python_dependecy_install
+  }
+
+  efde_python_dependecy_install() {
+    sudo apt install -y python3-pip
+    pip3 install python-dotenv
+  }
+
+  #######################################################################
+  # Installation section
+  #----------------------------------------------------------------------
   efde_source() {
     local EFDE_GIT_REPO
     EFDE_GIT_REPO=$PROJECT_REPO_GIT
@@ -63,18 +172,13 @@
     if [ "_$EFDE_METHOD" = "_git" ] || [ -z "$EFDE_METHOD" ]; then
       EFDE_SOURCE_URL="${EFDE_GIT_REPO}.git"
     elif [ "_$EFDE_METHOD" = "_script" ]; then
-      EFDE_SOURCE_URL="${EFDE_GIT_REPO}"
+      EFDE_SOURCE_URL="${EFDE_GIT_REPO}/archive/refs/heads/main.zip"
     else
       efde_echo >&2 "Unexpected value \"$EFDE_METHOD\" for \$EFDE_METHOD"
       return 1
     fi
 
     efde_echo "$EFDE_SOURCE_URL"
-  }
-
-  efde_input_response() {
-    read -p "$1 " RESPONSE
-    echo $RESPONSE
   }
 
   efde_default_install_dir() {
@@ -87,10 +191,6 @@
     else
       efde_default_install_dir
     fi
-  }
-
-  efde_latest_version() {
-    efde_echo "1.0.0"
   }
 
   efde_create_bin() {
@@ -110,29 +210,105 @@
     chmod +x $BIN_FILE
   }
 
-  efde_project_install_from_git() {
-    if ! efde_has git; then
-      efde_echo "You must install git to download ${PROJECT_NAME}"
-      efde_input_yes_no 'Do you want to install git now?' efde_git_install
+  efde_print_step() {
+    efde_echo >&2 ""
+    efde_echo >&2 "#######################################################################"
+    case $1 in
+    "requirements")
+      efde_echo >&2 "# Verifying requirements for $PROJECT_NAME"
+      efde_echo >&2 "# Download: GIT or CURL or WGET"
+      efde_echo >&2 "# Run: python3 y pip"
+      efde_echo >&2 "# Implement: docker and docker-compose"
+      ;;
+    "install")
+      efde_echo >&2 "# Installing $PROJECT_NAME"
+      ;;
+    "end")
+      efde_echo >&2 "# $PROJECT_NAME is successfully installed and configured."
+      efde_echo >&2 "# Select the directory and create your new project"
+      efde_echo >&2 "# By running '$ efde --help'"
+      ;;
+    *)
+      efde_echo >&2 "# Error step"
+    ;;
+    esac
+    
+    efde_echo >&2 "-----------------------------------------------------------------------"
+  }
+
+  efde_do_install() {
+    efde_print_step install
+
+    if [ -n "${EFDE_DIR-}" ] && ! [ -d "${EFDE_DIR}" ]; then
+      if [ -e "${EFDE_DIR}" ]; then
+        efde_echo >&2 "File \"${EFDE_DIR}\" has the same name as installation directory."
+        exit 1
+      fi
+
+      if [ "${EFDE_DIR}" = "$(efde_default_install_dir)" ]; then
+        mkdir "${EFDE_DIR}"
+      else
+        efde_echo >&2 "You have \$EFDE_DIR set to \"${EFDE_DIR}\", but that directory does not exist. Check your profile files and environment."
+        exit 1
+      fi
     fi
 
-    efde_echo "#######################################################################"
+    # Disable the optional which check, https://www.shellcheck.net/wiki/SC2230
+    # shellcheck disable=SC2230
+    if efde_has xcode-select && [ "$(
+      xcode-select -p >/dev/null 2>/dev/null
+      echo $?
+    )" = '2' ] && [ "$(which git)" = '/usr/bin/git' ] && [ "$(which curl)" = '/usr/bin/curl' ]; then
+      efde_echo >&2 'You may be on a Mac, and need to install the Xcode Command Line Developer Tools.'
+      # shellcheck disable=SC2016
+      efde_echo >&2 'If so, run `xcode-select --install` and try again. If not, please report this!'
+      exit 1
+    fi
 
+    # Install repo
+    if [ -z "${METHOD}" ]; then
+      # Autodetect install method
+      if efde_has git; then
+        efde_project_install_from_git
+      elif efde_has curl || efde_has wget; then
+        efde_project_install_from_script
+      else
+        efde_echo >&2 "You need git, curl, or wget to install $PROJECT_NAME"
+        exit 1
+      fi
+    elif [ "${METHOD}" = 'git' ]; then
+      if ! efde_has git; then
+        efde_echo >&2 "You need git to install $PROJECT_NAME"
+        exit 1
+      fi
+      efde_project_install_from_git
+    elif [ "${METHOD}" = 'script' ]; then
+      if ! efde_has curl && ! efde_has wget; then
+        efde_echo >&2 "You need curl or wget to install $PROJECT_NAME"
+        exit 1
+      fi
+      efde_project_install_from_script
+    else
+      efde_echo >&2 "The environment variable \$METHOD is set to \"${METHOD}\", which is not recognized as a valid installation method."
+      exit 1
+    fi
+
+    efde_reset
+  }
+
+  efde_project_install_from_git() {
     local INSTALL_DIR
     INSTALL_DIR="$(efde_install_dir)"
-
-    local fetch_error
 
     if [ -d "$INSTALL_DIR/.git" ]; then
       # Updating repo
       efde_echo "=> $PROJECT_NAME is already installed in $INSTALL_DIR"
       efde_echo "==> Updating repository"
-      if (command git checkout main && git reset --hard origin/main && git pull origin main) >/dev/null 2>&1; then
+      if (command cd $INSTALL_DIR; git checkout main; git reset --hard origin/main; git pull origin main) >/dev/null 2>&1; then
         efde_echo >&2 "===> Successfully updated!"
       else
         efde_echo >&2 "===> Failed to updated ${PROJECT_NAME} repo. Please report this!"
       fi
-
     else
       # Installing
       efde_echo "=> Downloading $PROJECT_NAME from git to '$INSTALL_DIR'"
@@ -181,119 +357,73 @@
 
     #
     efde_create_bin
+    efde_print_step end
 
-    efde_echo "#######################################################################"
-    efde_echo "$PROJECT_NAME is successfully installed and configured."
-    efde_echo "Select the directory and create your new project by running '$ efde'"
-    efde_echo "-----------------------------------------------------------------------"
-    efde --help
+    command efde --help
   }
 
+  # ToDo: Improve this scripts
   efde_project_install_from_script() {
-    efde_echo "Not available"
+    local HOME_DIR
+    HOME_DIR=$(printf %s "${HOME}")
+    local INSTALL_DIR
+    INSTALL_DIR="$(efde_install_dir)"
+    local EFDE_SOURCE_SCRIPT 
+    EFDE_SOURCE_SRIPT="$(efde_source script)"
+    local EFDE_SOURCE_FILE
+    EFDE_SOURCE_FILE=$(basename $EFDE_SOURCE_SRIPT)
+    local EFDE_UNZIP_FOLDER
+    EFDE_UNZIP_FOLDER=$(basename $EFDE_SOURCE_SRIPT .zip)
+
+    efde_project_download -LJO "$EFDE_SOURCE_SRIPT" --output-dir "$HOME_DIR"
+    
+    command unzip -uqq "$HOME_DIR/$PROJECT_FOLDER-$EFDE_SOURCE_FILE" -d $HOME_DIR
+    
+    command mv "$HOME_DIR/$PROJECT_FOLDER-$EFDE_UNZIP_FOLDER" $INSTALL_DIR
+    command rm "$HOME_DIR/$PROJECT_FOLDER-$EFDE_SOURCE_FILE"
+
+    efde_create_bin
+    
+    efde_print_step end
+
+    command efde --help
   }
 
-  efde_python_install() {
-    sudo apt-get install software-properties-common
-    sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt-get update
-    sudo apt-get install python3.8
-    efde_python_dependecy_install
-  }
-  
-  efde_python_dependecy_install() {
-    sudo apt install python3-pip
-    pip3 install python-dotenv
-  }
-
-  efde_git_install() {
-    sudo apt install git-all
-  }
-
-  efde_git_configure() {
-    efde_echo >&2 "Let's load the initial configuration for git"
-    git config --global user.email "$(efde_input_response 'Whats is your email?')"
-    git config --global user.name "$(efde_input_response 'Whats is your name?')"
-    git config -l | egrep user.
-    efde_echo >&2 "You can all the configuration with 'git config -l'"
-    efde_input_response 'Press enter to continue'
-  }
-
-  efde_do_install() {
-    if [ -n "${EFDE_DIR-}" ] && ! [ -d "${EFDE_DIR}" ]; then
-      if [ -e "${EFDE_DIR}" ]; then
-        efde_echo >&2 "File \"${EFDE_DIR}\" has the same name as installation directory."
-        exit 1
-      fi
-
-      if [ "${EFDE_DIR}" = "$(efde_default_install_dir)" ]; then
-        mkdir "${EFDE_DIR}"
-      else
-        efde_echo >&2 "You have \$EFDE_DIR set to \"${EFDE_DIR}\", but that directory does not exist. Check your profile files and environment."
-        exit 1
-      fi
+  efde_project_download() {
+    if efde_has "curl"; then
+      curl --fail --compressed -q "$@"
+    elif efde_has "wget"; then
+      # Emulate curl with wget
+      ARGS=$(efde_echo "$@" | command sed -e 's/--progress-bar /--progress=bar /' \
+        -e 's/--compressed //' \
+        -e 's/--fail //' \
+        -e 's/-L //' \
+        -e 's/-I /--server-response /' \
+        -e 's/-s /-q /' \
+        -e 's/-sS /-nv /' \
+        -e 's/-o /-O /' \
+        -e 's/-C - /-c /')
+      # shellcheck disable=SC2086
+      eval wget $ARGS
     fi
-
-    # Disable the optional which check, https://www.shellcheck.net/wiki/SC2230
-    # shellcheck disable=SC2230
-    if efde_has xcode-select && [ "$(
-      xcode-select -p >/dev/null 2>/dev/null
-      echo $?
-    )" = '2' ] && [ "$(which git)" = '/usr/bin/git' ] && [ "$(which curl)" = '/usr/bin/curl' ]; then
-      efde_echo >&2 'You may be on a Mac, and need to install the Xcode Command Line Developer Tools.'
-      # shellcheck disable=SC2016
-      efde_echo >&2 'If so, run `xcode-select --install` and try again. If not, please report this!'
-      exit 1
-    fi
-
-    #Check python3
-    if ! efde_has python3; then
-      efde_echo >&2 "$PROJECT_NAME requires having python3 to work"
-      efde_input_yes_no 'Do you want to install python3 now?' efde_python_install
-    fi
-
-    # Install repo
-    if [ -z "${METHOD}" ]; then
-      # Autodetect install method
-      if efde_has git; then
-        efde_project_install_from_git
-      elif efde_has curl || efde_has wget; then
-        efde_project_install_from_script
-      else
-        efde_echo >&2 "You need git, curl, or wget to install $PROJECT_NAME"
-        exit 1
-      fi
-    elif [ "${METHOD}" = 'git' ]; then
-      if ! efde_has git; then
-        efde_echo >&2 "You need git to install $PROJECT_NAME"
-        exit 1
-      fi
-      efde_project_install_from_git
-    elif [ "${METHOD}" = 'script' ]; then
-      if ! efde_has curl && ! efde_has wget; then
-        efde_echo >&2 "You need curl or wget to install $PROJECT_NAME"
-        exit 1
-      fi
-      efde_project_install_from_script
-    else
-      efde_echo >&2 "The environment variable \$METHOD is set to \"${METHOD}\", which is not recognized as a valid installation method."
-      exit 1
-    fi
-
   }
 
+  #######################################################################
+  # Clear section
   #
   # Unsets the various functions defined
   # during the execution of the install script
-  #
+  #----------------------------------------------------------------------
   efde_reset() {
     unset -f efde_do_install efde_git_configure efde_git_install efde_python_install \
       efde_python_dependecy_install efde_project_install_from_script efde_project_install_from_git \
       efde_create_bin efde_latest_version efde_install_dir efde_default_install_dir efde_echo efde_has \
-      efde_input_response efde_source efde_input_yes_no
+      efde_input_response efde_source efde_get_keypress efde_get_yes_keypress efde_confirm efde_confirm_yes \
+      efde_project_download efde_print_step
   }
 
-  [ "_$EFDE_ENV" = "_testing" ] || efde_do_install
+  [ "_$EFDE_ENV" = "_testing" ] || efde_check_requirements
+  efde_do_install
 
 } # this ensures the entire script is downloaded #
 

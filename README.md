@@ -43,6 +43,7 @@ The objective of the project is to be able to manage implementations with docker
 
 ### Released ### 
 - Symfony
+
 ### Coming soon ###
 - Magento
 - Wordpress
@@ -53,19 +54,39 @@ The objective of the project is to be able to manage implementations with docker
 
 ## Install & Update
 
+### Requirements
+The EFDE installation script. It will check and recommend the installation of the necessary packages for its proper functioning.
+Anyway, if you want to know more, you can see the following list with the official documentation
+
+- For downloads
+  - ![GIT](https://git-scm.com/book/en/Getting-Started-Installing-Git) or ![CURL](https://curl.se/docs/install.html) or ![WGET](https://www.gnu.org/software/wget/)
+- For run
+  - ![python3](https://wiki.python.org/moin/BeginnersGuide/Download)
+  - ![pip][https://packaging.python.org/en/latest/guides/installing-using-linux-tools/?highlight=install%20python3-pip#debian-ubuntu]
+- Implement
+  - ![docker](https://docs.docker.com/engine/install/ubuntu/)
+  - ![docker-compose](https://docs.docker.com/compose/install/other/)
+
 ### Install
 
-To **install** or **update** EFDE, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
+To **install** EFDE, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
 
 ```sh
 curl -o- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh | bash
 
-wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh| bash
+wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh | bash
 ```
 
 ### Update 
 
-EFDE checks if there is an update each time it is called, it will ask if you want to update it or postpone it to the future
+You can update in two ways
+
+- Installing it again according to [Install](#install)
+- Running efde with the **--update** option
+
+```sh
+$ efde --update
+```
 
 ## Usage
 
