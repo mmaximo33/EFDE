@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] AAAA-MM-DD
 ### Added 
 - EFDE: #14 Installation - Option by script due to lack of git and refactoring of the install.sh scripts
+- EFDE: #16 Installation - Migrate docker-compose (v1) to docker compose (v2)
+- EFDE: #18 Installation - Validate requirements for docker and docker compose
 ### Changed
 - EFDE: #10 Disable automatic EFDE update - Available by parameter --update
 ### Fixed 

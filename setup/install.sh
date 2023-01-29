@@ -1,4 +1,4 @@
-#!/usir/bin/env bash
+#!/usr/bin/env bash
 #
 # EFDE             : Easy and fast development environment
 # Author           : Marucci Maximo (https://mmaximo33.github.io/cv/)
@@ -99,11 +99,11 @@
     efde_print_step requirements
 
     if ! efde_has git; then
-      efde_echo "\nYou must install GIT to download ${PROJECT_NAME}"
+      efde_echo >&2 "\nYou must install GIT to download ${PROJECT_NAME}"
       if efde_confirm_yes "Do you want to install GIT now?"; then
         efde_git_install
       elif ! efde_has curl && ! efde_has wget; then
-        efde_echo "\nYou must install CURL to download ${PROJECT_NAME}"
+        efde_echo >&2 "\nYou must install CURL to download ${PROJECT_NAME}"
         efde_confirm_yes "Do you want to install CURL now?" && efde_curl_install || errors="$errors\n==> You need to have GIT or CURL or WGET installed"
       fi
     fi
@@ -114,6 +114,16 @@
     elif ! efde_has pip; then
       efde_echo >&2 "$PROJECT_NAME requires having python3-pip (dependencies) to work"
       efde_confirm_yes "Do you want to install python3-pip now?" && efde_python_dependecy_install || errors="$errors\n==> You need to have python3-pip (dependencies)"
+    fi
+
+    if ! efde_has docker; then
+      efde_echo >&2 "$PROJECT_NAME requires having docker to work"
+      efde_confirm_yes "Do you want to install docker now?" && efde_docker_install || errors="$errors\n==> You need to have docker"
+    else
+      if ! efde_has "docker compose"; then
+        efde_echo >&2 "$PROJECT_NAME requires having docker compose(v2) to work"
+        efde_confirm_yes "Do you want to install docker compose (v2) now?" && efde_docker_compose_install || errors="$errors\n==> You need to have docker compose (v2)"
+      fi
     fi
 
     if [ ! -z "$errors" ]; then
@@ -154,6 +164,38 @@
   efde_python_dependecy_install() {
     sudo apt install -y python3-pip
     pip3 install python-dotenv
+  }
+
+  efde_docker_install() {
+    # https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+    sudo apt install -y ca-certificates curl gnupg lsb-release
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    # https://docs.docker.com/engine/install/ubuntu/#install-docker-engine
+    sudo apt update -y
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    sudo apt install -y docker-ce docker-ce-cli containerd.io
+
+    # https://docs.docker.com/engine/install/linux-postinstall/
+    sudo groupadd docker
+    sudo usermod -aG docker $USER
+    newgrp docker
+    sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+    sudo chmod g+rwx "$HOME/.docker" -R
+    
+    #sudo systemctl restart docker
+
+    # docker compose (v2)
+    efde_docker_compose_install
+  }
+
+  efde_docker_compose_install() {
+    # https://docs.docker.com/compose/install/linux/
+    sudo apt-get install docker-compose-plugin
   }
 
   #######################################################################
