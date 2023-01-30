@@ -15,7 +15,7 @@ set -euo pipefail
 # Set the version and revision
 project_run="${0##*/}"
 project_name="Easy and Fast Development Environment"
-project_version='v1.1.1'
+project_version='v1.2.0'
 
 efde_echo() {
   command printf %s\\n "$*" 2>/dev/null

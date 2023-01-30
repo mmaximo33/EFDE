@@ -1,6 +1,6 @@
 # Easy and fast development environment (EFDE) [![follow](https://img.shields.io/badge/Follow-Youtube-red.svg)](https://www.youtube.com/@Efde.official)
 
-![efde version](https://img.shields.io/badge/version-v1.1.1-yellow.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg)
+![efde version](https://img.shields.io/badge/status-active-green.svg) ![efde version](https://img.shields.io/badge/version-v1.2.0-yellow.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ![so debian](https://img.shields.io/badge/SO-Debian-blue.svg)![so ubuntu](https://img.shields.io/badge/Ubuntu-orange.svg)
 

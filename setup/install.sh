@@ -16,7 +16,7 @@
   #----------------------------------------------------------------------
   PROJECT_NAME=EFDE
   PROJECT_FOLDER=efde
-  PROJECT_VERSION="1.1.1"
+  PROJECT_VERSION="1.2.0"
   PROJECT_REPO_GIT=https://github.com/mmaximo33/efde
 
   efde_echo() {
