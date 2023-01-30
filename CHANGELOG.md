@@ -16,8 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - EFDE: #14 Installation - Option by script due to lack of git and refactoring of the install.sh scripts
 - EFDE: #16 Installation - Migrate docker-compose (v1) to docker compose (v2)
 - EFDE: #18 Installation - Validate requirements for docker and docker compose
+- Symfony: #6 Being able to indicate the version to use 5.x or 6.x
+- Symfony: #13 Install - Establish type of application, microservice or webapp
 ### Changed
 - EFDE: #10 Disable automatic EFDE update - Available by parameter --update
+- EFDE: #1 - Partial - Create a file to save configurations 
 ### Fixed 
 - EFDE: #11 Installation on clean ubuntu - $HOME/bin
 - EFDE: #12 Installation - Missing python dependencies

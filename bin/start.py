@@ -6,7 +6,6 @@ dataFile = {'name': 'efde', 'description': 'Easy and Fast Developer Enviroment'}
 runPath = os.getcwd()
 runPathFolder = os.path.split(os.getcwd())
 efdePath = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}"
-efdeConfigEnvironment = "app_type"
 
 
 menu_option_start = [
@@ -33,46 +32,30 @@ menu_option_environment = {
 
 menu_current = []
 
-def checkConfigEfdeEnv():
-    """ TESTEO HELP """
+def check_config_efde_env():
+    return common.efde_file_env_exists()
 
-    return common.fileEnvExists(True)
-
-def checkEnvironment():
+def check_environment():
     global menu_current
-    app = common.fileEnvReading(f'{efdeConfigEnvironment}')
+    app = common.efde_file_env_read('app_type')
+
     if app == 'symfony':
-        menu_option_implement.insert(1,menu_option_environment['symfony'])
+        menu_option_implement.insert(1, menu_option_environment['symfony'])
         menu_current = menu_option_implement
     else:
         menu_current = menu_option_implement
     
     return menu_current
 
-def setNameProject():
-    while True:
-        projectName = input(f'Enter the project name [my-project]\nProject Name: ')
-        if projectName == '': continue
-        return projectName
-
-def installSymfony():
-    projectName = setNameProject()
-    projectPath = f"{runPath}/{projectName}"
-    common.cli(f'mkdir {projectPath} ',True)
-    common.cli(f'cp -rT {efdePath}/environments/symfony/ {projectPath}/',True)
-    common.cli(f'echo "app_type=symfony" > {projectPath}/{common.configEnv["fileEnv"]}',True)
-    common.cli(f'cd {projectPath};efde')
-    exit()
-
-def switchOption(code):
+def switch_option(code):
     if code == 'moreInfo':
-        moreInfo()
+        more_info()
     elif code == 'symfony':
-        installSymfony()
+        symfony.install_symfony()
     else: 
         print(common.msgColor('Coming soon...','DANGER'))
 
-def moreInfo():
+def more_info():
     url = "https://github.com/mmaximo33/efde"
     if sys.platform == 'darwin':    # in case of OS X
         subprocess.Popen(['open', url])
@@ -83,9 +66,9 @@ def moreInfo():
 if __name__ == '__main__':
     menu_current = menu_option_start # default menu
 
-    efdeConfigExists = checkConfigEfdeEnv()
+    efdeConfigExists = check_config_efde_env()
     if efdeConfigExists:
-        menu_current = checkEnvironment() # environment menu
+        menu_current = check_environment() # environment menu
         
 
     showHelper = False
@@ -107,7 +90,7 @@ if __name__ == '__main__':
                 common.cli("clear")
                 common.cli(f'python3 {efdePath}/bin/{code}.py')
             else: 
-                switchOption(code)
+                switch_option(code)
                 input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
                 common.cli("clear")
         else:

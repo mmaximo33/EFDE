@@ -1,4 +1,0 @@
-MYSQL_ROOT_PASSWORD=efderoot
-MYSQL_DATABASE=efdedb
-MYSQL_USER=efdeuser
-MYSQL_PASSWORD=efdepassword

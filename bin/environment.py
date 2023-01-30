@@ -17,9 +17,9 @@ menu_option = [
 
 ]
 
-def switchOption(code):
+def switch_option(code):
     if code in ['build', 'start', 'restart', 'stop','up','logs', 'entry','command', 'down']: 
-        managementContainer(code)
+        management_container(code)
     elif code == 'apache': common.cli('sudo service apache2 stop')
     elif code == 'stopAll': 
         shutdown = common.checkYesNo(common.msgColor('Are you sure you want to shutdown all docker containers?','DANGER'))
@@ -27,17 +27,19 @@ def switchOption(code):
     else:
         print('You must select an option')
 
-def managementContainer(action, command = ''):
-    commandDockerCompose = "docker-compose"
-    common.cli(commandDockerCompose + " ps")
-    
+def management_container(action, command = '', allContainers = False):
+    commandDockerCompose = common.command_docker_compose()
+    common.cli(f"{commandDockerCompose} ps")
+   
     # Check containers
+    container = ''
     if action in ['entry', 'command'] : 
         while True:
             container = input(common.msgColor('Enter container name: ','WARNING'))
             if not(container == ''): break
             else: continue
-    else: container = input(common.msgColor('Container name or enter for all: ','WARNING'))
+    elif not allContainers:
+        container = input(common.msgColor('Container name or enter for all: ','WARNING'))
 
     # Actions run
     if action == 'up': command = '-d'
@@ -56,10 +58,10 @@ def managementContainer(action, command = ''):
 
         if not(values ==''): command = command + ' | egrep --color=always "' + values + '"'
     elif action == 'entry':
-        action = modeInstance()
+        action = mode_instance()
         command = 'bash'
     elif action == 'command':
-        action = modeInstance()
+        action = mode_instance()
         command = input(common.msgColor('What command do you want to run?: ','WARNING'))
     elif action == 'down': 
         confirm = common.checkYesNo(common.msgColor('Are you sure you want to remove all containers?','DANGER'),'n')
@@ -76,7 +78,7 @@ def managementContainer(action, command = ''):
         True
     )
 
-def modeInstance():
+def mode_instance():
     mode = common.checkYesNo(common.msgColor('You want to open a new instance? (RUN/EXEC) =','WARNING'))
     if mode: return 'run --rm' 
     else: return 'exec'
@@ -97,7 +99,7 @@ if __name__ == '__main__':
             common.cli('clear')
         elif opt.isnumeric() and (int(opt) in range(0,len(menu_option))):
             code = menu_option[int(opt)]['code']
-            switchOption(code)
+            switch_option(code)
 
             input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
             common.cli('clear')

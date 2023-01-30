@@ -1,4 +1,4 @@
-import os, sys, subprocess
+import os, sys, subprocess, json
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -7,7 +7,7 @@ dataFile = {'name': 'common',
 
 configEnv = {
     'pathBin': './bin/',
-    'fileEnv': '.efde'
+    'efdeFileEnv': 'efde.json'
 }
 
 class bcolors:
@@ -58,6 +58,16 @@ def checkYesNo(message, default='y'):
         sys.stdout.write("Please respond with 'YES' or 'NO' \n")
         checkYesNo(message)
 
+def command_exists(command):
+    try:
+        subprocess.run(f'command -v {command}', shell=True, check=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def command_docker_compose():
+    command="docker compose"
+    return command
 
 def menu_print(data, menuData=[], showHelper=False):
     print(
@@ -92,68 +102,16 @@ def cli(command, show=False):  # ToDo: Detect operating system and apply replace
 def cliReturn(command, show=False):
     return subprocess.check_output(command, shell=True)
 
-def filePathEnv(): return (configEnv['fileEnv'])
-
-
-def fileEnvExists(view=True):
-    exists = os.path.exists(filePathEnv())
-    # ToDo: check utility
-    #if (exists and view):
-        #confirm = checkYesNo(
-        #    f"Desea ver el contenido del archivo {configEnv['fileEnv']}?", 'n')
-        #if confirm:
-        #    fileEnvGet()
-
-    return exists
-
-
-def fileEnvCreateFile():
-    cli(f"touch {filePathEnv()}")
-
-
-def fileEnvGet():
-    if (fileEnvExists(False)):
-        print('______________________________________________')
-        cli(f"cat {filePathEnv()}")
-        print('______________________________________________\n')
-
-# Set environment variables
-#os.environ['API_USER'] = 'username'
-#os.environ['API_PASSWORD'] = 'secret'
-
-# Get environment variables
-#USER = os.getenv('API_USER')
-#PASSWORD = os.environ.get('API_PASSWORD')
-
-# Getting non-existent keys
-# FOO = os.getenv('FOO') # None
-# BAR = os.environ.get('BAR') # None
-# BAZ = os.environ['BAZ'] # KeyError: key does not exist.
-
-
-def fileEnvReading(variable=''):
-    if (not (fileEnvExists(False))):
-        return
-    if (variable == ''):
-        print('Indicate the variable you want')
-
-    dotenv_path = Path(filePathEnv())
-    load_dotenv(dotenv_path=dotenv_path)
-    return (os.environ.get(variable))
-
-
-def fileEnvWrite(name, value):
-    with open(filePathEnv(), 'a') as f:
-        f.write(f'{name}="{value}"\n')
-
-def existsPath(path, debug = False):
+#########################################
+# FOLDERS
+def exists_path(path, debug = False):
     result = os.path.exists(path)
     if not result and debug:
         print(msgColor(f'The indicated path does not exist\n {path}','DANGER'))
     return result
 
-def isDirectory(directory, debug = False):
-    result = existsPath(directory, debug)
+def is_directory(directory, debug = False):
+    result = exists_path(directory, debug)
     if not result:
         return result
 
@@ -163,9 +121,8 @@ def isDirectory(directory, debug = False):
 
     return result
 
-def isEmptyDirectory(directory, debug = False):
-    
-    result = isDirectory(directory, debug)
+def is_empty_directory(directory, debug = False):
+    result = is_directory(directory, debug)
     if not result:
         return False
     
@@ -175,4 +132,109 @@ def isEmptyDirectory(directory, debug = False):
         cli(f'cd {directory} && ls -la')
 
     return not result
+
+#########################################
+# FILES 
+def file_create(pathName):
+    cli(f'touch {pathName}')
+
+def file_exists(path):
+    return os.path.exists(path)
+
+#########################################
+# Reade write File
+
+def write_json_file(data, file_path, indent = 2):
+    """
+    Write file.json
+    :param data: {'name': 'Maximo', 'age': 33, 'country': 'Argentina'}
+    :param file_path: 'path/example.json'
+    :param indent: integer
+    
+    Usage
+    write_json_file(data, file_path)
+    """
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent = indent)
+
+def read_json_file(file_path):
+    """
+    Read file.json
+    :param file_path: 'path/example.json'
+
+    data = read_json_file(file_path)
+    print(data)
+    Output: {'name': 'Maximo', 'age': 33, 'country': 'Argentina'}
+    """
+    with open(file_path, 'r') as json_file:
+        data = json.load(json_file)
+    return data
+
+#########################################
+# EFDE FILE ENV
+def efde_file_env_path(): return (configEnv['efdeFileEnv'])
+
+def efde_file_env_exists(path = efde_file_env_path()):
+    return file_exists(path)
+
+def efde_file_env_write(data, file_path = efde_file_env_path()):
+    write_json_file(data, file_path)
+
+def efde_file_env_read(variable = None):
+    if (not efde_file_env_exists()):
+        return
+    if variable == '':
+        print('Indicate the variable you want')
+    
+    data = read_json_file(efde_file_env_path())
+    if not variable == None:
+        return data[variable]
+        
+    return data
+
+#########################################
+# FILE ENV
+def file_env_read(variable='', path = '.env'):
+    if (not (file_exists(False))):
+        return
+    if (variable == ''):
+        print('Indicate the variable you want')
+
+    dotenv_path = Path(efde_file_env_path())
+    load_dotenv(dotenv_path=dotenv_path)
+    return (os.environ.get(variable))
+
+def file_env_write(path, key, value):
+    """
+    Updates an environment variable with the value specified in the .env file.
+    If the environment variable does not exist, a new one is created.
+    :param path: path to the .env file
+    :param key: environment variable name
+    :param value: value of the environment variable
+    """
+    dotenv_path = Path(path)
+    load_dotenv(dotenv_path=dotenv_path)
+
+    with open(path, 'r') as f:
+        lines = f.readlines()
+    with open(path, 'w') as f:
+        for line in lines:
+            if not line.startswith(f"{key}="):
+                f.write(line)
+            else:
+                f.write(f"{key}={str(value)}\n")
+
+#########################################
+# Installation process
+def set_name_project():
+    while True:
+        projectName = input(msgColor('Enter the project name [my-project]\nProject Name: ','WARNING'))
+        if projectName == '': continue
+        return projectName
+
+def get_row_dictionary_for_key_value(dictionary, key, value):
+    for item in dictionary:
+        if item[key] == value:
+            return item
+    return None
 

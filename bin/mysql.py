@@ -5,8 +5,6 @@ import common
 
 dataFile = {'name': 'Mysql', 'description': 'Help managing mysql elements'}
 
-pathDokerCompose = 'cd .. && '
-pathDokerCompose = ''
 menuReturn =  ''
 menu_option = [
     {"code": "showenv", "title": "Show Variables", 'description': 'Remove vendor'},
@@ -16,32 +14,31 @@ menu_option = [
     {"code": "runscripts", "title": "Run scripts", 'description': 'Run Scripts'},
 ]
 
-def switchOption(code):
-    commandDockerCompose = pathDokerCompose + 'docker-compose run --rm db '
-    pathEnv = '.docker/db/env'
+def switch_option(code):
+    commandDockerCompose = common.command_docker_compose()
     if code == 'showenv': 
-        print('MYSQL_ROOT_PASSWORD:' + common.fileEnvReading('MYSQL_ROOT_PASSWORD', '.docker/db/env'))
-        print('MYSQL_USER:' + common.fileEnvReading('MYSQL_USER', '.docker/db/env'))
-        print('MYSQL_PASSWORD:' + common.fileEnvReading('MYSQL_PASSWORD', '.docker/db/env'))
-        print('MYSQL_DATABASE:' + common.fileEnvReading('MYSQL_DATABASE', '.docker/db/env'))
+        print('MYSQL_ROOT_PASSWORD:' + common.file_env_read('MYSQL_ROOT_PASSWORD'))
+        print('MYSQL_USER:' + common.file_env_read('MYSQL_USER'))
+        print('MYSQL_PASSWORD:' + common.file_env_read('MYSQL_PASSWORD'))
+        print('MYSQL_DATABASE:' + common.file_env_read('MYSQL_DATABASE'))
         return
-    elif code == 'entry': common.cli(commandDockerCompose + 'bash')
+    elif code == 'entry': common.cli(commandDockerCompose + 'run --rm db bash')
     elif code == 'query':
         while True:
             query = input(common.msgColor('ingrese la query: ','WARNING'))
             if not(query == ''): break
             else: continue
-        mysqlUser = common.fileEnvReading('MYSQL_USER', '.docker/db/env')
-        mysqlPass = common.fileEnvReading('MYSQL_PASSWORD', '.docker/db/env')
-        mysqlDataBase = common.fileEnvReading('MYSQL_DATABASE', '.docker/db/env')
-        commandx = f'docker-compose exec db mysql -u{mysqlUser} -p{mysqlPass} --database={mysqlDataBase} -e"{query}"'
+        mysqlUser = common.file_env_read('MYSQL_USER')
+        mysqlPass = common.file_env_read('MYSQL_PASSWORD')
+        mysqlDataBase = common.file_env_read('MYSQL_DATABASE')
+        commandx = f'{commandDockerCompose} exec db mysql -u{mysqlUser} -p{mysqlPass} --database={mysqlDataBase} -e"{query}"'
         print(commandx)
         common.cli(commandx)
         # ToDo: Fix return
-        switchOption('query')
+        switch_option('query')
     elif code == 'import':return
     elif code == 'dump':
-        tables = "docker-compose exec db mysql -uadmin -pabcd1234 --database=wordpress -e\"show full tables where Table_Type = 'BASE TABLE'\" | awk '{print $2}' | grep -v '^Tables'"
+        tables = commandDockerCompose + " exec db mysql -uadmin -pabcd1234 --database=wordpress -e\"show full tables where Table_Type = 'BASE TABLE'\" | awk '{print $2}' | grep -v '^Tables'"
         bytelist = common.cliReturn(tables)
         
         #stringlist=[x.decode('utf-8') for x in bytelist]
@@ -56,11 +53,12 @@ if __name__ == '__main__':
     print(
         common.msgColor(
             f"-------------------------------\nIn construction\n-------------------------------",
-            'INFO_CYAN'
+            'WARNING'
         )
     )
     input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
     common.cli('clear')
+    exit()
     showHelper = False
     while True:
         common.menu_print(menu_option, dataFile, showHelper)
@@ -75,7 +73,7 @@ if __name__ == '__main__':
             common.cli('clear')
         elif opt.isnumeric() and (int(opt) in range(0,len(menu_option))):
             code = menu_option[int(opt)]['code']
-            switchOption(code)
+            switch_option(code)
 
             input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
             common.cli('clear')

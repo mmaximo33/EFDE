@@ -12,23 +12,23 @@ menu_option = [
 
 varEnv = 'DOMAIN_LCL'
 
-def switchOption(code):
+def switch_option(code):
     if code == 'check':
-        configureLocalCheck()
+        configure_local_check()
     elif code == 'inDocker':
-        configureLocalDomain()
+        configure_local_domain()
     elif code == 'inSymfony':
         print('insymfony')
     else:
         print('You must select an option')
 
-def configureLocalCheck():
+def configure_local_check():
     #check .env
     msgInEnv = ''
-    fileExists = common.fileEnvExists(False)
+    fileExists = common.efde_file_env_exists()
     if not fileExists: msgInEnv = common.msgColor(f'\n    This project does not have the file {common.filePathEnv()}','OKCYAN')
 
-    inEnvExists = common.fileEnvReading(varEnv)
+    inEnvExists = common.file_env_read(varEnv)
     checkInEnvExists = not inEnvExists == None and not inEnvExists ==''
     if not checkInEnvExists : msgInEnv = common.msgColor(f'\n    The variable was not configured {common.filePathEnv()}:{varEnv}','OKCYAN')
     if msgInEnv == '': msgInEnv = common.msgColor(f'\n    The project domain is {inEnvExists}','SUCCESS')
@@ -54,14 +54,14 @@ def configureLocalCheck():
     #symfony env domain    
     
 
-def configureLocalDomain():
-    fileExists = common.fileEnvExists()
+def configure_local_domain():
+    fileExists = common.efde_file_env_exists()
     
     if not fileExists:
         confirm = common.checkYesNo(common.msgColor('You want to create the configuration file?','WARNING'),'y')
         if confirm == False : return 
-        common.fileEnvCreateFile()
-    inEnvExists = common.fileEnvReading(varEnv)
+        common.cli(f"touch env")
+    inEnvExists = common.file_env_read(varEnv)
     if not inEnvExists == None : 
         print(f'It is configured as {inEnvExists}')
         return
@@ -72,21 +72,20 @@ def configureLocalDomain():
 
         domain = f'{domainName.lower()}.lcl'
         setDomain = f'127.0.0.1 {domain}'
-        common.fileEnvWrite('DOMAIN_LCL',setDomain)
+        common.fileEnvWrite('DOMAIN_LCL',setDomain) #ToDo Use efde.json
         common.cli(f'echo "\n# {domainName.upper()}\n127.0.0.1 {setDomain}" | sudo tee -a /etc/hosts',True)
         break
-    
-
 
 if __name__ == '__main__':
     print(
         common.msgColor(
             f"-------------------------------\nIn construction\n-------------------------------",
-            'INFO_CYAN'
+            'WARNING'
         )
     )
     input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
     common.cli('clear')
+    exit()
 
     showHelper = False
     while True:
@@ -102,7 +101,7 @@ if __name__ == '__main__':
             common.cli('clear')
         elif opt.isnumeric() and (int(opt) in range(0,len(menu_option))):
             code = menu_option[int(opt)]['code']
-            switchOption(code)
+            switch_option(code)
 
             input(common.msgColor('\nPress enter to return to the menu','SUCCESS'))
             common.cli('clear')

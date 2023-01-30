@@ -1,8 +1,10 @@
-# Easy and fast development environment (EFDE)
+# Easy and fast development environment (EFDE) [![follow](https://img.shields.io/badge/Follow-Youtube-red.svg)](https://www.youtube.com/@Efde.official)
 
-![efde version](https://img.shields.io/badge/version-v1.1.1-yellow.svg)
+![efde version](https://img.shields.io/badge/version-v1.1.1-yellow.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## Table of Contents
+![so debian](https://img.shields.io/badge/SO-Debian-blue.svg)![so ubuntu](https://img.shields.io/badge/Ubuntu-orange.svg)
+
+# Table of Contents
 
 - [Intro](#intro)
 - [About](#about)
@@ -14,7 +16,7 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-## Intro
+# Intro
 
 EFDE arises motivated by giving something back to this beautiful community of programmers, computer scientists or curious about technology.
 
@@ -35,26 +37,26 @@ You are invited to join, use or even contribute to the growth of EFDE to give ba
 
 It is NOT something super innovative, but surely more than one will find it interesting.
 
-## About
+# About
 
 EFDE is a project designed to facilitate the management of local development environments, mainly for teams that constantly have new members or beginners who are starting out in this beautiful world of programming.
 
 The objective of the project is to be able to manage implementations with docker such as
 
-### Released ### 
-- Symfony
+## Released
+:heavy_check_mark: [Symfony](documentation/symfony.md)
 
-### Coming soon ###
-- Magento
+## Coming soon
 - Wordpress
-- WooCommerce
+  - WooCommerce
+- Magento
 - Prestashop
 - Django
 - Others
 
-## Install & Update
+# Install & Update
 
-### Requirements
+## Requirements
 The EFDE installation script. It will check and recommend the installation of the necessary packages for its proper functioning.
 Anyway, if you want to know more, you can see the following list with the official documentation
 
@@ -65,9 +67,9 @@ Anyway, if you want to know more, you can see the following list with the offici
   - [pip](https://packaging.python.org/en/latest/guides/installing-using-linux-tools/?highlight=install%20python3-pip#debian-ubuntu)
 - Implement
   - [docker](https://docs.docker.com/engine/install/ubuntu/)
-  - [docker-compose](https://docs.docker.com/compose/install/other/)
+  - [docker compose](https://docs.docker.com/compose/install/other/)
 
-### Install
+## Install
 
 To **install** EFDE, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
 
@@ -77,7 +79,9 @@ curl -o- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh 
 wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh | bash
 ```
 
-### Update 
+[See Youtube - Short](https://www.youtube.com/shorts/gE3qYC1AUOk)
+
+## Update 
 
 You can update in two ways
 
@@ -88,7 +92,7 @@ You can update in two ways
 $ efde --update
 ```
 
-## Usage
+# Usage
 
 Once installed, you can run EFDE from any directory
 
@@ -96,19 +100,19 @@ Once installed, you can run EFDE from any directory
 $ efde --help
 ```
 
-## Captures
+# Captures
 
 ![efde + symfony](documentation/images/efde_symfony.png)
 
-## Maintainers
+# Maintainers
 
 Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time. [Governance](./documentation/GOVERNANCE.md) will be re-evaluated as the project evolves.
 
-## Contributing
+# Contributing
 
 There is still a lot to do with this small project if you are invited to join.
 Please see [CONTRIBUTING](./documentation/CONTRIBUTING.md) for details.
 
-## License
+# License
 
 The MIT License (MIT). Please see [License File](./LICENSE).
