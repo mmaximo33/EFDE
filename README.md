@@ -10,10 +10,11 @@
   - [Install](#install)
   - [Update](#update)
 - [Usage](#usage)
-- [Maintainers](#maintainers)
-- [Code of conduct](#code-of-conduct)
-- [Contributing](#contributing)
-- [License](#license)
+- [Documentation](#documentation)
+  - [Code of conduct](#code-of-conduct)
+  - [Maintainers](#maintainers)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Intro
 
@@ -106,21 +107,23 @@ efde --help
 
 ![efde + symfony](./docs/images/efde_symfony.png)
 
-## Maintainers
+## Documentation
 
-Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time.
-[GOVERNANCE](./GOVERNANCE.md) will be re-evaluated as the project evolves.
-
-## Code of conduct
+### Code of conduct
 
 The collaborators of this project strongly believe in a respectful community.
 For this reason we operate under the following [CODE OF CONDUCT](./CODE_OF_CONDUCT.md)
 
-## Contributing
+### Maintainers
+
+Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time.
+[GOVERNANCE](./GOVERNANCE.md) will be re-evaluated as the project evolves.
+
+### Contributing
 
 There is still a lot to do with this small project if you are invited to join.
 Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
 
-## License
+### License
 
-The MIT License (MIT). Please see [LICENSE File](./LICENSE.md).
+The MIT License (MIT). Please see [LICENSE](./LICENSE.md).

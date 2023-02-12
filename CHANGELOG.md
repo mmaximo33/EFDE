@@ -19,7 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Doc: Add CoC (Code of conduct)
+- Docs: Add CoC (Code of conduct)
+- Docs: Add issue template
+
+### Changed
+
+- Docs: Improve contributing
 
 ## [1.2.0] 2022-01-30
 
