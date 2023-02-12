@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Docs: Improve contributing
+- Efde: Small change in show_version
 
 ## [1.2.0] 2022-01-30
 

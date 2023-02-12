@@ -98,7 +98,7 @@ END
 }
 
 show_version() {
-  efde_echo $project_version
+  efde_echo "${project_run} ${project_version}"
 }
 
 open_more_info() {
