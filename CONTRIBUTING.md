@@ -1,4 +1,4 @@
-# `EFDE` Project Governance
+# `EFDE` Project Contributing
 
 ## Contributors
 

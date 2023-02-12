@@ -1,10 +1,8 @@
 # Easy and fast development environment (EFDE) [![follow](https://img.shields.io/badge/Follow-Youtube-red.svg)](https://www.youtube.com/@Efde.official)
 
-![efde version](https://img.shields.io/badge/status-active-green.svg) ![efde version](https://img.shields.io/badge/version-v1.2.0-yellow.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg)
+![efde type](https://img.shields.io/badge/project-OpenSource-green.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg) ![efde version](https://img.shields.io/badge/status-active-green.svg) ![efde version](https://img.shields.io/badge/version-v1.2.0-yellow.svg) ![so debian](https://img.shields.io/badge/SO-Debian-blue.svg)![so ubuntu](https://img.shields.io/badge/Ubuntu-orange.svg)
 
-![so debian](https://img.shields.io/badge/SO-Debian-blue.svg)![so ubuntu](https://img.shields.io/badge/Ubuntu-orange.svg)
-
-# Table of Contents
+## Table of Contents
 
 - [Intro](#intro)
 - [About](#about)
@@ -13,10 +11,11 @@
   - [Update](#update)
 - [Usage](#usage)
 - [Maintainers](#maintainers)
+- [Code of conduct](#code-of-conduct)
 - [Contributing](#contributing)
 - [License](#license)
 
-# Intro
+## Intro
 
 EFDE arises motivated by giving something back to this beautiful community of programmers, computer scientists or curious about technology.
 
@@ -37,16 +36,18 @@ You are invited to join, use or even contribute to the growth of EFDE to give ba
 
 It is NOT something super innovative, but surely more than one will find it interesting.
 
-# About
+## About
 
 EFDE is a project designed to facilitate the management of local development environments, mainly for teams that constantly have new members or beginners who are starting out in this beautiful world of programming.
 
 The objective of the project is to be able to manage implementations with docker such as
 
-## Released
-:heavy_check_mark: [Symfony](documentation/symfony.md)
+### Released
 
-## Coming soon
+:heavy_check_mark: [Symfony](docs/symfony.md)
+
+### Coming soon
+
 - Wordpress
   - WooCommerce
 - Magento
@@ -54,9 +55,10 @@ The objective of the project is to be able to manage implementations with docker
 - Django
 - Others
 
-# Install & Update
+## Install & Update
 
-## Requirements
+### Requirements
+
 The EFDE installation script. It will check and recommend the installation of the necessary packages for its proper functioning.
 Anyway, if you want to know more, you can see the following list with the official documentation
 
@@ -69,7 +71,7 @@ Anyway, if you want to know more, you can see the following list with the offici
   - [docker](https://docs.docker.com/engine/install/ubuntu/)
   - [docker compose](https://docs.docker.com/compose/install/other/)
 
-## Install
+### Install
 
 To **install** EFDE, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
 
@@ -81,7 +83,7 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh
 
 [See Youtube - Short](https://www.youtube.com/shorts/gE3qYC1AUOk)
 
-## Update 
+### Update
 
 You can update in two ways
 
@@ -89,30 +91,36 @@ You can update in two ways
 - Running efde with the **--update** option
 
 ```sh
-$ efde --update
+efde --update
 ```
 
-# Usage
+## Usage
 
 Once installed, you can run EFDE from any directory
 
 ```sh
-$ efde --help
+efde --help
 ```
 
-# Captures
+## Captures
 
-![efde + symfony](documentation/images/efde_symfony.png)
+![efde + symfony](./docs/images/efde_symfony.png)
 
-# Maintainers
+## Maintainers
 
-Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time. [Governance](./documentation/GOVERNANCE.md) will be re-evaluated as the project evolves.
+Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time.
+[GOVERNANCE](./GOVERNANCE.md) will be re-evaluated as the project evolves.
 
-# Contributing
+## Code of conduct
+
+The collaborators of this project strongly believe in a respectful community.
+For this reason we operate under the following [CODE OF CONDUCT](./CODE_OF_CONDUCT.md)
+
+## Contributing
 
 There is still a lot to do with this small project if you are invited to join.
-Please see [CONTRIBUTING](./documentation/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
 
-# License
+## License
 
-The MIT License (MIT). Please see [License File](./LICENSE).
+The MIT License (MIT). Please see [LICENSE File](./LICENSE.md).
