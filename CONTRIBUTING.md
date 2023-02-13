@@ -56,6 +56,19 @@ Don't worry, there is a template to report an issue, anyway, below we give a bri
         <tr>
             <td><b>Description</b></td>
             <td>
+                A clear and concise description of the bug.
+            </td>
+            <td>
+                -
+            </td>
+            <td>
+                Trying to install the symfony environment the following error occurs <br/>
+                <b>` Error in console `<b>
+            </td>
+        </tr>
+        <tr>
+            <td><b>How to Reproduce</b></td>
+            <td>
                 Describe the exact steps which reproduce the problem in as many details as possible <br/>
                 When listing steps, don't just say what you did, but explain how you did it.
             </td>
@@ -72,6 +85,12 @@ Don't worry, there is a template to report an issue, anyway, below we give a bri
             </td>
         </tr>
         <tr>
+            <td><b>Expected behavior</b></td>
+            <td>Describe what was the behavior you expected for said action</td>
+            <td>-</td>
+            <td>After indicating action 1 (example action) you should perform ...</td>
+        </tr>
+        <tr>
             <td><b>Visual evidence</b></td>
             <td>Supporting what is reported with visual evidence can often give a quick indication of what the real problem might be.</td>
             <td>
@@ -85,14 +104,8 @@ Don't worry, there is a template to report an issue, anyway, below we give a bri
             </td>
         </tr>
         <tr>
-            <td><b>Expected behavior</b></td>
-            <td>Describe what was the behavior you expected for said action</td>
-            <td>-</td>
-            <td>After indicating action 1 (example action) you should perform ...</td>
-        </tr>
-        <tr>
-            <td><b>Context</b></td>
-            <td>Please provide all the context you think is necessary or even what you think is irrelevant but you think may be related</td>
+            <td><b>System Information</b></td>
+            <td>Provide the output of the <b>`efde --debug`</b> command</td>
             <td>
                 - efde --version <br/>
                 - Operating system and version <br/>
@@ -110,6 +123,12 @@ Don't worry, there is a template to report an issue, anyway, below we give a bri
                 - Docker Compose version v2.16.0 <br/>
                 - others <br/>
             </td>
+        </tr>
+        <tr>
+            <td><b>Additional Context</b></td>
+            <td>Add any other context about the problem here.</td>
+            <td>-</td>
+            <td>I am running EFDE in a virtual machine from MAC/Windows ...</td>
         </tr>
     <tbody>
 </table>
