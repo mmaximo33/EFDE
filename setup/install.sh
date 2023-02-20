@@ -120,7 +120,7 @@
       efde_echo >&2 "$PROJECT_NAME requires having docker to work"
       efde_confirm_yes "Do you want to install docker now?" && efde_docker_install || errors="$errors\n==> You need to have docker"
     else
-      if ! efde_has "docker compose"; then
+      if ! efde_has compose; then
         efde_echo >&2 "$PROJECT_NAME requires having docker compose(v2) to work"
         efde_confirm_yes "Do you want to install docker compose (v2) now?" && efde_docker_compose_install || errors="$errors\n==> You need to have docker compose (v2)"
       fi
