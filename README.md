@@ -49,6 +49,7 @@ The objective of the project is to be able to manage implementations with docker
 
 ### Coming soon
 
+- Portainer.io
 - Wordpress
   - WooCommerce
 - Magento
@@ -127,3 +128,9 @@ Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
 ### License
 
 The MIT License (MIT). Please see [LICENSE](./LICENSE.md).
+
+## Collaborate with us
+
+<a href="https://jb.gg/OpenSourceSupport" target="_blank">
+  <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height="125" alt="Logotipo de JetBrains (principal) logo.">
+</a>
