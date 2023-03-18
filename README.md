@@ -66,9 +66,6 @@ Anyway, if you want to know more, you can see the following list with the offici
 
 - For download
   - [GIT](https://git-scm.com/book/en/Getting-Started-Installing-Git) or [CURL](https://curl.se/docs/install.html) or [WGET](https://www.gnu.org/software/wget/)
-- For run
-  - [python3](https://wiki.python.org/moin/BeginnersGuide/Download)
-  - [pip](https://packaging.python.org/en/latest/guides/installing-using-linux-tools/?highlight=install%20python3-pip#debian-ubuntu)
 - Implement
   - [docker](https://docs.docker.com/engine/install/ubuntu/)
   - [docker compose](https://docs.docker.com/compose/install/other/)
@@ -78,9 +75,9 @@ Anyway, if you want to know more, you can see the following list with the offici
 To **install** EFDE, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
 
 ```sh
-curl -o- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh | bash
+curl -o- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
 
-wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/setup/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
 ```
 
 [See Youtube - Short](https://www.youtube.com/shorts/gE3qYC1AUOk)
