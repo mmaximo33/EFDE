@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MENU_RESPONSE_CHOICE="" #VARIABLE GLOBAL - HIGH SOLUTION ;)
+declare -gA MENU_RESPONSE_ARRAY_ASOCITIVE
+
+# USAGE
+# my_array=(
+#   'code 0,Title 0,Description 0'
+#   'code 1,Title 1,Description 1'
+#   'code-2,Title 2,Description 2'
+# )
+#
+# common.tasks.menu.show_menu "¿Question?" "${my_array[@]}"
+#
+# common.tasks.message.echo $SHOW_MENU_RESPONSE
+_mod_.print_menu(){
+    local question="$1"
+    shift
+    local options=("$@")
+
+    common.tasks.message.info "$question\n"
+
+    for i in "${!options[@]}"; do
+        option=${options[i]}
+        IFS=',' read -r -a values <<< "$option"
+        if [[ ${#values[@]} -ge 2 ]]; then
+            titulo=${values[1]}
+            descripcion=${values[2]}
+            #common.tasks.message.echo "$i $titulo"
+            printf "%-0s. %-40s %s\n" "$i" "$titulo" "$descripcion"
+        else
+            common.tasks.message.warning "Opción inválida: $option"
+        fi
+    done
+
+    common.tasks.message.info "\nPress I to get info about efde"
+    common.tasks.message.info "Press Q to quit"
+
+    choice=$(common.tasks.prompt.request_input "$(common.tasks.message.success "Enter the option number: ")")
+
+    if [[ $choice =~ ^[0-9]+$ && $choice -ge 0 && $choice -le $(( ${#options[@]} -1 )) ]]; then
+        #echo "option $((choice )) | value : ${options[$selected_number]}"
+        MENU_RESPONSE_CHOICE=$choice
+        _mod_.menu_response_asociative "${MENU_INIT[$MENU_RESPONSE_CHOICE]}"
+    else
+        [[ "$choice" == "q" ]] && exit 0
+        common.console_clear
+        common.tasks.message.danger "La opción '$choice' no está en la lista."
+        _mod_.print_menu "$question" "${options[@]}"
+    fi
+}
+
+_mod_.menu_response_asociative(){
+  local MENU_ARRAY="$1"
+  local VALUES
+
+  IFS=',' read -r -a VALUES <<< "$MENU_ARRAY"
+  if [[ ${#VALUES[@]} -ge 2 ]]; then
+    MENU_RESPONSE_ARRAY_ASOCITIVE['code']="${VALUES[0]}"
+    MENU_RESPONSE_ARRAY_ASOCITIVE['title']="${VALUES[1]}"
+    MENU_RESPONSE_ARRAY_ASOCITIVE['description']="${VALUES[2]}"
+  else
+    echo "Error: Formato de entrada incorrecto"  # Mensaje de error
+    exit 1
+  fi
+}

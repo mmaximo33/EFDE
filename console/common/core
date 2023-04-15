@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.console_clear() {
+  # Todo: Determinar si es linux,windows, mac
+  clear
+}
+
+_mod_.msg_debug(){
+    if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+      command printf "\033[1;35m$@\033[0m\n" 2>/dev/null
+    fi
+}
+_mod_.msg_danger(){
+    command printf "\033[1;31m$@\033[0m\n" 2>/dev/null
+}
+
+_mod_.load_module(){
+  local PATH_MODULE=$1
+  local elements=("props" "tasks")
+
+  for element in "${elements[@]}"; do
+    CHECK_PATH="$PATH_MODULE/$element"
+    if [ -d "$CHECK_PATH" ]; then
+      _mod_.msg_debug "=> Load $element"
+      for file in $(ls -1 $CHECK_PATH); do
+        _mod_.msg_debug "==> Load $file"
+        _mod_.replacemod  --file-name="$file" --new-name="$MODULE_NAME.$element.${file%}" --source-path="$CHECK_PATH/$file"
+      done
+    fi
+  done
+}
+
+_mod_.replacemod () {
+  local FILE_NAME NEW_NAME SOURCE_PATH
+  local USED="The '$FUNCNAME' method must contain the 3 required parameters \n--file-name='file \n--new-name='common.task' \n--source-path='path/folder/file"
+
+  if [[  $# != 3 ]]; then
+    _mod_.msg_danger $USED
+    _mod_.msg_debug "$@"
+    exit 1;
+  fi
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --file-name=*)    FILE_NAME="${1#*=}";    shift ;;
+      --new-name=*)     NEW_NAME="${1#*=}";     shift ;;
+      --source-path=*)  SOURCE_PATH="${1#*=}";  shift ;;
+      *)
+        _mod_.msg_danger $USED
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$FILE_NAME" || -z "$NEW_NAME" || -z "$SOURCE_PATH"  ]]; then
+    _mod_.msg_danger $USED
+    exit 1
+  fi
+
+  PATH_TARGET="$DIRECTORY_TMP/$NEW_NAME"
+
+  _mod_.msg_debug "Function: $FUNCNAME"
+  _mod_.msg_debug "- File > $FILE_NAME"
+  _mod_.msg_debug "- Name >  $NEW_NAME"
+  _mod_.msg_debug "- Path >  $SOURCE_PATH"
+  _mod_.msg_debug "- Tmp > $DIRECTORY_TMP/$NEW_NAME"
+
+  if [ "$EFDE_MOD_DEV" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
+    sed "s/_mod_/$NEW_NAME/g" "$SOURCE_PATH" > "$PATH_TARGET"
+  fi
+
+  _mod_.msg_debug "Load $NEW_NAME"
+  source "$PATH_TARGET"
+}

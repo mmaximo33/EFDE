@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.check() {
+  echo "Load " $(basename "${BASH_SOURCE[0]}")
+}
+
+_mod_.menu(){
+  echo "test"
+}
+
+_mod_.exists_function(){
+  [ "$(type -t "$1")" = "function" ]
+}
