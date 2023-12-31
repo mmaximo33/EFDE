@@ -65,8 +65,9 @@ The EFDE installation script. It will check and recommend the installation of th
 Anyway, if you want to know more, you can see the following list with the official documentation
 
 - For download
-  - [GIT](https://git-scm.com/book/en/Getting-Started-Installing-Git) or [CURL](https://curl.se/docs/install.html) or [WGET](https://www.gnu.org/software/wget/)
-- Implement
+  - [CURL](https://curl.se/docs/install.html) or [WGET](https://www.gnu.org/software/wget/)
+- Implement (If you do not have it installed, EFDE manages the installation on Linux)
+  - [GIT](https://git-scm.com/book/en/Getting-Started-Installing-Git) 
   - [docker](https://docs.docker.com/engine/install/ubuntu/)
   - [docker compose](https://docs.docker.com/compose/install/other/)
 
@@ -98,7 +99,7 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-ba
 ─── Do you want to create a backup? [y/N]? y
 ──── Creating a backup
 ────── [SUCCESS] Backup created in /home/$USER/.efde_bkp_install_20231231123418
-── Downloading EFDE from git to '/home/$USER/.efde'
+── Downloading EFDE from git to /home/$USER/.efde
 ──── Cloning repository
 ──── Repository optimization
 ────── [SUCCESS] Compression
@@ -106,7 +107,13 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-ba
 ── Creating symbolic link
 ──── Removing symbolic link previous versions (v1.*.*)
 ──── In /home/$USER/bin/efde FROM /home/$USER/.efde/bin/efde.sh
-You want to run efde --help now? [Y/n]?
+
+#######################################################################
+# EFDE is successfully installed and configured.
+# Select the directory and create your new project
+# By running '$ efde --help'
+-----------------------------------------------------------------------
+You want to run efde --help now? [Y/n]? 
 
 ```
 

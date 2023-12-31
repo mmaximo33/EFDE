@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.environment(){
+  echo "INSTALAR SYMFONY $(pwd)"
+  echo $PATH_CONSOLE
+}
+
+_mod_.move_environment(){
+  #mv $PATH_SETUP/symfony $(pwd)/
+  echo "te"
+}

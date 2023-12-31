@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IMPLEMENTION_EFDE_FOLDER=".efde"
+
+declare -gA SETUP_ENVIRONMENT=(
+  [NAME]=""
+  [CREATE_AT]=""
+  [IMPLEMENTION]=""
+)
+
+_mod_.has_folder_implementation(){
+  common.tasks.directory.exists "$(pwd)/$IMPLEMENTION_EFDE_FOLDER"
+}
+
+_mod_.create_folder(){
+  common.tasks.directory.create_recursive "$(pwd)/$1"
+}
+
+_mod_.setup_environment(){
+  local FUNCTION_INSTALL=$(printf "%s.tasks.install.environment" $RESPONSE_CODE)
+  local STRING_ENV=""
+
+
+  if ! common.tasks.module.exists_function "$FUNCTION_INSTALL" ;then
+    common.tasks.message.danger "The installation of the selected environment is not yet available '$RESPONSE_TITLE'"
+    common.tasks.prompt.confirm_default_yes "Back to menu?" && menu_init
+  fi
+
+  SETUP_ENVIRONMENT=(
+    [NAME]=$(_mod_.project_name)
+    [CREATE_AT]=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
+    [IMPLEMENTION]=$RESPONSE_CODE
+  )
+
+  _mod_.create_folder "${SETUP_ENVIRONMENT['NAME']}/$IMPLEMENTION_EFDE_FOLDER"
+  STRING_ENV="$(efde.tasks.config.prepare_string_to_env SETUP_ENVIRONMENT)"
+  echo -e "$STRING_ENV" > "${SETUP_ENVIRONMENT['NAME']}/$IMPLEMENTION_EFDE_FOLDER/env"
+
+  cd "${SETUP_ENVIRONMENT['NAME']}"
+  $FUNCTION_INSTALL
+}
+
+_mod_.project_name(){
+  local value=$(common.tasks.prompt.request_input "$(common.tasks.message.warning "Enter the project name\nProject name: ")")
+
+  if ! [[ "$value" =~ ^[[:alnum:][:space:]]+$ ]]; then
+    common.tasks.message.danger "The entered value can only contain letters or numbers."
+    common.tasks.message.info "Cancel to [ctrl + c] "
+    _mod_.project_name
+  fi
+
+  echo "$(common.tasks.string.convert_string_to_camelcase "$value")"
+}

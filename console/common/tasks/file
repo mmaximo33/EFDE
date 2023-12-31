@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.exists() {
+  [ -e "$1" ]
+}

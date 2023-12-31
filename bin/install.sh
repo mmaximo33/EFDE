@@ -25,7 +25,6 @@
 
   efde_echo() {
     local level="${2:-0}"
-    local status="${3}"
 
     local prefix=""
     if [ "$level" -gt 0 ]; then
@@ -348,12 +347,16 @@
   efde_project_install_clone_project(){
     local INSTALL_DIR="$(efde_install_dir)"
 
-    efde_echo >&2 "Downloading $PROJECT_NAME from git to '$INSTALL_DIR'" 1
+    efde_echo >&2 "Downloading $PROJECT_NAME from git to $INSTALL_DIR" 1
     mkdir -p "${INSTALL_DIR}"
     efde_echo >&2 "Cloning repository" 2
     if command git clone --branch $GIT_BRANCH "$(efde_source)"  "$INSTALL_DIR" 2>/dev/null; then
       cd "$INSTALL_DIR"
-      #efde_echo >&2 "[SUCCESS] $(git switch -c $GIT_VERSION_LATEST 2>&1)" 3
+      if [[ ! "$GIT_BRANCH" == "main" ]]; then
+        efde_echo >&2 "[DEBUG] TESTING BRANCH $(git rev-parse --abbrev-ref HEAD 2>&1)" 3
+      else
+        efde_echo >&2 "[SUCCESS] $(git switch -c $GIT_VERSION_LATEST 2>&1)" 3
+      fi
     else
       efde_echo >&2 "[ERROR] Failed to clone $PROJECT_NAME repo. Please report this!" 3
       exit 2

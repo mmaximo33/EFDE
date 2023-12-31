@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.exists() {
+  [ -d "$1" ]
+}
+
+_mod_.create_recursive() {
+  mkdir -p "$1"
+}

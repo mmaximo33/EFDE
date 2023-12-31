@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+MENU_INIT=(
+  'tools,Tools, '
+  'symfony,Install Symfony, '
+  'magento,Coming soon - Install Magento | Wordpress | Prestashop | Drupal | React | Angular | Vue | Next, '
+#  'magento,Coming soon - Install Magento, '
+#  'wordpress,Coming soon - Install Wordpress, '
+#  'woocommerce,Coming soon - Install WooCommerce, '
+#  'prestashop,Coming soon - Install Prestashop, '
+#  'drupal,Coming soon - Install Drupal, '
+#  'react,Coming soon - Install React, '
+#  'angular,Coming soon - Install Angular, '
+#  'vue,Coming soon - Install Vue, '
+#  'next,Coming soon - Install Next, '
+)
