@@ -79,8 +79,41 @@ curl -o- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bas
 
 wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
 ```
+#### What will happen in the installation process?
+
+```sh
+
+#######################################################################
+# Verifying requirements for EFDE
+-----------------------------------------------------------------------
+── [OK] Check install GIT
+── [OK] Check install DOCKER
+── [OK] Check install DOCKER-COMPOSE
+── [SUCCESS] Requirements verified
+
+#######################################################################
+# Installing EFDE
+-----------------------------------------------------------------------
+── EFDE is already installed in /home/$USER/.efde
+──── Checking for updates
+────── [SUCCESS] Updated repository!
+──── Repository optimization
+────── [SUCCESS] Compression
+────── [SUCCESS] Cleaning
+=> Creating /home/$USER/bin/efde
+chmod: cannot operate on dangling symlink '/home/$USER/bin/efde'
+
+#######################################################################
+# EFDE is successfully installed and configured.
+# Select the directory and create your new project
+# By running '$ efde --help'
+-----------------------------------------------------------------------
+You want to run efde --help now? [Y/n]? 
+
+```
 
 [See Youtube - Short](https://www.youtube.com/shorts/gE3qYC1AUOk)
+
 
 ### Update
 

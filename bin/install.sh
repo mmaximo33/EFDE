@@ -15,7 +15,7 @@
   # INIT section
   #----------------------------------------------------------------------
   PROJECT_NAME=EFDE
-  PROJECT_FOLDER=common
+  PROJECT_FOLDER=efde
 
   GIT_USER=mmaximo33
   GIT_REPOSITORY=$PROJECT_NAME
@@ -24,7 +24,20 @@
   GIT_URL_REPOSITORY="https://github.com/$GIT_USER/$GIT_REPOSITORY"
 
   efde_echo() {
-    command printf %s\\n "$*" 2>/dev/null
+    local level="${2:-0}"
+    local status="${3}"
+
+    local prefix=""
+    if [ "$level" -gt 0 ]; then
+      for ((i=0; i<level; i++)); do
+        prefix+="─"
+      done
+    fi
+
+    if [ ! -z $prefix ]; then
+      prefix+="$prefix "
+    fi
+    command printf "%s%s\\n" "$prefix" "$1" 2>/dev/null
   }
 
   if [ -z "${BASH_VERSION}" ] || [ -n "${ZSH_VERSION}" ]; then
@@ -86,7 +99,7 @@
     echo $RESPONSE
   }
 
-  # ToDo: Review install for version
+  # MMToDo: Review install for version
   efde_latest_version() {
     GIT_VERSION_LATEST=$(curl -s "https://api.github.com/repos/$GIT_USER/$GIT_REPOSITORY/releases/latest" | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4)
   }
@@ -95,51 +108,79 @@
   # Requiriments section
   #----------------------------------------------------------------------
   efde_has() {
-    type "$1" >/dev/null 2>&1
+    local command_to_check="$1"
+    if [ "$command_to_check" == "docker-compose" ]; then
+      command_result=$(type "$command_to_check" 2>/dev/null)
+      [ $? -eq 0 ] && type "$command_to_check" >/dev/null 2>&1 || type "compose" >/dev/null 2>&1
+    else
+      type "$command_to_check" >/dev/null 2>&1
+    fi
+  }
+
+  efde_check_environment() {
+    # MMTodo: Review code check
+    if [ -n "${EFDE_DIR-}" ] && ! [ -d "${EFDE_DIR}" ]; then
+      if [ -e "${EFDE_DIR}" ]; then
+        efde_echo >&2 "File \"${EFDE_DIR}\" has the same name as installation directory."
+        exit 1
+      fi
+
+      if [ "${EFDE_DIR}" = "$(efde_default_install_dir)" ]; then
+        mkdir "${EFDE_DIR}"
+      else
+        efde_echo >&2 "You have \$EFDE_DIR set to \"${EFDE_DIR}\", but that directory does not exist. Check your profile files and environment."
+        exit 1
+      fi
+    fi
+
+    # Disable the optional which check, https://www.shellcheck.net/wiki/SC2230
+    # shellcheck disable=SC2230
+    if efde_has xcode-select && [ $(xcode-select -p >/dev/null 2>/dev/null; echo $?) = '2' ] && \
+       [ "$(which git)" = '/usr/bin/git' ] && [ "$(which curl)" = '/usr/bin/curl' ]; then
+      efde_echo >&2 'You may be on a Mac, and need to install the Xcode Command Line Developer Tools.'
+      # shellcheck disable=SC2016
+      efde_echo >&2 'If so, run `xcode-select --install` and try again. If not, please report this!'
+      exit 1
+    fi
   }
 
   efde_check_requirements() {
-    local errors
     efde_print_step requirements
+    local errors=""
+    check_and_install() {
+      local tool_name="$1"
+      local install_command="$2"
 
-    if ! efde_has git; then
-      efde_echo >&2 "\nYou must install GIT to download ${PROJECT_NAME}"
-      if efde_confirm_yes "Do you want to install GIT now?"; then
-        efde_git_install
-      elif ! efde_has curl && ! efde_has wget; then
-        efde_echo >&2 "\nYou must install CURL to download ${PROJECT_NAME}"
-        efde_confirm_yes "Do you want to install CURL now?" && efde_curl_install || errors="$errors\n==> You need to have GIT or CURL or WGET installed"
+      if ! efde_has "$tool_name"; then
+        efde_echo >&2 "You must install ${tool_name^^} to use $PROJECT_NAME" 1
+        if efde_confirm_yes "Do you want to install ${tool_name^^} now?"; then
+          $install_command || errors="$errors\n==> Failed to install ${tool_name^^}"
+        else
+          errors="$errors\n==> You need to have ${tool_name^^} installed"
+        fi
+      else
+        efde_echo >&2 "[OK] Check install ${tool_name^^}" 1
       fi
-    fi
+    }
 
-    if ! efde_has docker; then
-      efde_echo >&2 "$PROJECT_NAME requires having docker to work"
-      efde_confirm_yes "Do you want to install docker now?" && efde_docker_install
-    else
-      if ! efde_has compose; then
-        efde_echo >&2 "$PROJECT_NAME requires having docker compose(v2) to work"
-        efde_confirm_yes "Do you want to install docker compose (v2) now?" && efde_docker_compose_install
-      fi
-    fi
+    check_and_install "git" "efde_install_git"
+    check_and_install "docker" "efde_install_docker"
+    check_and_install "docker-compose" "efde_install_docker_compose"
 
-    if [ ! -z "$errors" ]; then
-      efde_echo "=> The following problems were detected:"
+    if [ -n "$errors" ]; then
+      efde_echo "[ERROR] The following problems were detected:" 1
       echo -e "$errors"
       exit 1
     fi
 
-    efde_echo "=> Requirements OK"
+    efde_echo >&2 "[SUCCESS] Requirements verified" 1
   }
 
-  efde_curl_install() {
-    sudo apt install -y curl
-  }
-
-  efde_git_install() {
+  efde_install_git() {
     sudo apt install -y git-all
   }
 
-  efde_docker_install() {
+  efde_install_docker() {
     # https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
     sudo apt install -y ca-certificates curl gnupg lsb-release
     sudo mkdir -p /etc/apt/keyrings
@@ -161,19 +202,40 @@
     sudo chmod g+rwx "$HOME/.docker" -R
 
     #sudo systemctl restart docker
-
-    # docker compose (v2)
-    efde_docker_compose_install
   }
 
-  efde_docker_compose_install() {
+  efde_install_docker_compose() {
     # https://docs.docker.com/compose/install/linux/
-    sudo apt-get install docker-compose-plugin
+    echo "install"
+    #sudo apt-get install docker-compose-plugin
   }
 
   #######################################################################
   # Installation section
   #----------------------------------------------------------------------
+  efde_print_step() {
+      efde_echo >&2 ""
+      efde_echo >&2 "#######################################################################"
+      case $1 in
+      "requirements")
+        efde_echo >&2 "# Verifying requirements for $PROJECT_NAME"
+        ;;
+      "install")
+        efde_echo >&2 "# Installing $PROJECT_NAME"
+        ;;
+      "end")
+        efde_echo >&2 "# $PROJECT_NAME is successfully installed and configured."
+        efde_echo >&2 "# Select the directory and create your new project"
+        efde_echo >&2 "# By running '$ efde --help'"
+        ;;
+      *)
+        efde_echo >&2 "# Error step"
+      ;;
+      esac
+
+      efde_echo >&2 "-----------------------------------------------------------------------"
+    }
+
   efde_source() {
     local EFDE_GIT_REPO=$GIT_URL_REPOSITORY
     local EFDE_METHOD="$1"
@@ -209,96 +271,22 @@
     local BIN_FILE="$BIN_DIR/efde"
 
     efde_echo >&2 "=> Creating $BIN_FILE"
-    if [ -f $BIN_FILE ]; then
-      rm $BIN_FILE
+    if [ -f "$BIN_FILE" ]; then
+        rm "$BIN_FILE" || {
+            efde_echo >&2 "Error: Failed to remove existing $BIN_FILE"
+            exit 1
+        }
     fi
 
     mkdir -p $BIN_DIR
-    cp "$INSTALL_DIR/bin/efde.sh" $BIN_FILE
-    chmod +x $BIN_FILE
-  }
-
-  efde_print_step() {
-    efde_echo >&2 ""
-    efde_echo >&2 "#######################################################################"
-    case $1 in
-    "requirements")
-      efde_echo >&2 "# Verifying requirements for $PROJECT_NAME"
-      efde_echo >&2 "# Download: GIT or CURL or WGET"
-      efde_echo >&2 "# Implement: docker and docker compose"
-      ;;
-    "install")
-      efde_echo >&2 "# Installing $PROJECT_NAME"
-      ;;
-    "end")
-      efde_echo >&2 "# $PROJECT_NAME is successfully installed and configured."
-      efde_echo >&2 "# Select the directory and create your new project"
-      efde_echo >&2 "# By running '$ efde --help'"
-      ;;
-    *)
-      efde_echo >&2 "# Error step"
-    ;;
-    esac
-    
-    efde_echo >&2 "-----------------------------------------------------------------------"
+    ln -sfT "$INSTALL_DIR/bin/efde.sh" $BIN_FILE
   }
 
   efde_do_install() {
     efde_latest_version
     efde_print_step install
-
-    if [ -n "${EFDE_DIR-}" ] && ! [ -d "${EFDE_DIR}" ]; then
-      if [ -e "${EFDE_DIR}" ]; then
-        efde_echo >&2 "File \"${EFDE_DIR}\" has the same name as installation directory."
-        exit 1
-      fi
-
-      if [ "${EFDE_DIR}" = "$(efde_default_install_dir)" ]; then
-        mkdir "${EFDE_DIR}"
-      else
-        efde_echo >&2 "You have \$EFDE_DIR set to \"${EFDE_DIR}\", but that directory does not exist. Check your profile files and environment."
-        exit 1
-      fi
-    fi
-
-    # Disable the optional which check, https://www.shellcheck.net/wiki/SC2230
-    # shellcheck disable=SC2230
-    if efde_has xcode-select && [ $(xcode-select -p >/dev/null 2>/dev/null; echo $?) = '2' ] && \
-       [ "$(which git)" = '/usr/bin/git' ] && [ "$(which curl)" = '/usr/bin/curl' ]; then
-      efde_echo >&2 'You may be on a Mac, and need to install the Xcode Command Line Developer Tools.'
-      # shellcheck disable=SC2016
-      efde_echo >&2 'If so, run `xcode-select --install` and try again. If not, please report this!'
-      exit 1
-    fi
-
-
     # Install repo
-    if [ -z "${METHOD}" ]; then
-      # Autodetect install method
-      if efde_has git; then
-        efde_project_install_from_git
-      elif efde_has curl || efde_has wget; then
-        efde_project_install_from_script
-      else
-        efde_echo >&2 "You need git, curl, or wget to install $PROJECT_NAME"
-        exit 1
-      fi
-    elif [ "${METHOD}" = 'git' ]; then
-      if ! efde_has git; then
-        efde_echo >&2 "You need git to install $PROJECT_NAME"
-        exit 1
-      fi
-      efde_project_install_from_git
-    elif [ "${METHOD}" = 'script' ]; then
-      if ! efde_has curl && ! efde_has wget; then
-        efde_echo >&2 "You need curl or wget to install $PROJECT_NAME"
-        exit 1
-      fi
-      efde_project_install_from_script
-    else
-      efde_echo >&2 "The environment variable \$METHOD is set to \"${METHOD}\", which is not recognized as a valid installation method."
-      exit 1
-    fi
+    efde_project_install_from_git
 
     efde_reset
   }
@@ -307,97 +295,86 @@
     local INSTALL_DIR="$(efde_install_dir)"
 
     if [ -d "$INSTALL_DIR/.git" ]; then
-      # Updating repo
-      efde_echo "=> $PROJECT_NAME is already installed in $INSTALL_DIR"
-      efde_echo "==> Updating repository"
-      if (command cd $INSTALL_DIR; git checkout main; git reset --hard origin/main; git pull origin main) >/dev/null 2>&1; then
-        efde_echo >&2 "===> Successfully updated!"
-      else
-        efde_echo >&2 "===> Failed to updated ${PROJECT_NAME} repo. Please report this!"
-      fi
+      efde_project_install_existing_folder
+    elif [ -d "${INSTALL_DIR}" ] && [ "$(ls -A "${INSTALL_DIR}" 2>/dev/null)" ]; then
+      efde_project_install_recovery_project
     else
-      # Installing
-      efde_echo "=> Downloading $PROJECT_NAME from git to '$INSTALL_DIR'"
-      mkdir -p "${INSTALL_DIR}"
-      if [ "$(ls -A "${INSTALL_DIR}")" ]; then
-        # Initializing repo
-        command git init "${INSTALL_DIR}" || {
-          efde_echo >&2 "==> Failed to initialize $PROJECT_NAME repo. Please report this!"
-          exit 2
-        }
-        command git --git-dir="${INSTALL_DIR}/.git" remote add origin "$(efde_source)" 2>/dev/null ||
-          command git --git-dir="${INSTALL_DIR}/.git" remote set-url origin "$(efde_source)" || {
-          efde_echo >&2 '==> Failed to add remote "origin" (or set the URL). Please report this!'
-          exit 2
-        }
-      else
-        # Cloning repo
-        efde_echo >&2 "==> Cloning repository"
-        if command git clone --branch $GIT_BRANCH "$(efde_source)"  "$INSTALL_DIR" 2>/dev/null; then
-          cd "$INSTALL_DIR"
-          git switch -c $GIT_VERSION_LATEST
-          efde_echo >&2 "===> Successfully updated"
-        else
-          efde_echo >&2 "===> Failed to clone $PROJECT_NAME repo. Please report this!"
-          exit 2
-        fi
-
-      fi
+      efde_project_install_clone_project
     fi
 
-    efde_echo "====> Compressing and cleaning up git repository"
-    if ! command git --git-dir="$INSTALL_DIR"/.git --work-tree="$INSTALL_DIR" reflog expire --expire=now --all; then
-      efde_echo >&2 "=====> Your version of git is out of date. Please update it!"
-    fi
-    if ! command git --git-dir="$INSTALL_DIR"/.git --work-tree="$INSTALL_DIR" gc --auto --aggressive --prune=now; then
-      efde_echo >&2 "=====> Your version of git is out of date. Please update it!"
-    fi
-
-    #
+    efde_project_install_optimization
     efde_create_bin
     efde_print_step end
 
-    #command efde --help
+    if efde_confirm_yes "You want to run efde --help now?"; then
+      efde --help
+    else
+      errors="$errors\n==> You need to have ${tool_name^^} installed"
+    fi
   }
 
-  # ToDo: Improve this scripts
-  efde_project_install_from_script() {
-    local HOME_DIR=$(printf %s "${HOME}")
+  efde_project_install_existing_folder(){
     local INSTALL_DIR="$(efde_install_dir)"
-    local EFDE_SOURCE_SCRIPT="$(efde_source script)"
-    local EFDE_SOURCE_FILE=$(basename $EFDE_SOURCE_SRIPT)
-    local EFDE_UNZIP_FOLDER=$(basename $EFDE_SOURCE_SRIPT .zip)
 
-    efde_project_download -LJO "$EFDE_SOURCE_SRIPT" --output-dir "$HOME_DIR"
-    
-    command unzip -uqq "$HOME_DIR/$PROJECT_FOLDER-$EFDE_SOURCE_FILE" -d $HOME_DIR
-    
-    command mv "$HOME_DIR/$PROJECT_FOLDER-$EFDE_UNZIP_FOLDER" $INSTALL_DIR
-    command rm "$HOME_DIR/$PROJECT_FOLDER-$EFDE_SOURCE_FILE"
-
-    efde_create_bin
-    
-    efde_print_step end
-
-    command efde --help
+    efde_echo "$PROJECT_NAME is already installed in $INSTALL_DIR" 1
+    efde_echo "Checking for updates" 2
+    if (command cd $INSTALL_DIR; git checkout main; git reset --hard origin/main; git pull origin main) >/dev/null 2>&1; then
+      efde_echo >&2 "[SUCCESS] Updated repository!" 3
+    else
+      efde_echo >&2 "[ERROR] Failed to updated ${PROJECT_NAME} repo. Please report this!" 3
+    fi
   }
 
-  efde_project_download() {
-    if efde_has "curl"; then
-      curl --fail --compressed -q "$@"
-    elif efde_has "wget"; then
-      # Emulate curl with wget
-      ARGS=$(efde_echo "$@" | command sed -e 's/--progress-bar /--progress=bar /' \
-        -e 's/--compressed //' \
-        -e 's/--fail //' \
-        -e 's/-L //' \
-        -e 's/-I /--server-response /' \
-        -e 's/-s /-q /' \
-        -e 's/-sS /-nv /' \
-        -e 's/-o /-O /' \
-        -e 's/-C - /-c /')
-      # shellcheck disable=SC2086
-      eval wget $ARGS
+  # MMTodo: Review
+  efde_project_install_recovery_project(){
+    local INSTALL_DIR="$(efde_install_dir)"
+
+    efde_echo >&2 "The $INSTALL_DIR directory exists without version control (.git). Trying to get it back" 1
+    # Initializing repo
+    if [ "$(command git init "${INSTALL_DIR}" 2>/dev/null)" ]; then
+      efde_echo >&2 "[SUCCESS] Initializing git"
+    else
+      efde_echo >&2 "[ERROR] Failed to initialize $PROJECT_NAME repo. Please report this!" 2
+      exit 2
+    fi
+
+    command git --git-dir="${INSTALL_DIR}/.git" remote add origin "$(efde_source)" 2>/dev/null ||
+      command git --git-dir="${INSTALL_DIR}/.git" remote set-url origin "$(efde_source)" || {
+      efde_echo >&2 '[ERROR] Failed to add remote "origin" (or set the URL). Please report this!' 2
+      exit 2
+    }
+  }
+
+  efde_project_install_clone_project(){
+    local INSTALL_DIR="$(efde_install_dir)"
+
+    efde_echo >&2 "Downloading $PROJECT_NAME from git to '$INSTALL_DIR'" 1
+    mkdir -p "${INSTALL_DIR}"
+    efde_echo >&2 "Cloning repository" 2
+    if command git clone --branch $GIT_BRANCH "$(efde_source)"  "$INSTALL_DIR" 2>/dev/null; then
+      cd "$INSTALL_DIR"
+      #efde_echo >&2 "[SUCCESS] $(git switch -c $GIT_VERSION_LATEST 2>&1)" 3
+    else
+      efde_echo >&2 "[ERROR] Failed to clone $PROJECT_NAME repo. Please report this!" 3
+      exit 2
+    fi
+  }
+
+  efde_project_install_optimization(){
+    efde_echo >&2 "Repository optimization" 2
+    local action
+    action="Compression"
+    if command git --git-dir="$INSTALL_DIR"/.git --work-tree="$INSTALL_DIR" reflog expire --expire=now --all; then
+      efde_echo >&2 "[SUCCESS] $action" 3
+    else
+      efde_echo >&2 "[ERROR] $action: Your version of git is out of date. Please update it!" 3
+    fi
+
+    action="Cleaning"
+    if command git --git-dir="$INSTALL_DIR"/.git --work-tree="$INSTALL_DIR" gc --auto --aggressive --prune=now; then
+      efde_echo >&2 "[SUCCESS] $action" 3
+    else
+      efde_echo >&2 "[ERROR] $action: Your version of git is out of date. Please update it!" 3
     fi
   }
 
@@ -408,15 +385,30 @@
   # during the execution of the install script
   #----------------------------------------------------------------------
   efde_reset() {
-    unset -f efde_do_install efde_git_install \
-      efde_project_install_from_script efde_project_install_from_git \
-      efde_create_bin efde_latest_version efde_install_dir efde_default_install_dir efde_echo efde_has \
-      efde_input_response efde_source efde_get_keypress efde_get_yes_keypress efde_confirm efde_confirm_yes \
-      efde_project_download efde_print_step
+    unset -f efde_echo efde_get_keypress efde_get_yes_keypress efde_confirm efde_confirm_yes \
+      efde_input_response efde_latest_version \
+      efde_has efde_check_environment efde_check_requirements \
+      efde_install_git efde_install_docker efde_install_docker_compose \
+      efde_source efde_default_install_dir efde_install_dir efde_create_bin efde_print_step \
+      efde_do_install efde_project_install_from_git \
+      efde_project_install_existing_folder efde_project_install_recovery_project efde_project_install_clone_project \
+      efde_project_install_optimization efde_reset
   }
 
-  [ "_$EFDE_ENV" = "_testing" ] || efde_check_requirements
-  efde_do_install
+  #######################################################################
+  # Main section
+  #----------------------------------------------------------------------
+  main() {
+
+    if [ "_$EFDE_ENV" != "_testing" ]; then
+      efde_check_environment
+      efde_check_requirements
+    fi
+
+    efde_do_install
+  }
+  main
+
 
 } # this ensures the entire script is downloaded #
 

@@ -37,3 +37,41 @@ init_dirs()
 init_dirs
 source "$PATH_CONSOLE/init"
 
+
+
+main(){
+  if efde.tasks.implemention.has_folder_implementation ; then
+    #ES SYMFONY CARGA MENU
+    echo "symfony"
+  else
+    menu_init
+  fi
+}
+
+menu_init(){
+
+#IFS=',' read -ra elements <<< "${ALL_MENUS["MENU_INIT"]}"
+#
+#for element in "${elements[@]}"; do
+#  echo "$element"
+#done
+    #common.tasks.menu.print_menu "Select an option:" "${ALL_MENUS["MENU_INIT"][@]}"
+    common.tasks.menu.print_menu "Select an option:" "${MENU_INIT[@]}"
+    RESPONSE_CODE=${MENU_RESPONSE_ARRAY_ASOCITIVE['code']}
+    RESPONSE_TITLE=${MENU_RESPONSE_ARRAY_ASOCITIVE['title']}
+
+    efde.tasks.implemention.setup_environment $RESPONSE_CODE
+    exit;
+    if common.tasks.module.exists_function "$RESPONSE_CODE.tasks.install.environment" ;then
+      efde.tasks.implemention.setup_environment $RESPONSE_CODE
+    else
+      common.tasks.message.danger "The installation of the selected environment is not yet available '$RESPONSE_TITLE'"
+
+      common.tasks.prompt.confirm_default_yes "Back to menu?" && menu_init
+    fi
+}
+
+main
+
+
+
