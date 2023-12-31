@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # Debug mode
-EFDE_MOD_DEBUG=false # Messages debug
-EFDE_MOD_DEV=true # Create tmps
+EFDE_MOD_DEBUG=true # Messages debug
+EFDE_MOD_DEV=true # MMTodo: Prepared for create tmps
 
 [[ $(echo "$@" | grep -oP '(?<=--debug=)[^ ]+') = "true" && "$EFDE_MOD_DEBUG" = "false" ]] && EFDE_MOD_DEBUG=true
 
@@ -26,8 +26,8 @@ init_dirs()
     resolve_absolute_dir
     export DOCKERGENTO_DIR="${ABSOLUTE_PATH}"
 
-    export PATH_CONSOLE="${EFDE_PATH_INSTALL}/console/"
-    export PATH_BIN="${EFDE_PATH_INSTALL}/bin/"
+    export PATH_CONSOLE="${EFDE_PATH_INSTALL}/console"
+    export PATH_BIN="${EFDE_PATH_INSTALL}/bin"
 
 #    export COMMANDS_DIR="${ABSOLUTE_PATH}/console/commands"
 #    export TASKS_DIR="${ABSOLUTE_PATH}/console/tasks"
