@@ -94,21 +94,19 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-ba
 #######################################################################
 # Installing EFDE
 -----------------------------------------------------------------------
-── EFDE is already installed in /home/$USER/.efde
-──── Checking for updates
-────── [SUCCESS] Updated repository!
+── The /home/maximo/.efde directory exists without version control (.git)
+─── Do you want to create a backup? [y/N]? y
+──── Creating a backup
+────── [SUCCESS] Backup created in /home/$USER/.efde_bkp_install_20231231123418
+── Downloading EFDE from git to '/home/$USER/.efde'
+──── Cloning repository
 ──── Repository optimization
 ────── [SUCCESS] Compression
 ────── [SUCCESS] Cleaning
-=> Creating /home/$USER/bin/efde
-chmod: cannot operate on dangling symlink '/home/$USER/bin/efde'
-
-#######################################################################
-# EFDE is successfully installed and configured.
-# Select the directory and create your new project
-# By running '$ efde --help'
------------------------------------------------------------------------
-You want to run efde --help now? [Y/n]? 
+── Creating symbolic link
+──── Removing symbolic link previous versions (v1.*.*)
+──── In /home/$USER/bin/efde FROM /home/$USER/.efde/bin/efde.sh
+You want to run efde --help now? [Y/n]?
 
 ```
 

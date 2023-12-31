@@ -82,14 +82,13 @@
 
   # Credit: http://unix.stackexchange.com/a/14444/143394
   # Prompt to confirm, defaulting to NO on <enter>
-  # Usage: confirm "Dangerous. Are you sure?" && rm *
-  efde_confirm() {
+  # Usage: efde_confirm_default_no "Dangerous. Are you sure? [y/N]" && rm *
+  efde_confirm_default_no() {
     local prompt="${*:-Are you sure} [y/N]? "
     efde_get_yes_keypress "$prompt" 1
   }
 
-  # Prompt to confirm, defaulting to YES on <enter>
-  efde_confirm_yes() {
+  efde_confirm_default_yes() {
     local prompt="${*:-Are you sure} [Y/n]? "
     efde_get_yes_keypress "$prompt" 0
   }
@@ -110,7 +109,7 @@
   efde_has() {
     local command_to_check="$1"
     if [ "$command_to_check" == "docker-compose" ]; then
-      command_result=$(type "$command_to_check" 2>/dev/null)
+      local command_result=$(type "$command_to_check" 2>/dev/null)
       [ $? -eq 0 ] && type "$command_to_check" >/dev/null 2>&1 || type "compose" >/dev/null 2>&1
     else
       type "$command_to_check" >/dev/null 2>&1
@@ -153,7 +152,7 @@
 
       if ! efde_has "$tool_name"; then
         efde_echo >&2 "You must install ${tool_name^^} to use $PROJECT_NAME" 1
-        if efde_confirm_yes "Do you want to install ${tool_name^^} now?"; then
+        if efde_confirm_default_yes "Do you want to install ${tool_name^^} now?"; then
           $install_command || errors="$errors\n==> Failed to install ${tool_name^^}"
         else
           errors="$errors\n==> You need to have ${tool_name^^} installed"
@@ -267,25 +266,32 @@
 
   efde_create_bin() {
     local INSTALL_DIR="$(efde_install_dir)"
+    local INSTALL_DIR_FILE="$INSTALL_DIR/bin/efde.sh"
     local BIN_DIR="$HOME/bin"
     local BIN_FILE="$BIN_DIR/efde"
 
-    efde_echo >&2 "=> Creating $BIN_FILE"
+    efde_echo >&2 "Creating symbolic link" 1
+    # PATCH_FROM_V1x_TO_V2x
     if [ -f "$BIN_FILE" ]; then
+        efde_echo >&2 "Removing symbolic link previous versions (v1.*.*)" 2
         rm "$BIN_FILE" || {
-            efde_echo >&2 "Error: Failed to remove existing $BIN_FILE"
+            efde_echo >&2 "[ERROR]: Failed to remove existing $BIN_FILE" 3
             exit 1
         }
     fi
 
     mkdir -p $BIN_DIR
-    ln -sfT "$INSTALL_DIR/bin/efde.sh" $BIN_FILE
+    efde_echo >&2 "In $BIN_FILE FROM $INSTALL_DIR_FILE" 2
+    if ! ln -sfT "$INSTALL_DIR_FILE" "$BIN_FILE"; then
+      echo "[ERROR]: Cannot create symbolic link. Please report this!"
+      exit 1
+    fi
   }
 
   efde_do_install() {
     efde_latest_version
     efde_print_step install
-    # Install repo
+
     efde_project_install_from_git
 
     efde_reset
@@ -304,13 +310,9 @@
 
     efde_project_install_optimization
     efde_create_bin
-    efde_print_step end
 
-    if efde_confirm_yes "You want to run efde --help now?"; then
-      efde --help
-    else
-      errors="$errors\n==> You need to have ${tool_name^^} installed"
-    fi
+    efde_print_step end
+    efde_confirm_default_yes "You want to run efde --help now?" && efde --help
   }
 
   efde_project_install_existing_folder(){
@@ -318,31 +320,29 @@
 
     efde_echo "$PROJECT_NAME is already installed in $INSTALL_DIR" 1
     efde_echo "Checking for updates" 2
-    if (command cd $INSTALL_DIR; git checkout main; git reset --hard origin/main; git pull origin main) >/dev/null 2>&1; then
+    if (command cd $INSTALL_DIR; git checkout main; git reset --hard origin/$GIT_BRANCH; git pull origin $GIT_BRANCH) >/dev/null 2>&1; then
       efde_echo >&2 "[SUCCESS] Updated repository!" 3
     else
       efde_echo >&2 "[ERROR] Failed to updated ${PROJECT_NAME} repo. Please report this!" 3
     fi
   }
 
-  # MMTodo: Review
   efde_project_install_recovery_project(){
     local INSTALL_DIR="$(efde_install_dir)"
+    local BACKUP_DIR="${INSTALL_DIR}_bkp_install_$(date +'%Y%m%d%H%M%S')"
 
-    efde_echo >&2 "The $INSTALL_DIR directory exists without version control (.git). Trying to get it back" 1
-    # Initializing repo
-    if [ "$(command git init "${INSTALL_DIR}" 2>/dev/null)" ]; then
-      efde_echo >&2 "[SUCCESS] Initializing git"
-    else
-      efde_echo >&2 "[ERROR] Failed to initialize $PROJECT_NAME repo. Please report this!" 2
-      exit 2
+    efde_echo >&2 "The $INSTALL_DIR directory exists without version control (.git)" 1
+    if efde_confirm_default_no "─── Do you want to create a backup?" ;then
+      efde_echo >&2 "Creating a backup" 2
+      if mv "$INSTALL_DIR" "$BACKUP_DIR"; then
+        efde_echo >&2 "[SUCCESS] Backup created in $BACKUP_DIR" 3
+      else
+        efde_echo >&2 "[ERROR] Failed to create a backup of the existing directory. Please report this!" 3
+        exit 2
+      fi
     fi
 
-    command git --git-dir="${INSTALL_DIR}/.git" remote add origin "$(efde_source)" 2>/dev/null ||
-      command git --git-dir="${INSTALL_DIR}/.git" remote set-url origin "$(efde_source)" || {
-      efde_echo >&2 '[ERROR] Failed to add remote "origin" (or set the URL). Please report this!' 2
-      exit 2
-    }
+    efde_project_install_clone_project
   }
 
   efde_project_install_clone_project(){
@@ -385,7 +385,7 @@
   # during the execution of the install script
   #----------------------------------------------------------------------
   efde_reset() {
-    unset -f efde_echo efde_get_keypress efde_get_yes_keypress efde_confirm efde_confirm_yes \
+    unset -f efde_echo efde_get_keypress efde_get_yes_keypress efde_confirm_default_no efde_confirm_default_yes \
       efde_input_response efde_latest_version \
       efde_has efde_check_environment efde_check_requirements \
       efde_install_git efde_install_docker efde_install_docker_compose \
@@ -399,7 +399,6 @@
   # Main section
   #----------------------------------------------------------------------
   main() {
-
     if [ "_$EFDE_ENV" != "_testing" ]; then
       efde_check_environment
       efde_check_requirements
