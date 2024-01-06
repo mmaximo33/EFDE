@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.run() {
+  if [ "$#" -ne 3 ]; then
+    local USED=""
+    USED+="Error: Three parameters are required:\n"
+    USED+=" - FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE\n"
+    USED+="\n parameters:\n ${@}\n"
+    USED+="\n Example:\n"
+    USED+=" - $FUNCNAME FORCE_SHOW_CLI=true FORCE_SHOW_OUTPUT=true COMMAND_LINE\n"
+    USED+=" - $FUNCNAME 1 0 'cd folder'"
+    common.tasks.message.danger $USED
+    return 1
+  fi
+
+  local FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE
+
+  FORCE_SHOW_CLI=$1
+  FORCE_SHOW_OUTPUT=$2
+  COMMAND_LINE="$3"
+
+  if [ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_DEFAULT']}" = "false" ]; then
+    FORCE_SHOW_CLI=${GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']}
+    FORCE_SHOW_OUTPUT=${GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']}
+    #[ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']}" = "true" ] && FORCE_SHOW_CLI=true
+    #[ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']}" = "true" ] && FORCE_SHOW_OUTPUT=true
+  fi
+
+  if [ "${FORCE_SHOW_CLI}" = "true" ]; then
+    common.tasks.message.info "# RUN CLI > ${COMMAND_LINE}"
+  fi
+
+  if [ "${FORCE_SHOW_OUTPUT}" = "false" ]; then
+    ${COMMAND_LINE} > /dev/null 2>&1
+  else
+    ${COMMAND_LINE}
+  fi
+}

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.main(){
+  common.tasks.menu.print_menu "Select an option:" "${symfony_props_menu_MAIN[@]}"
+}
+
+_mod_.create_environment(){
+  common.tasks.menu.print_menu "Select an option:" "${symfony_props_menu_CREATE_ENVIRONMENT[@]}"
+}
+
+_mod_.create_environment_version(){
+  common.tasks.menu.print_menu "Select an option:" "${symfony_props_menu_CREATE_ENVIRONMENT_VERSION[@]}"
+}
+
+_mod_.show_config_efde(){
+  cat "$(efde.tasks.implemention.get_current_path_env_file)"
+  if  common.tasks.prompt.confirm_default_yes "Back to menu?"; then
+    common.console_clear
+    _mod_.main
+  else
+    exit
+  fi
+}

@@ -1,12 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
+###################################################################################################################
+# IMPORTANT
+#------------------------------------------------------------------------------------------------------------------
+# En Bash, la convención general es utilizar el
+# valor de retorno del comando o función para indicar el éxito o fracaso de la operación.
+# El código de retorno 0 se usa para indicar éxito (o "true") y cualquier otro valor se usa para indicar fracaso (o "false").
+#
+# USED SIMPLE
+#   _mod_.confirm_default_no  "Question?" && action_function
+#   _mod_.confirm_default_yes "Question?" && action_function
+#
+# USED Extra
+#  local RESULT=true
+#  if common.tasks.prompt.confirm_default_yes "Question? " ; then
+#    RESULT=true
+#  fi
+#
+#  if [ "$RESULT" = "true" ]; then
+#    echo "webapp"
+#  fi
+###################################################################################################################
 
 # Read a single char from /dev/tty, prompting with "$*"
 # Note: pressing enter will return a null string. Perhaps a version terminated with X and then remove it in caller?
 # See https://unix.stackexchange.com/a/367880/143394 for dealing with multi-byte, etc.
 _mod_.get_keypress() {
   local REPLY IFS=
-  printf >/dev/tty '%s' "$*"
+
+  #printf >/dev/tty '%s' "$*" #MMTodo: Original
+  printf >/dev/tty "%b" "$*"  #MMTodo: apply color
+
   #[[ $ZSH_VERSION ]] && read -rk1 # Use -u0 to read from STDIN
   # See https://unix.stackexchange.com/q/383197/143394 regarding '\n' -> ''
   [[ $BASH_VERSION ]] && read </dev/tty -rn1
@@ -33,7 +57,8 @@ _mod_.get_yes_keypress() {
 
 # Credit: http://unix.stackexchange.com/a/14444/143394
 # Prompt to confirm, defaulting to NO on <enter>
-# Usage: _mod_.confirm_default_no "Dangerous. Are you sure?" && action_function
+# Usage:
+#   _mod_.confirm_default_no "Dangerous. Are you sure?" && action_function
 _mod_.confirm_default_no() {
   local prompt="${*:-Are you sure} [y/N]? "
   _mod_.get_yes_keypress "$prompt" 1
@@ -41,13 +66,14 @@ _mod_.confirm_default_no() {
 
 # Prompt to confirm, defaulting to YES on <enter>
 # Usage:
-# _mod_.confirm_default_yes "question?" && action_function
+#   _mod_.confirm_default_yes "question?" && action_function
 _mod_.confirm_default_yes() {
   local prompt="${*:-Are you sure} [Y/n]? "
   _mod_.get_yes_keypress "$prompt" 0
 }
 
 _mod_.request_input() {
-  read -r -p "$@" value
-  echo $value
+  local prompt="$*"
+  read -r -p "$(printf "%b" "$prompt")"  value
+  echo "$value"
 }

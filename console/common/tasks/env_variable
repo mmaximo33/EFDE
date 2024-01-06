@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.set_variable() {
+
+    if [ "$#" -ne 3 ]; then
+        echo "Error: Se requieren tres parámetros: key, value, file"
+        return 1
+    fi
+
+    local key="$1"
+    local value="$2"
+    local file="$3"
+
+    key=$(echo "$key" | tr '[:lower:]' '[:upper:]' | tr ' ' '_')
+
+    if [ ! -e "$file" ]; then
+        touch "$file"
+    fi
+
+    if grep -q "^$key=" "$file"; then
+        # Update existing
+        sed -i "s/^$key=.*/$key=\"$value\"/" "$file"
+    else
+        # add new
+        echo "$key=\"$value\"" >> "$file"
+    fi
+}
+
+_mod_.get_variable() {
+    if [ "$#" -ne 2 ]; then
+        echo "Error: Se requieren dos parámetros: key, file"
+        return 1
+    fi
+
+    local key="$1"
+    local file="$2"
+
+    key=$(echo "$key" | tr '[:lower:]' '[:upper:]' | tr ' ' '_')
+
+    if [ -e "$file" ]; then
+        local value=$(grep "^$key=" "$file" | sed "s/^$key=//")
+        if [ -n "$value" ]; then
+            value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/')
+            echo -n "$value"
+        else
+            echo "No encontrado"
+        fi
+    else
+        echo "Error: El archivo $file no existe."
+        return 1
+    fi
+}
+#
+#
+## USAGED
+## Call:
+##   SETUP_ENVIRONMENT=(
+##     [NAME]="MyName"
+##     [CREATE_AT]="2000-01-01"
+##     [IMPLEMENTION]="efde"
+##   )
+##   VAR_STRING="$(_mod_.prepare_string_to_env SETUP_ENVIRONMENT)"
+##
+##   echo -e "$VAR_STRING" > "$PATH_FILE"
+##
+## Response:
+##   'NAME="MyName"\nCREATE_AT="2000-01-01"\nIMPLEMENTION="efde"'
+#_mod_.prepare_string_to_env(){
+#  local -n env_array=$1
+#  local env_str=""
+#
+#  for key in "${!env_array[@]}"; do
+#    value="${env_array[$key]}"
+#    env_str+="\n$key=\"$value\""
+#  done
+#
+#  env_str="${env_str:2}" # Remove firts \n
+#
+#  echo "$env_str"
+#}
+#
+#_mod_.load_variables_from_file() {
+#  local file_path="$1"
+#  local variables=""
+#
+#  if [ -f "$file_path" ]; then
+#    # Leer el archivo y construir la cadena de variables
+#    while IFS='=' read -r key value; do
+#      # Eliminar espacios en blanco alrededor de la clave y el valor
+#      key=$(echo "$key" | sed 's/^[ \t]*//;s/[ \t]*$//')
+#      value=$(echo "$value" | sed 's/^[ \t]*//;s/[ \t]*$//')
+#
+#      # Agregar la variable a la cadena
+#      variables+="$key=\"$value\" "
+#    done < "$file_path"
+#
+#    # Eliminar posibles espacios en blanco al final
+#    variables=$(echo "$variables" | sed 's/[ \t]*$//')
+#
+#    # Devolver la cadena de variables
+#    echo "$variables"
+#  else
+#    echo "Error: El archivo $file_path no existe."
+#    return 1
+#  fi
+#}

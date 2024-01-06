@@ -2,13 +2,13 @@
 set -euo pipefail
 
 MENU_RESPONSE_CHOICE="" #VARIABLE GLOBAL - HIGH SOLUTION ;)
-declare -gA MENU_RESPONSE_ARRAY_ASOCITIVE
+declare -gA GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE
 
 # USAGE
 # my_array=(
-#   'code 0,Title 0,Description 0'
-#   'code 1,Title 1,Description 1'
-#   'code-2,Title 2,Description 2'
+#   'code,                            Title 0,  Description 0'
+#   'function_name,                   Title 1,  Description 1'
+#   'common.tasks.module.function,    Title 2,  Description 2'
 # )
 #
 # common.tasks.menu.show_menu "¿Question?" "${my_array[@]}"
@@ -26,25 +26,35 @@ _mod_.print_menu(){
         IFS=',' read -r -a values <<< "$option"
         if [[ ${#values[@]} -ge 2 ]]; then
             titulo=${values[1]}
-            descripcion=${values[2]}
-            #common.tasks.message.echo "$i $titulo"
-            printf "%-0s. %-40s %s\n" "$i" "$titulo" "$descripcion"
+            description=$([ "$EFDE_MOD_DEBUG" = "true" ] && echo  ${values[0]} || echo ${values[2]})
+            printf "%-0s. %-40s %s\n" "$i" "$titulo" "$description"
         else
             common.tasks.message.warning "Opción inválida: $option"
         fi
     done
 
-    common.tasks.message.info "\nPress I to get info about efde"
-    common.tasks.message.info "Press Q to quit"
+    common.tasks.message.info "\nPress R to return | Q to quit | I for info"
 
-    choice=$(common.tasks.prompt.request_input "$(common.tasks.message.success "Enter the option number: ")")
+    choice=$(common.tasks.prompt.request_input "$(common.tasks.message.success "Enter the option number:") ")
 
     if [[ $choice =~ ^[0-9]+$ && $choice -ge 0 && $choice -le $(( ${#options[@]} -1 )) ]]; then
-        #echo "option $((choice )) | value : ${options[$selected_number]}"
         MENU_RESPONSE_CHOICE=$choice
-        _mod_.menu_response_asociative "${MENU_INIT[$MENU_RESPONSE_CHOICE]}"
+        GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['choice']=$MENU_RESPONSE_CHOICE
+
+        _mod_.menu_response_asociative "${options[$MENU_RESPONSE_CHOICE]}"
+        common.console_clear
+        local RUN_FUNCTION=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+        if common.tasks.module.exists_function "$RUN_FUNCTION" ;then
+            _mod_.msg_debug
+            ${RUN_FUNCTION}
+        fi
+#        else
+#          common.msg_danger "Error: ${RUN_FUNCTION^^} The functions don't exists"
+#          _mod_.print_menu "$question" "${options[@]}"
+#        fi
     else
         [[ "$choice" == "q" ]] && exit 0
+        [[ "$choice" == "r" ]] && { common.console_clear; ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}; return; }
         common.console_clear
         common.tasks.message.danger "La opción '$choice' no está en la lista."
         _mod_.print_menu "$question" "${options[@]}"
@@ -57,11 +67,36 @@ _mod_.menu_response_asociative(){
 
   IFS=',' read -r -a VALUES <<< "$MENU_ARRAY"
   if [[ ${#VALUES[@]} -ge 2 ]]; then
-    MENU_RESPONSE_ARRAY_ASOCITIVE['code']="${VALUES[0]}"
-    MENU_RESPONSE_ARRAY_ASOCITIVE['title']="${VALUES[1]}"
-    MENU_RESPONSE_ARRAY_ASOCITIVE['description']="${VALUES[2]}"
+
+  # Return function menu
+  # MMTodo: Review
+  # Solo se puede hacer un solo return,
+  # Solucion acumular historico de functions, durante el ciclo de vida de la ejecucion
+  if [[ ! -n "${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']+isset}" ]]; then
+    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']=""
+  else
+    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']="${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}"
+  fi
+
+  GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']="${VALUES[0]}"
+  GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']="${VALUES[1]}"
+  GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']="${VALUES[2]}"
+
   else
     echo "Error: Formato de entrada incorrecto"  # Mensaje de error
     exit 1
   fi
 }
+
+_mod_.msg_debug(){
+  common.msg_debug "#######################################################################"
+  common.msg_debug "# MENU "
+  common.msg_debug "GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE:" 1
+  common.msg_debug "title: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']}" 2
+  common.msg_debug "description: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']}" 2
+  common.msg_debug "functions:" 2
+  common.msg_debug "new: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}" 3
+  common.msg_debug "old: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}" 3 1
+  common.msg_debug "-----------------------------------------------------------------------"
+}
+

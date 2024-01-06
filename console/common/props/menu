@@ -3,10 +3,10 @@
 #declare -a MENU=('tools,Tools, ' 'symfony,Install Symfony, ' 'magento,Coming soon - Install Magento | Wordpress | Prestashop | Drupal | React | Angular | Vue | Next, ')
 #ALL_MENUS["MENU_INIT"]="${MENU[@]}"
 
-MENU_INIT=(
-  'tools,Tools, '
+_mod_INIT=(
+  'tools,Tools, ESTE'
   'symfony,Install Symfony, '
-  'magento,Coming soon - Install Magento | Wordpress | Prestashop | Drupal | React | Angular | Vue | Next, ')
+  'magento,Coming soon Install Magento | Wordpress | Prestashop | Drupal | React | Angular | Vue | Next ')
 #  'magento,Coming soon - Install Magento, '
 #  'wordpress,Coming soon - Install Wordpress, '
 #  'woocommerce,Coming soon - Install WooCommerce, '

@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 
-MENU_INIT=(
-  'tools,Tools, '
-  'symfony,Install Symfony, '
-  'magento,Coming soon - Install Magento | Wordpress | Prestashop | Drupal | React | Angular | Vue | Next, '
-#  'magento,Coming soon - Install Magento, '
-#  'wordpress,Coming soon - Install Wordpress, '
-#  'woocommerce,Coming soon - Install WooCommerce, '
-#  'prestashop,Coming soon - Install Prestashop, '
-#  'drupal,Coming soon - Install Drupal, '
-#  'react,Coming soon - Install React, '
-#  'angular,Coming soon - Install Angular, '
-#  'vue,Coming soon - Install Vue, '
-#  'next,Coming soon - Install Next, '
+_mod_MAIN=(
+  'symfony.tasks.menu.show_config_efde,EFDE show config, '
+  'console,Console, '
+  'docker,Docker, '
 )
+
+_mod_CREATE_ENVIRONMENT=(
+  'symfony.tasks.install.create_new_environment,Create new app, '
+  'symfony.tasks.install.clone_environment,Clone existing app, '
+)
+
+_mod_CREATE_ENVIRONMENT_VERSION=(
+  '5,Symfony 5.x,This version works with PHP-7.x'
+  '6,Symfony 6.x,This version works with PHP-8.x'
+)
+

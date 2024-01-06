@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#declare -gA ALL_MENUS
+#declare -a MENU=('tools,Tools, ' 'symfony,Install Symfony, ' 'magento,Coming soon - Install Magento | Wordpress | Prestashop | Drupal | React | Angular | Vue | Next, ')
+#ALL_MENUS["MENU_INIT"]="${MENU[@]}"
+
+_mod_MAIN=(
+  'tools,Tools, ESTE'
+  'symfony.tasks.menu.create_environment,Install Symfony, ')

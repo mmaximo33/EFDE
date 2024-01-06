@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
 _mod_.echo() {
   # shellcheck disable=SC2068
   local MSG="$(_mod_.msg_color $@)"
-  command printf "$MSG"  2>/dev/null
+  command printf "$MSG\n"  2>/dev/null
 }
 
 _mod_.msg_color(){
     local MSG START_COLOR INIT_COLOR=${COLOR_RESET}
     case $1 in
-      success)  shift;  MSG="${B_GREEN}$@${COLOR_RESET}\n";;
-      info)     shift;  MSG="${B_CYAN}$@${COLOR_RESET}\n";;
-      warning)  shift;  MSG="${B_YELLOW}$@${COLOR_RESET}\n";;
-      danger)   shift;  MSG="${B_RED}$@${COLOR_RESET}\n";;
-      debug)    shift;  MSG="${B_PURPLE}$@${COLOR_RESET}\n";;
-      *)                MSG="$@\n";;
+      success)  shift;  MSG="${B_GREEN}$@${COLOR_RESET}";;
+      info)     shift;  MSG="${B_CYAN}$@${COLOR_RESET}";;
+      warning)  shift;  MSG="${B_YELLOW}$@${COLOR_RESET}";;
+      danger)   shift;  MSG="${B_RED}$@${COLOR_RESET}";;
+      debug)    shift;  MSG="${B_PURPLE}$@${COLOR_RESET}";;
+      *)                MSG="$@";;
     esac
 
     echo "$MSG"
@@ -30,7 +29,7 @@ _mod_.msg_type(){
       error)    shift;    type="Error";;
       warning)  shift;    type="Warning";;
       danger)   shift;    type="Danger";;
-      *)        echo $@;  return;;
+      *)        echo "$@";  return;;
     esac
 
     # shellcheck disable=SC2145
@@ -38,23 +37,23 @@ _mod_.msg_type(){
 }
 
 _mod_.success(){
-  _mod_.echo success $@
+  _mod_.echo success "$@"
 }
 
 _mod_.info(){
-  _mod_.echo info $@
+  _mod_.echo info "$@"
 }
 
 _mod_.warning(){
-  _mod_.echo warning $@
+  _mod_.echo warning "$@"
 }
 
 _mod_.danger(){
-  _mod_.echo danger $@
+  _mod_.echo danger "$@"
 }
 
 _mod_.debug(){
   if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
-    _mod_.echo debug $@
+    _mod_.echo debug "$@"
   fi
 }

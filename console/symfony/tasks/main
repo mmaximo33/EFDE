@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.run_command_app_cli(){
+  # shellcheck disable=SC2145
+  docker.tasks.main.dp_command_run "run --rm app_cli ${@}"
+}
+
+_mod_.permissions_fix(){
+  local PATH_APP="./app"
+  ! common.tasks.directory.exists "$PATH_APP" && common.tasks.directory.create_recursive "$PATH_APP"
+  common.tasks.command_line.run true false "sudo chown -R $USER:$USER $PATH_APP"
+}

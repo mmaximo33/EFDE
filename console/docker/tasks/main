@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+declare -g GLOBAL_DOCKER_COMPOSE_COMMAND
+
+# https://docs.docker.com/compose/
+# From the end of June 2023 Compose V1 won’t be supported anymore and will be removed from all Docker Desktop versions.
+if docker compose version > /dev/null 2>&1; then
+  GLOBAL_DOCKER_COMPOSE_COMMAND="docker compose"
+else
+  GLOBAL_DOCKER_COMPOSE_COMMAND="docker-compose"
+fi
+
+_mod_.dp_up(){
+  _mod_.dp_command_run "up -d --build"
+}
+
+_mod_.dp_start(){
+  _mod_.dp_command_run "start"
+}
+
+_mod_.dp_stop(){
+  _mod_.dp_command_run "stop"
+}
+
+_mod_.dp_all_stop(){
+  local CONTAINERS=$(docker ps -q)
+  if [ -n "$CONTAINERS" ]; then
+    common.tasks.command_line.run false false "docker stop $CONTAINERS"
+  fi
+}
+
+_mod_.dp_command_run(){
+  local COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} $@"
+  common.tasks.command_line.run true false "${COMMAND_RUN}"
+}
+
+
+_mod_.apache_stop(){
+  if systemctl is-active --quiet apache2; then
+      local QUESTION="APACHE2 is ON, do you want to turn it OFF?"
+      if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
+        local COMMAND_RUN="sudo service apache2 stop"
+        common.tasks.command_line.run true false ${COMMAND_RUN}
+      fi
+  fi
+}
