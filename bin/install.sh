@@ -199,13 +199,12 @@
     sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
     sudo chmod g+rwx "$HOME/.docker" -R
 
-    #sudo systemctl restart docker
+    sudo systemctl restart docker
   }
 
   efde_install_docker_compose() {
     # https://docs.docker.com/compose/install/linux/
-    echo "install"
-    #sudo apt-get install docker-compose-plugin
+    sudo apt-get install docker-compose-plugin
   }
 
   #######################################################################
