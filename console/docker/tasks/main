@@ -10,6 +10,11 @@ else
   GLOBAL_DOCKER_COMPOSE_COMMAND="docker-compose"
 fi
 
+_mod_.dp_command_run(){
+  local COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} $@"
+  common.tasks.command_line.run true false "${COMMAND_RUN}"
+}
+
 _mod_.dp_up(){
   _mod_.dp_command_run "up -d --build"
 }
@@ -26,21 +31,121 @@ _mod_.dp_all_stop(){
   local CONTAINERS=$(docker ps -q)
   if [ -n "$CONTAINERS" ]; then
     common.tasks.command_line.run false false "docker stop $CONTAINERS"
+  else
+    common.tasks.message.info "> There are no containers running at this time."
   fi
 }
-
-_mod_.dp_command_run(){
-  local COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} $@"
-  common.tasks.command_line.run true false "${COMMAND_RUN}"
-}
-
 
 _mod_.apache_stop(){
   if systemctl is-active --quiet apache2; then
       local QUESTION="APACHE2 is ON, do you want to turn it OFF?"
       if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
         local COMMAND_RUN="sudo service apache2 stop"
-        common.tasks.command_line.run true false ${COMMAND_RUN}
+        common.tasks.command_line.run true false "$COMMAND_RUN"
       fi
   fi
 }
+
+_mod_.dp_down(){
+  _mod_.dp_command_run "down"
+}
+
+_mod_.dp_logs(){
+  local COMMAND_RUN VALUES MSG SEARCH
+  COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} logs -f"
+  VALUES=""
+  MSG=$(common.tasks.message.msg_color warning 'Enter value to search or press Enter for all:')
+
+  while true; do
+      SEARCH=$(common.tasks.prompt.request_input "$MSG")
+
+      if [[ -z "$SEARCH" ]]; then
+          break
+      else
+          if [[ -n "$VALUES" ]]; then
+              VALUES="$VALUES|$SEARCH"
+          else
+              VALUES="$SEARCH"
+          fi
+      fi
+  done
+
+  if [[ -n "$VALUES" ]]; then
+      COMMAND_RUN="${COMMAND_RUN} | egrep --color=always -E \"$VALUES\""
+  fi
+  common.tasks.command_line.run true true "${COMMAND_RUN}"
+}
+
+_mod_.dp_show_container(){
+  local COMMAND="ps"
+  if [[ $# -gt 0 && "$1" == "simple" ]]; then
+    COMMAND="ps --format \"table {{.Name}}\t{{.Image}}\t{{.Service}}\""
+  fi
+  _mod_.dp_command_run "$COMMAND"
+
+}
+
+#_mod_.container_select() {
+#  local MSG SERVICE
+#  _mod_.dp_show_container simple
+#
+#  local MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+#  local SERVICE
+#  SERVICE=$(common.tasks.prompt.request_input "$MSG")
+#
+#  while [[ -z "$SERVICE" || -z $(docker-compose ps -q --services | grep -w "$SERVICE") ]]; do
+#    common.tasks.message.warning "Invalid service name. Please enter a valid service."
+#    SERVICE=$(common.tasks.prompt.request_input "$MSG")
+#  done
+#
+#  _mod_.dp_command_run "ps --filter name=$SERVICE"
+#  echo "$SERVICE"
+#}
+
+
+_mod_.container_entry(){
+  local COMMAND_RUN VALUES MSG SERVICE
+
+  _mod_.dp_show_container simple
+  MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+  SERVICE=$(common.tasks.prompt.request_input "$MSG")
+
+  MSG=$(common.tasks.message.msg_color warning 'You want to open a new instance? RUN=Y or EXEC=N')
+  if common.tasks.prompt.confirm_default_yes "$MSG"; then
+    COMMAND_RUN="run --rm"
+  else
+    COMMAND_RUN="exec"
+  fi
+  _mod_.dp_command_run "$COMMAND_RUN $SERVICE bash"
+}
+
+_mod_.container_run_command() {
+  local COMMAND_RUN COMMAND_CUSTOM MSG SERVICE
+
+  _mod_.dp_show_container simple
+
+  MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+  SERVICE=$(common.tasks.prompt.request_input "$MSG")
+
+  MSG=$(common.tasks.message.msg_color warning 'You want to open a new instance? RUN=Y or EXEC=N')
+  if common.tasks.prompt.confirm_default_yes "$MSG"; then
+    COMMAND_RUN="run --rm"
+  else
+    COMMAND_RUN="exec"
+  fi
+
+  while true; do
+    MSG=$(common.tasks.message.msg_color warning 'What command do you want to run?:')
+    COMMAND_CUSTOM=$(common.tasks.prompt.request_input "$MSG")
+
+    common.tasks.command_line.run true false "$GLOBAL_DOCKER_COMPOSE_COMMAND $COMMAND_RUN $SERVICE $COMMAND_CUSTOM"
+
+    MSG=$(common.tasks.message.msg_color warning 'Do you want to run another command?')
+    if common.tasks.prompt.confirm_default_yes "$MSG"; then
+      continue
+    else
+      break
+    fi
+  done
+}
+

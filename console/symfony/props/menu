@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
+{
+  # shellcheck disable=SC2168
+  local PATH_MENU="symfony.tasks.menu"
 
-_mod_MAIN=(
-  'symfony.tasks.menu.show_config_efde,EFDE show config, '
-  'console,Console, '
-  'docker,Docker, '
-)
+  _mod_MAIN=(
+    "$PATH_MENU.show_config_project,Project config,Settings established in the project"
+    "$PATH_MENU.console,Console,Symfony Console"
+    "docker.tasks.menu.main,Docker,Dockerization management in the project"
+    "$PATH_MENU.symfony_fix_permissions,Fix permissions, "
+  )
 
-_mod_CREATE_ENVIRONMENT=(
-  'symfony.tasks.install.create_new_environment,Create new app, '
-  'symfony.tasks.install.clone_environment,Clone existing app, '
-)
+  _mod_CREATE_ENVIRONMENT=(
+    "symfony.tasks.install.create_new_environment,Create new app, "
+    "symfony.tasks.install.clone_environment,Clone existing app, "
+  )
 
-_mod_CREATE_ENVIRONMENT_VERSION=(
-  '5,Symfony 5.x,This version works with PHP-7.x'
-  '6,Symfony 6.x,This version works with PHP-8.x'
-)
-
+  _mod_CREATE_ENVIRONMENT_VERSION=(
+    "5,Symfony 5.x,This version works with PHP-7.x"
+    "6,Symfony 6.x,This version works with PHP-8.x"
+  )
+}

@@ -54,7 +54,9 @@ _mod_.print_menu(){
 #        fi
     else
         [[ "$choice" == "q" ]] && exit 0
-        [[ "$choice" == "r" ]] && { common.console_clear; ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}; return; }
+        # MMToDo: Bug in return functions
+        [[ "$choice" == "r" ]] && { common.tasks.message.danger "We detected a BUG, we are working to correct the return"; ${GLOBAL_RUN_EFDE}; }
+        #[[ "$choice" == "r" ]] && { common.console_clear; ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}; return; }
         common.console_clear
         common.tasks.message.danger "The '$choice' option is not in the list."
         _mod_.print_menu "$question" "${options[@]}"

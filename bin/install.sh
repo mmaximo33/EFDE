@@ -223,7 +223,7 @@
       "end")
         efde_echo >&2 "# $PROJECT_NAME is successfully installed and configured."
         efde_echo >&2 "# Select the directory and create your new project"
-        efde_echo >&2 "# By running '$ efde --help'"
+        efde_echo >&2 "# By running '$ efde'"
         ;;
       *)
         efde_echo >&2 "# Error step"
@@ -293,7 +293,6 @@
     efde_project_install_from_git
 
     efde_reset
-    efde_confirm_default_yes "You want to run efde --help now?" && efde
   }
 
   efde_project_install_from_git() {
@@ -311,6 +310,8 @@
     efde_create_bin
 
     efde_print_step end
+
+    #efde_confirm_default_yes "You want to run efde now?" && efde
   }
 
   efde_project_install_existing_folder(){

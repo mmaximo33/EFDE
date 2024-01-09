@@ -13,12 +13,22 @@ _mod_.create_environment_version(){
   common.tasks.menu.print_menu "Select an option:" "${symfony_props_menu_CREATE_ENVIRONMENT_VERSION[@]}"
 }
 
-_mod_.show_config_efde(){
+_mod_.show_config_project(){
   cat "$(efde.tasks.implemention.get_current_path_env_file)"
-  if  common.tasks.prompt.confirm_default_yes "Back to menu?"; then
+  if common.tasks.prompt.confirm_default_yes $(common.tasks.message.msg_color warning "Back to menu?"); then
     common.console_clear
     _mod_.main
   else
     exit
   fi
+}
+
+_mod_.symfony_fix_permissions(){
+  symfony.tasks.main.permissions_fix
+  _mod_.main
+}
+
+_mod_.console(){
+  symfony.tasks.main.symfony_console_run_command
+  _mod_.main
 }

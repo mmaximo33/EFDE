@@ -5,11 +5,11 @@
 ## Table of Contents
 
 - [Intro](#intro)
-- [About](#about)
 - [Installing and Updating](#install--update)
   - [Install](#install)
   - [Update](#update)
 - [Usage](#usage)
+- [About](#about)
 - [Documentation](#documentation)
   - [Code of conduct](#code-of-conduct)
   - [Maintainers](#maintainers)
@@ -17,27 +17,6 @@
   - [License](#license)
 
 ## Intro
-
-EFDE arises motivated by giving something back to this beautiful community of programmers, computer scientists or curious about technology.
-
-After having gone through some companies, participated in several teams, been a mentor to team members with beginner profiles and even taught this world to family and friends.
-I realized that today there are several elements (services, tools, systems, others) that orbit around trying to learn a language, framework or technology.
-
-EFDE aims to standardize, automate and simplify the deployment or preparation of local development environments for different projects. Without losing the flexibility that they can be customized or adjusted according to the need or complexity of the project.
-
-EFDE is not the definitive solution to your problems, sooner or later you will have to understand exactly what is happening behind the things, but you will acquire the answers of what, when, where, for what and why, as you use it.
-
-Who is it for?
-It originally arises to help understand and expedite the induction process for those new members of a project or those people who are starting out in the world of programming and are not entirely clear about some knowledge, concepts or bases of services, applications or implementations. .
-
-But it's also thinking of those developers who have a bit more experience and really want to have a little tool to help them do the usual tasks.
-
-Whatever your level, EFDE will be interesting for you!
-You are invited to join, use or even contribute to the growth of EFDE to give back to the developer community and open the doors to the new generations.
-
-It is NOT something super innovative, but surely more than one will find it interesting.
-
-## About
 
 EFDE is a project designed to facilitate the management of local development environments, mainly for teams that constantly have new members or beginners who are starting out in this beautiful world of programming.
 
@@ -74,6 +53,8 @@ Anyway, if you want to know more, you can see the following list with the offici
 ### Install
 
 To **install** EFDE, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
+
+[See Youtube - Short](https://www.youtube.com/shorts/gE3qYC1AUOk)
 
 ```sh
 curl -o- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
@@ -115,34 +96,41 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-ba
 # By running '$ efde --help'
 -----------------------------------------------------------------------
 You want to run efde --help now? [Y/n]? 
-
 ```
 
-[See Youtube - Short](https://www.youtube.com/shorts/gE3qYC1AUOk)
+### Usage
 
-
-### Update
-
-You can update in two ways
-
-- Installing it again according to [Install](#install)
-- Running efde with the **--update** option
+- Once installed, you can run EFDE from any directory
+- If you are in a project created with EFDE, it will give you the options available for that environment
 
 ```sh
-efde --update
-```
-
-## Usage
-
-Once installed, you can run EFDE from any directory
-
-```sh
-efde --help
+# Run command in console
+efde
 ```
 
 ## Captures
 
 ![efde + symfony](./docs/images/efde_symfony.png)
+
+## About
+EFDE arises motivated by giving something back to this beautiful community of programmers, computer scientists or curious about technology.
+
+After having gone through some companies, participated in several teams, been a mentor to team members with beginner profiles and even taught this world to family and friends.
+I realized that today there are several elements (services, tools, systems, others) that orbit around trying to learn a language, framework or technology.
+
+EFDE aims to standardize, automate and simplify the deployment or preparation of local development environments for different projects. Without losing the flexibility that they can be customized or adjusted according to the need or complexity of the project.
+
+EFDE is not the definitive solution to your problems, sooner or later you will have to understand exactly what is happening behind the things, but you will acquire the answers of what, when, where, for what and why, as you use it.
+
+Who is it for?
+It originally arises to help understand and expedite the induction process for those new members of a project or those people who are starting out in the world of programming and are not entirely clear about some knowledge, concepts or bases of services, applications or implementations. .
+
+But it's also thinking of those developers who have a bit more experience and really want to have a little tool to help them do the usual tasks.
+
+Whatever your level, EFDE will be interesting for you!
+You are invited to join, use or even contribute to the growth of EFDE to give back to the developer community and open the doors to the new generations.
+
+It is NOT something super innovative, but surely more than one will find it interesting.
 
 ## Documentation
 

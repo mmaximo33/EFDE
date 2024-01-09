@@ -18,3 +18,7 @@ _mod_.tools(){
   common.tasks.menu.print_menu "Select an option:" "${efde_props_menu_TOOLS[@]}"
 }
 
+_mod_.comming_soon(){
+  efde.tasks.main.comming_soon
+  _mod_.main
+}
