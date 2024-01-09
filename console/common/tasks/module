@@ -8,3 +8,15 @@ _mod_.check() {
 _mod_.exists_function(){
   [ "$(type -t "$1")" = "function" ]
 }
+
+# MMTodo: Prepare for debug
+# Debug Call Stack
+_mod_.debug_function_moment(){
+    local func_last func_penultimate
+    func_last=$(caller 0)
+    func_penultimate=$(caller 1)
+    common.tasks.message.warning "$(echo "$func_last" | awk '{print $3}')"
+    echo -e "\n"
+    #echo $func_penultimate
+    #echo $(echo "$caller_info" | awk '{print $3}')
+}

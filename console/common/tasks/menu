@@ -27,15 +27,15 @@ _mod_.print_menu(){
         if [[ ${#values[@]} -ge 2 ]]; then
             titulo=${values[1]}
             description=$([ "$EFDE_MOD_DEBUG" = "true" ] && echo  ${values[0]} || echo ${values[2]})
-            printf "%-0s. %-40s %s\n" "$i" "$titulo" "$description"
+            printf "%-0s. %-35s %s\n" "$i" "$titulo" "$description"
         else
-            common.tasks.message.warning "Opción inválida: $option"
+            common.tasks.message.warning "Invalid option: $option"
         fi
     done
 
     common.tasks.message.info "\nPress R to return | Q to quit | I for info"
 
-    choice=$(common.tasks.prompt.request_input "$(common.tasks.message.success "Enter the option number:") ")
+    choice=$(common.tasks.prompt.request_input "$(common.tasks.message.success "Enter the option number:")")
 
     if [[ $choice =~ ^[0-9]+$ && $choice -ge 0 && $choice -le $(( ${#options[@]} -1 )) ]]; then
         MENU_RESPONSE_CHOICE=$choice
@@ -56,7 +56,7 @@ _mod_.print_menu(){
         [[ "$choice" == "q" ]] && exit 0
         [[ "$choice" == "r" ]] && { common.console_clear; ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}; return; }
         common.console_clear
-        common.tasks.message.danger "La opción '$choice' no está en la lista."
+        common.tasks.message.danger "The '$choice' option is not in the list."
         _mod_.print_menu "$question" "${options[@]}"
     fi
 }

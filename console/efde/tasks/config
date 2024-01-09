@@ -13,26 +13,60 @@ _mod_.check_config() {
 }
 
 _mod_.create_config() {
-  common.tasks.message.warning "Crearemos tu configuracion"
+  common.tasks.message.info "Your first time with EFDE?"
+  common.tasks.message.info "We will create the basic configurations"
   _mod_.set_config
 }
 
 _mod_.set_config(){
-  #autoupdate #days
-  #lenguaje #es_ES en_US pt_PT
-  #my_options=("es_ES" "en_US" "pt_PT")
-  #common.tasks.menu.show_menu --question="¿Que lenguaje?" --options="es_ES,en_US,pt_PT"
-  result=$(common.tasks.menu.show_menu --question="¿Que lenguaje?" --options="es_ES,en_US,pt_PT")
-  echo $result
-  exit
-  # Definir el array asociativo con los pares "key=value"
-  declare -A env_vars=(
-    [VERSION]=$(_mod_.set_config_version)
-    [SO]=$(common.tasks.os.get_operating_system)
-    [LAST_UPDATE]=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
-  )
+  _mod_.set_config_language
+  _mod_.set_efde_global
 
-  echo -e "$(_mod_.prepare_string_to_env env_vars)" > $CONFIG_PATH_FILE
+  _mod_.set_var "SO" "$(common.tasks.os.get_operating_system)"
+  _mod_.set_var "EFDE_VERSION" "$(_mod_.set_config_version)"
+  _mod_.set_var "EFDE_LAST_UPDATE" "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
+
+  _mod_.confirm_config
+  ${GLOBAL_RUN_EFDE}
+}
+
+_mod_.confirm_config(){
+    common.tasks.message.success "This is your EFDE configuration"
+    common.tasks.message.info "It is stored in the following file \n > $CONFIG_PATH_FILE \n"
+    _mod_.show_config
+    if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "\nReset settings") ; then
+      _mod_.set_config
+    fi
+}
+
+_mod_.show_config() {
+  while IFS= read -r LINE || [[ -n "$LINE" ]]; do
+      common.tasks.message.info "$LINE"
+  done < "$CONFIG_PATH_FILE"
+}
+
+_mod_.set_config_language(){
+  common.tasks.menu.print_menu "Default language?" "${efde_props_menu_CONFIG_SET_LENGUAGE[@]}"
+  RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  _mod_.set_var "LENGUAGE" "$RESPONSE"
+}
+
+_mod_.set_efde_global(){
+  local MSG=""
+  local RESPONSE=false
+  MSG=$(common.tasks.message.msg_color warning "Take default settings (Recommended)")
+  common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true
+  _mod_.set_var "CLI_SHOW_DEFAULT" "$RESPONSE"
+  if [ "$RESPONSE" = "false" ]; then
+      MSG=$(common.tasks.message.msg_color warning "Always show executed commands?")
+      common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true || RESPONSE=false
+      _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
+
+      MSG=$(common.tasks.message.msg_color warning "Always show command output?")
+      common.tasks.prompt.confirm_default_yes "$MSG"  && RESPONSE=true || RESPONSE=false
+      _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
+  fi
+
 }
 
 _mod_.set_config_version() {
@@ -40,113 +74,19 @@ _mod_.set_config_version() {
 }
 
 _mod_.load_config() {
-  echo "load config"
+  GLOBAL_EFDE_CONFIG['CLI_SHOW_DEFAULT']=$(_mod_.get_var "CLI_SHOW_DEFAULT")
+  GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']=$(_mod_.get_var "CLI_SHOW_CLI")
+  GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']=$(_mod_.get_var "CLI_SHOW_OUTPUT")
 }
 
-_mod_.show_config() {
- echo "t"
+_mod_.get_var(){
+  local KEY="$1"
+  echo $(common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_FILE")
 }
 
-_mod_.set_environment_variable() {
-
-    if [ "$#" -ne 3 ]; then
-        echo "Error: Se requieren tres parámetros: key, value, file"
-        return 1
-    fi
-
-    local key="$1"
-    local value="$2"
-    local file="$3"
-
-    key=$(echo "$key" | tr '[:lower:]' '[:upper:]' | tr ' ' '_')
-
-    if [ ! -e "$file" ]; then
-        touch "$file"
-    fi
-
-    if grep -q "^$key=" "$file"; then
-        # Update existing
-        sed -i "s/^$key=.*/$key=\"$value\"/" "$file"
-    else
-        # add new
-        echo "$key=\"$value\"" >> "$file"
-    fi
-}
-
-# USAGED
-# Call:
-#   SETUP_ENVIRONMENT=(
-#     [NAME]="MyName"
-#     [CREATE_AT]="2000-01-01"
-#     [IMPLEMENTION]="efde"
-#   )
-#   VAR_STRING="$(_mod_.prepare_string_to_env SETUP_ENVIRONMENT)"
-#
-#   echo -e "$VAR_STRING" > "$PATH_FILE"
-#
-# Response:
-#   'NAME="MyName"\nCREATE_AT="2000-01-01"\nIMPLEMENTION="efde"'
-_mod_.prepare_string_to_env(){
-  local -n env_array=$1
-  local env_str=""
-
-  for key in "${!env_array[@]}"; do
-    value="${env_array[$key]}"
-    env_str+="\n$key=\"$value\""
-  done
-
-  env_str="${env_str:2}" # Remove firts \n
-
-  echo "$env_str"
-}
-
-_mod_.get_environment_variable() {
-    if [ "$#" -ne 2 ]; then
-        echo "Error: Se requieren dos parámetros: key, file"
-        return 1
-    fi
-
-    local key="$1"
-    local file="$2"
-
-    key=$(echo "$key" | tr '[:lower:]' '[:upper:]' | tr ' ' '_')
-
-    if [ -e "$file" ]; then
-        local value=$(grep "^$key=" "$file" | sed "s/^$key=//")
-        if [ -n "$value" ]; then
-            echo "$value"
-        else
-            echo "No encontrado"
-        fi
-    else
-        echo "Error: El archivo $file no existe."
-        return 1
-    fi
-}
-
-_mod_.load_variables_from_file() {
-  local file_path="$1"
-  local variables=""
-
-  if [ -f "$file_path" ]; then
-    # Leer el archivo y construir la cadena de variables
-    while IFS='=' read -r key value; do
-      # Eliminar espacios en blanco alrededor de la clave y el valor
-      key=$(echo "$key" | sed 's/^[ \t]*//;s/[ \t]*$//')
-      value=$(echo "$value" | sed 's/^[ \t]*//;s/[ \t]*$//')
-
-      # Agregar la variable a la cadena
-      variables+="$key=\"$value\" "
-    done < "$file_path"
-
-    # Eliminar posibles espacios en blanco al final
-    variables=$(echo "$variables" | sed 's/[ \t]*$//')
-
-    # Devolver la cadena de variables
-    echo "$variables"
-  else
-    echo "Error: El archivo $file_path no existe."
-    return 1
-  fi
+_mod_.set_var(){
+  local KEY="$1"
+  local VALUE="$2"
+  common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$CONFIG_PATH_FILE"
 }
 

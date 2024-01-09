@@ -72,6 +72,7 @@ _mod_.tree(){
   local line prefix=""
   local level="${2:-0}"
   local end="${3:-0}"
+  local mode="${4:-}"
 
   if [ "$level" -eq 1 ]; then
     prefix+="├──"
@@ -88,7 +89,7 @@ _mod_.tree(){
   fi
 
   local LINE="$prefix $1"
-  _mod_.tree_print "$(_mod_.msg_color ${4} "$LINE")"
+  _mod_.tree_print "$(_mod_.msg_color $mode "$LINE")"
 }
 
 _mod_.tree_print(){

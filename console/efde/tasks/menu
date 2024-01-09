@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.main(){
+  common.tasks.menu.print_menu "Select an option:" "${efde_props_menu_EFDE[@]}"
+}
+
+_mod_.config(){
+  common.tasks.menu.print_menu "Select an option:" "${efde_props_menu_CONFIG[@]}"
+}
+
+_mod_.config_show(){
+  efde.tasks.config.show_config
+  _mod_.config
+}
+
+_mod_.tools(){
+  common.tasks.menu.print_menu "Select an option:" "${efde_props_menu_TOOLS[@]}"
+}
+

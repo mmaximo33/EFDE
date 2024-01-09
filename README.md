@@ -77,7 +77,8 @@ To **install** EFDE, you should run the install script. To do that, you may eith
 
 ```sh
 curl -o- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
-
+```
+```sh
 wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
 ```
 #### What will happen in the installation process?

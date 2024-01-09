@@ -3,14 +3,14 @@ set -euo pipefail
 
 _mod_.run() {
   if [ "$#" -ne 3 ]; then
-    local USED=""
-    USED+="Error: Three parameters are required:\n"
-    USED+=" - FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE\n"
-    USED+="\n parameters:\n ${@}\n"
-    USED+="\n Example:\n"
-    USED+=" - $FUNCNAME FORCE_SHOW_CLI=true FORCE_SHOW_OUTPUT=true COMMAND_LINE\n"
-    USED+=" - $FUNCNAME 1 0 'cd folder'"
-    common.tasks.message.danger $USED
+    local USE=""
+    USE+="Error: Three parameters are required:\n"
+    USE+=" - FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE\n"
+    USE+="\n parameters:\n ${@}\n"
+    USE+="\n Example:\n"
+    USE+=" - $FUNCNAME FORCE_SHOW_CLI=true FORCE_SHOW_OUTPUT=true COMMAND_LINE\n"
+    USE+=" - $FUNCNAME 1 0 'cd folder'"
+    common.tasks.message.danger $USE
     return 1
   fi
 
@@ -23,8 +23,6 @@ _mod_.run() {
   if [ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_DEFAULT']}" = "false" ]; then
     FORCE_SHOW_CLI=${GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']}
     FORCE_SHOW_OUTPUT=${GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']}
-    #[ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']}" = "true" ] && FORCE_SHOW_CLI=true
-    #[ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']}" = "true" ] && FORCE_SHOW_OUTPUT=true
   fi
 
   if [ "${FORCE_SHOW_CLI}" = "true" ]; then

@@ -4,3 +4,35 @@ set -euo pipefail
 _mod_.exists() {
   [ -e "$1" ]
 }
+
+# USE
+#
+# common.tasks.file.remove "$PATH_FILE"
+_mod_.remove() {
+  local FORCE PATH
+  FORCE=false
+  [[ "$1" == "force" ]] && { force=true; shift; path="$1"; }
+
+  local PATH="$1"
+  if [[ -z "$PATH" ]]; then
+    common.tasks.message.info "Usage: _mod_.remove [force] <path file>"
+    return 1
+  fi
+
+  if [[ ! -e "$PATH" ]]; then
+    common.tasks.message.danger "Error: Path file '$PATH' does not exist."
+    return 1
+  fi
+
+  local CONFIRM="Delete FILE"
+  local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
+  local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR'")
+  common.tasks.message.warning "We are about to delete the file $(common.tasks.message.msg_color info $PATH)"
+  local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
+  if [[ "$RESPONSE" == "$CONFIRM" ]]; then
+    [[ "$FORCE" == true ]] && /bin/rm -f "$PATH" || /bin/rm "$PATH"
+    common.tasks.message.success "Removed: $PATH"
+  else
+    common.tasks.message.warning "Removal aborted."
+  fi
+}

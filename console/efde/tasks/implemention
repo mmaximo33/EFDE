@@ -42,7 +42,7 @@ _mod_.has_folder_implementation(){
 }
 
 _mod_.create_symbolic_link_env(){
-local ORIGIN="${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
+  local ORIGIN="${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
   local TARGET="$(_mod_.get_new_path_project)/.env"
   ln -sfT "$ORIGIN" "$TARGET"
 }
@@ -60,12 +60,12 @@ _mod_.create_folder(){
 
 _mod_.set_envs(){
   local FILE="$(_mod_.get_new_path_env_file)"
-  efde.tasks.config.set_environment_variable $1 $2 $FILE
+  common.tasks.env_variable.set_variable $1 $2 $FILE
 }
 
 _mod.set_all_env(){
   local FILE="$(_mod_.get_new_path_env_file)"
-  local DATA_ENV="$(efde.tasks.config.prepare_string_to_env GLOBAL_SETUP_IMPLEMENTION)"
+  local DATA_ENV="$(common.tasks.env_variable.prepare_string_to_env GLOBAL_SETUP_IMPLEMENTION)"
 
   echo -e "$DATA_ENV" > "$FILE"
 

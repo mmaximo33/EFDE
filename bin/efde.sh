@@ -2,16 +2,11 @@
 set -euo pipefail
 # Debug mode
 EFDE_MOD_DEBUG=false # Messages debug
-EFDE_MOD_DEV=true # MMTodo: Prepared for create tmps
-EFDE_CFG_SHOW_CLI=true #show COMMANDLINE
-declare -gA GLOBAL_EFDE_CONFIG=(
-  [CLI_SHOW_DEFAULT]=true   # Omite configuraciones personalizadas
-  [CLI_SHOW_CLI]=true        #
-  [CLI_SHOW_OUTPUT]=false
-)
+EFDE_MOD_DEV=false # MMTodo: Prepared for create tmps
+declare -gA GLOBAL_EFDE_CONFIG
 
 
-GLOBAL_RUN_EFDE=$([ "$EFDE_MOD_DEBUG" = "true" ] && echo "e2" || echo "efde")
+GLOBAL_RUN_EFDE=$([ "$EFDE_MOD_DEV" = "true" ] && echo "e2" || echo "efde")
 
 [[ $(echo "$@" | grep -oP '(?<=--debug=)[^ ]+') = "true" && "$EFDE_MOD_DEBUG" = "false" ]] && EFDE_MOD_DEBUG=true
 
@@ -35,10 +30,6 @@ init_dirs()
     resolve_absolute_dir
     export PATH_CONSOLE="${EFDE_PATH_INSTALL}/console"
     export PATH_BIN="${EFDE_PATH_INSTALL}/bin"
-
-#    export COMMANDS_DIR="${ABSOLUTE_PATH}/console/commands"
-#    export TASKS_DIR="${ABSOLUTE_PATH}/console/tasks"
-#    export PROPERTIES_DIR="${EFDE_PATH_INSTALL}/console/common/properties"
 }
 
 init_dirs
@@ -50,15 +41,20 @@ menu_main(){
 
 menu_implementation(){
   local PATH_ENV=$(efde.tasks.implemention.get_current_path_env_file)
-  variables_string="$(efde.tasks.config.load_variables_from_file ${PATH_ENV})"
-  # Evaluar la cadena de variables
-  eval "$variables_string"
-  RUN_FUNCTION_IMPLEMENTATION_MAIN= "$IMPLEMENTION.tasks.menu.main"
+  local IMPLEMENTION=$(common.tasks.env_variable.get_variable "IMPLEMENTION" "$PATH_ENV")
 
-  ${RUN_FUNCTION_IMPLEMENTATION_MAIN}
+
+  RUN_FUNCTION_IMPLEMENTATION_MAIN="$IMPLEMENTION.tasks.menu.main"
+  if  common.tasks.module.exists_function "${RUN_FUNCTION_IMPLEMENTATION_MAIN}"; then
+    ${RUN_FUNCTION_IMPLEMENTATION_MAIN}
+  fi
+#  else
+#    ${GLOBAL_RUN_EFDE}
+#  fi
 }
 
 main(){
+  efde.tasks.config.check_config
   if ! efde.tasks.implemention.has_folder_implementation ; then
     menu_main
   fi

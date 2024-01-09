@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-_mod_.set_variable() {
+_mod_.pila_llamada(){
+    local caller_info
+    caller_info=$(caller 0)
+    echo $caller_info
+    echo $(echo "$caller_info" | awk '{print $3}')
+}
 
+# USE
+#
+#   common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$PATH_FILE"
+#   common.tasks.env_variable.set_variable $1 $2 $FILE
+_mod_.set_variable() {
     if [ "$#" -ne 3 ]; then
-        echo "Error: Se requieren tres parámetros: key, value, file"
+        common.tasks.message.danger "[Error]: Se requieren tres parámetros: key, value, file \n" >&2
         return 1
     fi
 
@@ -29,7 +39,7 @@ _mod_.set_variable() {
 
 _mod_.get_variable() {
     if [ "$#" -ne 2 ]; then
-        echo "Error: Se requieren dos parámetros: key, file"
+        common.tasks.message.danger "[Error]: Two parameters required: $KEY, $FILE \n" >&2
         return 1
     fi
 
@@ -44,64 +54,75 @@ _mod_.get_variable() {
             value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/')
             echo -n "$value"
         else
-            echo "No encontrado"
+            common.tasks.message.danger  "No encontrado: " >&2
         fi
     else
-        echo "Error: El archivo $file no existe."
-        return 1
+        #echo $(common.tasks.module.debug_function_moment) >&2
+        common.tasks.message.debug "[Error]: File $file does not exist " >&2
+        common.tasks.message.debug "- Function: $FUNCNAME" >&2
+        common.tasks.message.debug "- CallFunction: $FUNCNAME" >&2
+        return 0
     fi
 }
+
+
+# USAGED
+# Call:
+#   SETUP_ENVIRONMENT=(
+#     [NAME]="MyName"
+#     [CREATE_AT]="2000-01-01"
+#     [IMPLEMENTION]="efde"
+#   )
+#   VAR_STRING="$(_mod_.prepare_string_to_env SETUP_ENVIRONMENT)"
 #
+#   echo -e "$VAR_STRING" > "$PATH_FILE"
 #
-## USAGED
-## Call:
-##   SETUP_ENVIRONMENT=(
-##     [NAME]="MyName"
-##     [CREATE_AT]="2000-01-01"
-##     [IMPLEMENTION]="efde"
-##   )
-##   VAR_STRING="$(_mod_.prepare_string_to_env SETUP_ENVIRONMENT)"
-##
-##   echo -e "$VAR_STRING" > "$PATH_FILE"
-##
-## Response:
-##   'NAME="MyName"\nCREATE_AT="2000-01-01"\nIMPLEMENTION="efde"'
-#_mod_.prepare_string_to_env(){
-#  local -n env_array=$1
-#  local env_str=""
+# Response:
+#   'NAME="MyName"\nCREATE_AT="2000-01-01"\nIMPLEMENTION="efde"'
+_mod_.prepare_string_to_env(){
+  local -n env_array=$1
+  local env_str=""
+
+  for key in "${!env_array[@]}"; do
+    value="${env_array[$key]}"
+    env_str+="\n$key=\"$value\""
+  done
+
+  env_str="${env_str:2}" # Remove firts \n
+
+  echo "$env_str"
+}
+
+# USE
 #
-#  for key in "${!env_array[@]}"; do
-#    value="${env_array[$key]}"
-#    env_str+="\n$key=\"$value\""
-#  done
+#  variables_string="$(common.tasks.env_variable.load_variables_from_file ${PATH_ENV})"
+#  # Evaluar la cadena de variables
+#  eval "$variables_string"
+#  RUN_FUNCTION_IMPLEMENTATION_MAIN= "$IMPLEMENTION.tasks.menu.main"
 #
-#  env_str="${env_str:2}" # Remove firts \n
-#
-#  echo "$env_str"
-#}
-#
-#_mod_.load_variables_from_file() {
-#  local file_path="$1"
-#  local variables=""
-#
-#  if [ -f "$file_path" ]; then
-#    # Leer el archivo y construir la cadena de variables
-#    while IFS='=' read -r key value; do
-#      # Eliminar espacios en blanco alrededor de la clave y el valor
-#      key=$(echo "$key" | sed 's/^[ \t]*//;s/[ \t]*$//')
-#      value=$(echo "$value" | sed 's/^[ \t]*//;s/[ \t]*$//')
-#
-#      # Agregar la variable a la cadena
-#      variables+="$key=\"$value\" "
-#    done < "$file_path"
-#
-#    # Eliminar posibles espacios en blanco al final
-#    variables=$(echo "$variables" | sed 's/[ \t]*$//')
-#
-#    # Devolver la cadena de variables
-#    echo "$variables"
-#  else
-#    echo "Error: El archivo $file_path no existe."
-#    return 1
-#  fi
-#}
+# $IMPLEMENTION="TEST"
+_mod_.load_variables_from_file() {
+  local file_path="$1"
+  local variables=""
+
+  if [ -f "$file_path" ]; then
+    # Leer el archivo y construir la cadena de variables
+    while IFS='=' read -r key value; do
+      # Eliminar espacios en blanco alrededor de la clave y el valor
+      key=$(echo "$key" | sed 's/^[ \t]*//;s/[ \t]*$//')
+      value=$(echo "$value" | sed 's/^[ \t]*//;s/[ \t]*$//')
+
+      # Agregar la variable a la cadena
+      variables+="$key=\"$value\" "
+    done < "$file_path"
+
+    # Eliminar posibles espacios en blanco al final
+    variables=$(echo "$variables" | sed 's/[ \t]*$//')
+
+    # Devolver la cadena de variables
+    echo "$variables"
+  else
+    common.tasks.message.danger "[Error]: File $file_path does not exist" >&2
+    return 1
+  fi
+}

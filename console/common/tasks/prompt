@@ -7,11 +7,11 @@ set -euo pipefail
 # valor de retorno del comando o función para indicar el éxito o fracaso de la operación.
 # El código de retorno 0 se usa para indicar éxito (o "true") y cualquier otro valor se usa para indicar fracaso (o "false").
 #
-# USED SIMPLE
+# USE SIMPLE
 #   _mod_.confirm_default_no  "Question?" && action_function
 #   _mod_.confirm_default_yes "Question?" && action_function
 #
-# USED Extra
+# USE Extra
 #  local RESULT=true
 #  if common.tasks.prompt.confirm_default_yes "Question? " ; then
 #    RESULT=true
@@ -74,6 +74,6 @@ _mod_.confirm_default_yes() {
 
 _mod_.request_input() {
   local prompt="$*"
-  read -r -p "$(printf "%b" "$prompt")"  value
+  read -r -p "$(printf "%b" "$prompt") "  value
   echo "$value"
 }
