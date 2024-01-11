@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  TITLE="$(printf '%.s+' {1..45})\nEFDE | Easy and Fast Developer Environment\nSelect an option:"
+
+  _mod_.main(){
+    common.tasks.menu.print_menu "$TITLE" "${efde_props_menu_MAIN[@]}"
+  }
+
+  _mod_.efde(){
+    common.tasks.menu.print_menu "$TITLE" "${efde_props_menu_EFDE[@]}"
+  }
+
+  _mod_.config(){
+    common.tasks.menu.print_menu "$TITLE" "${efde_props_menu_CONFIG[@]}"
+  }
+
+  _mod_.config_show(){
+    efde.tasks.config.show_config
+    _mod_.config
+  }
+
+  _mod_.tools(){
+    common.tasks.menu.print_menu "$TITLE" "${efde_props_menu_TOOLS[@]}"
+  }
+
+  _mod_.coming_soon(){
+    efde.tasks.main.coming_soon
+    _mod_.main
+  }
+}

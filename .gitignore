@@ -1,1 +1,3 @@
-__pycache__
+.idea
+bin/.tmp
+bin/config.env

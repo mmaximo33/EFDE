@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.get_operating_system() {
+  local os=""
+  case "$OSTYPE" in
+    linux-gnu)   os="Linux"       ;;
+    darwin*)     os="macOS"       ;;
+    cygwin|msys) os="Windows"     ;;
+    *)           os="Undefined" ;;
+  esac
+  echo "$os"
+}

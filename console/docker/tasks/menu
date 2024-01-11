@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.main(){
+  common.tasks.menu.print_menu "Select an option:" "${docker_props_menu_MAIN[@]}"
+}
+
+_mod_.build(){
+  docker.tasks.main.dp_up
+  _mod_.main
+}
+
+_mod_.show(){
+  docker.tasks.main.dp_show_container simple
+  _mod_.main
+}
+
+_mod_.start(){
+  docker.tasks.main.dp_start
+  _mod_.main
+}
+
+_mod_.stop(){
+  docker.tasks.main.dp_stop
+  _mod_.main
+}
+
+_mod_.stop_all(){
+  docker.tasks.main.dp_all_stop
+  _mod_.main
+}
+
+_mod_.apache_stop(){
+  docker.tasks.main.apache_stop
+  _mod_.main
+}
+
+_mod_.down(){
+  docker.tasks.main.dp_down
+  _mod_.main
+}
+
+_mod_.logs(){
+  docker.tasks.main.dp_logs
+}
+
+_mod_.entry(){
+  docker.tasks.main.container_entry
+  _mod_.main
+}
+
+_mod_.command(){
+  docker.tasks.main.container_run_command
+}
+
+_mod_.recipe_see(){
+  cat docker-compose.yml
+  _mod_.main
+}

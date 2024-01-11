@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage
+# Call:       _mod_.validate_project_name "this is test"
+# Response:   thisIsTest
+_mod_.convert_string_to_camelcase(){
+  local input="$@"
+  echo "$input" | awk 'BEGIN{OFS=""};{for(j=1;j<=NF;j++){ if(j==1){$j=tolower($j)} else {$j=toupper(substr($j,1,1)) tolower(substr($j,2)) }}}1'
+}

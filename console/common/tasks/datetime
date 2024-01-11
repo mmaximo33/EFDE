@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usaged
+# Obtener la fecha y hora actual en el formato AAAA-MM-DD HH:MM:SS
+# formatted_datetime=$(get_formatted_datetime)
+# echo "Fecha y hora actual: $formatted_datetime"
+# Obtener la fecha actual en el formato DD/MM/AAAA
+# formatted_date=$(get_formatted_datetime "%d-%m-%Y")
+# echo "Fecha actual: $formatted_date"
+# Obtener la hora actual en el formato HH:MM:SS
+# formatted_time=$(get_formatted_datetime "%H:%M:%S")
+# echo "Hora actual: $formatted_time"
+_mod_.get_formatted_datetime() {
+    local format="${1:-%Y-%m-%d %H:%M:%S}"  # Formato por defecto: AAAA-MM-DD HH:MM:SS
+    local datetime=$(awk "BEGIN {print strftime(\"$format\")}")
+    echo "$datetime"
+}

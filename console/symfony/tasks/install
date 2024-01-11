@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+declare -gA GLOBAL_SYMFONY_INSTALL=(
+  [INSTALL_WEBAPP]=false
+  [MESSAGE_WARNING]="Default will install symfony for microservice projects or apis"
+  [MESSAGE_ASK]=$(common.tasks.message.msg_color warning "Do you want to install the packages for webapp?")
+  [MESSAGE_CLONE_GIT]="Enter the url of your repository"
+  [MESSAGE_CLONE_URL]=$(common.tasks.message.msg_color warning "Enter URL (https):")
+  [MESSAGE_DATABASE]="MYSQL AND PHPMYADMIN Variables"
+  [MESSAGE_DATABASE_DEFAULT]=$(common.tasks.message.msg_color warning "Do you want to set variables for DATABASE?")
+  [MESSAGE_DATABASE_VARIABLE]=$(common.tasks.message.msg_color warning "Enter value for variable [VALUE]:")
+)
+
+_mod_.run_app_cli(){
+    # shellcheck disable=SC2145
+    symfony.tasks.main.run_command_app_cli "$@"
+}
+
+_mod_.question_versions(){
+  # PHP and Symfony version
+  symfony.tasks.menu.create_environment_version
+  local VERSION_PHP VERSION_SYMFONY
+  VERSION_SYMFONY=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  VERSION_PHP=$( [ "$VERSION_SYMFONY" == "5" ] && echo "7.4" || echo "8.1" )
+
+  GLOBAL_SETUP_IMPLEMENTION['IMPLEMENTION']="symfony"
+  GLOBAL_SETUP_IMPLEMENTION['VERSION']="$VERSION_SYMFONY"
+  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="$VERSION_PHP"
+}
+
+_mod_.question_type(){
+    # Type Instalation API or WEBAPP
+    common.tasks.message.info "${GLOBAL_SYMFONY_INSTALL['MESSAGE_WARNING']}"
+    if common.tasks.prompt.confirm_default_yes "${GLOBAL_SYMFONY_INSTALL['MESSAGE_ASK']}" ; then
+      GLOBAL_SYMFONY_INSTALL['INSTALL_WEBAPP']=true
+    fi
+}
+
+_mod_.get_env_version(){
+  local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+  echo $(common.tasks.env_variable.get_variable "VERSION" "$PATH_ENV")
+}
+
+_mod_.set_database_variables(){
+  local VALUE=""
+  local MSG="${GLOBAL_SYMFONY_INSTALL['MESSAGE_DATABASE_VARIABLE']}"
+  local -A KEYS=("MYSQL_ROOT_PASSWORD" "MYSQL_USER" "MYSQL_PASSWORD" "MYSQL_DATABASE")
+
+
+  common.tasks.message.info "\n${GLOBAL_SYMFONY_INSTALL['MESSAGE_DATABASE']}"
+  if common.tasks.prompt.confirm_default_yes "${GLOBAL_SYMFONY_INSTALL['MESSAGE_DATABASE_DEFAULT']}" ; then
+    GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']=toor
+    GLOBAL_SETUP_IMPLEMENTION['MYSQL_USER']=efdeuser
+    GLOBAL_SETUP_IMPLEMENTION['MYSQL_PASSWORD']=efdepassword
+    GLOBAL_SETUP_IMPLEMENTION['MYSQL_DATABASE']=efdedb
+  else
+    for KEY in "${KEYS[@]}"; do
+      local MSG_CUSTOM=$(echo "$MSG" | sed "s/VALUE/$KEY/g")
+      while true; do
+        VALUE=$(common.tasks.prompt.request_input "$MSG_CUSTOM")
+        if [ -n "$VALUE" ] && [ "${#VALUE}" -ge 4 ]; then
+          break
+        else
+          common.tasks.message.danger "You must enter a value greater than 4 characters"
+        fi
+      done
+
+      GLOBAL_SETUP_IMPLEMENTION["$KEY"]="$VALUE"
+    done
+  fi
+
+  # Default variables
+  GLOBAL_SETUP_IMPLEMENTION['PMA_HOST']=db
+  GLOBAL_SETUP_IMPLEMENTION['PMA_USER']=root
+  GLOBAL_SETUP_IMPLEMENTION['PMA_PASSWORD']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']}"
+}
+
+_mod_.prepare_setup_environment(){
+  _mod_.set_database_variables
+  efde.tasks.implemention.setup_environment
+  # IMPORTANT: Siempre entro al proyecto
+  common.tasks.command_line.run false false "cd $(efde.tasks.implemention.get_new_path_project)"
+}
+
+_mod_.create_new_environment(){
+  _mod_.question_versions
+  _mod_.question_type
+  _mod_.prepare_setup_environment
+  docker.tasks.main.dp_all_stop # Importat: If another container exists using the same ports
+  _mod_.run_app_cli "composer create-project symfony/skeleton:$(_mod_.get_env_version).* ."
+  [ "${GLOBAL_SYMFONY_INSTALL['INSTALL_WEBAPP']}" = "true" ] && _mod_.run_app_cli "composer require webapp"
+  _mod_.docker_start
+}
+
+_mod_.clone_environment(){
+  _mod_.question_versions
+  _mod_.prepare_setup_environment
+  common.tasks.message.warning "${GLOBAL_SYMFONY_INSTALL['MESSAGE_CLONE_GIT']}"
+  local REPOSITORY_URL=$(common.tasks.prompt.request_input "${GLOBAL_SYMFONY_INSTALL['MESSAGE_CLONE_URL']} ")
+
+  # MMTodo: Mover a un metodo de tasks.git
+  common.tasks.command_line.run true false "git clone $REPOSITORY_URL $(pwd)/app"
+  _mod_.docker_start
+}
+
+_mod_.docker_start(){
+  symfony.tasks.main.permissions_fix
+  docker.tasks.main.apache_stop
+  docker.tasks.main.dp_all_stop
+  docker.tasks.main.dp_up
+  efde.tasks.implemention.clear_global_variables
+  common.tasks.message.success "SUCCES: Project installed successfully, check the url http://localhost"
+}
+

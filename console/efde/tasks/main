@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  URL_REPOSITORY="https://github.com/mmaximo33/EFDE"
+  _mod_.run_global_efde(){
+    ${GLOBAL_RUN_EFDE}
+  }
+
+  _mod_.coming_soon(){
+    common.tasks.message.info "We're excited about the upcoming release!"
+    common.tasks.message.info "Our team is hard at work to bring you the latest features and improvements."
+    common.tasks.message.info "Stay tuned for updates and follow the project's progress on $URL_REPOSITORY."
+    common.tasks.message.warning "Thank you for your patience, and remember to check back for the latest developments."
+  }
+
+  _mod_.more_info(){
+    url="$URL_REPOSITORY?tab=readme-ov-file#easy-and-fast-development-environment-efde-"
+    common.tasks.command_line.run false false "xdg-open $url"
+    _mod_.run_global_efde
+  }
+
+  _mod_.report_github(){
+    url="$URL_REPOSITORY/issues/new/choose"
+    common.tasks.command_line.run false false "xdg-open $url"
+    _mod_.run_global_efde
+  }
+
+  #MMTodo: Review
+  _mod_.start_on_github(){
+    USERNAME="tu_nombre_de_usuario"
+    TOKEN="tu_token_de_acceso"
+    REPO_OWNER="dueño_del_repositorio"
+    REPO_NAME="nombre_del_repositorio"
+
+    # Obtener el token de acceso (puedes generar uno en tu configuración de GitHub)
+    # Más información: https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+
+    # Endpoint de la API de GitHub para dar estrella a un repositorio
+    ENDPOINT="https://api.github.com/user/starred/$REPO_OWNER/$REPO_NAME"
+
+    # Realizar la acción de dar estrella utilizando cURL
+    curl -X PUT -H "Authorization: token $TOKEN" "$ENDPOINT"
+
+    echo "Repositorio estrellado exitosamente."
+  }
+
+
+  _mod_.efde_update() {
+    common.tasks.message.tree "Check update" 1 0 info
+    common.tasks.message.tree "Path: $EFDE_PATH_INSTALL" 2 0 info
+
+    local UPSTREAM=${1:-'@{u}'}
+    local LOCAL_BRANCH=$(git -C "$EFDE_PATH_INSTALL" symbolic-ref -q --short HEAD)
+    local COMMIT_LOCAL=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 "$LOCAL_BRANCH")
+
+    # Configure upstream if not configured
+    if ! git -C "$EFDE_PATH_INSTALL" rev-parse --abbrev-ref "$UPSTREAM" &>/dev/null; then
+      common.tasks.message.tree "Configuring upstream for branch '$LOCAL_BRANCH'" 2 0 info
+      git -C "$EFDE_PATH_INSTALL" branch --set-upstream-to=origin/"$LOCAL_BRANCH" "$LOCAL_BRANCH"
+    fi
+
+    local COMMIT_REMOTE=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 "$UPSTREAM")
+    common.tasks.message.tree "Branch: $LOCAL_BRANCH" 2 0 info
+    common.tasks.message.tree "Local  commit: $COMMIT_LOCAL" 2 0 info
+    common.tasks.message.tree "Remote commit: $COMMIT_REMOTE" 2 0 info
+    if [ "$COMMIT_LOCAL" == "$COMMIT_REMOTE" ]; then
+      common.tasks.message.tree "Result: $(common.tasks.message.msg_color success "Up to date!")" 2 0 info
+    else
+      common.tasks.message.tree "Result: $(common.tasks.message.msg_color warning "There is an update available!")" 2 0 info
+      local URL_COMPARE="$URL_REPOSITORY/compare/$COMMIT_LOCAL...$COMMIT_REMOTE"
+      common.tasks.message.tree "Compare URL: $URL_COMPARE" 2 0 warning
+      if common.tasks.prompt.confirm_default_yes "Do you want to download the new version?"; then
+        git -C "$EFDE_PATH_INSTALL" pull origin "$LOCAL_BRANCH"
+        common.tasks.message.success "Updated!"
+      else
+        common.tasks.message.warning "Update canceled."
+      fi
+    fi
+    _mod_.run_global_efde
+  }
+
+  _mod_.efde_uninstall() {
+    common.tasks.message.info "You are about to eliminate one of the best tools for application development in local environments"
+    if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "Are you sure you want to do it?"); then
+      local CONFIRM="Delete EFDE"
+      local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
+      local QUESTION=$(common.tasks.message.msg_color warning "If you are completely sure, write '$CONFIRM_COLOR'")
+      local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
+      if [[ "$RESPONSE" == "$CONFIRM" ]]; then
+        common.tasks.file.remove "$(type -P $GLOBAL_RUN_EFDE)"
+        common.tasks.directory.remove force "$EFDE_PATH_INSTALL"
+        common.tasks.message.success "EFDE was successfully uninstalled from your computer"
+        common.tasks.message.warning "We hope to work together again"
+        _mod_.more_info
+      else
+        common.tasks.message.danger "Confirmation failed. Aborting EFDE deletion."
+      fi
+    fi
+  }
+
+
+}

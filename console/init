@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DIRECTORY_TMP="$PATH_BIN/.tmp"
+
+create_folder_tmp() {
+  [[ "$EFDE_MOD_DEV" = "true" ]] && rm -rf $DIRECTORY_TMP
+
+  [ ! -d $DIRECTORY_TMP ] && mkdir -p $DIRECTORY_TMP; chmod +x $DIRECTORY_TMP
+}
+
+create_construct(){
+  # Load basic module
+  MODULE_NAME="common"
+  IMPORT_FILE="core"
+  PATH_SOURCE="$PATH_CONSOLE/$MODULE_NAME/$IMPORT_FILE"
+  PATH_TARGET="$DIRECTORY_TMP/$IMPORT_FILE"
+
+  if [ "$EFDE_MOD_DEV" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
+      sed "/sed/! s/_mod_/$MODULE_NAME/g" "$PATH_SOURCE" > "$PATH_TARGET"
+  fi
+  
+  load_scripts "$PATH_TARGET"
+  load_scripts "$PATH_CONSOLE/$MODULE_NAME/init"
+}
+
+load_modules(){
+  # Load all directories
+  DIRECTORIES=$(find "$PATH_CONSOLE" -maxdepth 1 -type d ! -path "$PATH_CONSOLE" ! -name "$(basename "$PATH_CONSOLE")" -printf "%f\n")
+  for DIRECTORY in $DIRECTORIES; do
+      [ "$DIRECTORY" = "common" ] && continue
+      PATH_TARGET="$PATH_CONSOLE/$DIRECTORY/init"
+      load_scripts "$PATH_TARGET"
+  done
+}
+
+load_scripts(){
+    source "$@"
+}
+
+main() {
+  create_folder_tmp
+  create_construct
+  load_modules
+}
+
+main
+#common.tasks.message.echo "test"
+
+
+
+
+
+

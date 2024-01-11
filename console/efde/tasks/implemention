@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+declare -gA GLOBAL_SETUP_IMPLEMENTION=(
+  [NAME]=""
+  [CREATE_AT]=""
+  [IMPLEMENTION]=""
+)
+declare -gA GLOBAL_IMPLEMENTION_EFDE_FOLDER=(
+  [FOLDER]=".efde"
+  [FILE_ENV]=".env"
+)
+
+################################
+# CURRENT PROJECT
+#-------------------------------
+_mod_.get_current_path_env_file(){
+  echo "$(pwd)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
+}
+
+################################
+# NEW OR CLONE PROJECT
+#-------------------------------
+_mod_.clear_global_variables(){
+  GLOBAL_SETUP_IMPLEMENTION=()
+}
+
+_mod_.get_new_path_project(){
+  echo "$(pwd)/${GLOBAL_SETUP_IMPLEMENTION['NAME']}"
+}
+
+_mod_.get_new_path_implemention(){
+  echo "$(_mod_.get_new_path_project)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}"
+}
+
+_mod_.get_new_path_env_file(){
+  echo "$(_mod_.get_new_path_implemention)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
+}
+
+_mod_.has_folder_implementation(){
+  common.tasks.directory.exists "$(_mod_.get_new_path_implemention)"
+}
+
+_mod_.create_symbolic_link_env(){
+  local ORIGIN="${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
+  local TARGET="$(_mod_.get_new_path_project)/.env"
+  ln -sfT "$ORIGIN" "$TARGET"
+}
+
+_mod_.create_folder(){
+  local FOLDER_PROJECT="$(_mod_.get_new_path_project)"
+  local FOLDER_IMPLEMENTION="$(_mod_.get_new_path_implemention)"
+
+  if common.tasks.directory.exists "$FOLDER_PROJECT"; then
+    common.tasks.message.danger "Error: The project name already exists in this directory.\nVerify: $FOLDER_PROJECT"
+    _mod_.setup_environment
+  fi
+  common.tasks.directory.create_recursive "$FOLDER_IMPLEMENTION"
+}
+
+_mod_.set_envs(){
+  local FILE="$(_mod_.get_new_path_env_file)"
+  common.tasks.env_variable.set_variable $1 $2 $FILE
+}
+
+_mod.set_all_env(){
+  local FILE="$(_mod_.get_new_path_env_file)"
+  local DATA_ENV="$(common.tasks.env_variable.prepare_string_to_env GLOBAL_SETUP_IMPLEMENTION)"
+
+  echo -e "$DATA_ENV" > "$FILE"
+
+  _mod_.create_symbolic_link_env
+}
+
+_mod_.copy_environment(){
+  local ORIGIN="$PATH_CONSOLE/${GLOBAL_SETUP_IMPLEMENTION['IMPLEMENTION']}/environment/"
+  local TARGET="$(_mod_.get_new_path_project)"
+
+  shopt -s dotglob
+  cp -r "$ORIGIN"/* "$TARGET"
+  shopt -u dotglob
+}
+
+_mod_.project_name(){
+  local value=$(common.tasks.prompt.request_input "$(common.tasks.message.warning "Enter the project name\nProject name:") ")
+
+  if ! [[ "$value" =~ ^[[:alnum:][:space:]]+$ ]]; then
+    common.tasks.message.danger "The entered value can only contain letters or numbers."
+    common.tasks.message.info "Cancel to [ctrl + c] "
+    _mod_.project_name
+  fi
+
+  echo "$(common.tasks.string.convert_string_to_camelcase "$value")"
+}
+
+_mod_.setup_environment(){
+
+  GLOBAL_SETUP_IMPLEMENTION['NAME']=$(_mod_.project_name)
+  GLOBAL_SETUP_IMPLEMENTION['CREATE_AT']=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
+
+  _mod_.create_folder
+  _mod_.copy_environment
+  _mod.set_all_env
+}
+
+

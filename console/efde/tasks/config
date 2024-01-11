@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONFIG_FILE="config.env"
+CONFIG_PATH="$EFDE_PATH_INSTALL/bin"
+CONFIG_PATH_FILE="$CONFIG_PATH/$CONFIG_FILE"
+
+_mod_.check_config() {
+  if ! common.tasks.file.exists "$CONFIG_PATH_FILE"; then
+    _mod_.create_config
+  fi
+  _mod_.load_config
+}
+
+_mod_.create_config() {
+  common.tasks.message.info "Your first time with EFDE?"
+  common.tasks.message.info "We will create the basic configurations"
+  _mod_.set_config
+}
+
+_mod_.set_config(){
+  _mod_.set_config_language
+  _mod_.set_efde_global
+
+  _mod_.set_var "SO" "$(common.tasks.os.get_operating_system)"
+  _mod_.set_var "EFDE_VERSION" "$(_mod_.set_config_version)"
+  _mod_.set_var "EFDE_LAST_UPDATE" "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
+
+  _mod_.confirm_config
+  ${GLOBAL_RUN_EFDE}
+}
+
+_mod_.confirm_config(){
+    common.tasks.message.success "This is your EFDE configuration"
+    common.tasks.message.info "It is stored in the following file \n > $CONFIG_PATH_FILE \n"
+    _mod_.show_config
+    if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "\nReset settings") ; then
+      _mod_.set_config
+    fi
+}
+
+_mod_.show_config() {
+  while IFS= read -r LINE || [[ -n "$LINE" ]]; do
+      common.tasks.message.info "$LINE"
+  done < "$CONFIG_PATH_FILE"
+}
+
+_mod_.set_config_language(){
+  common.tasks.menu.print_menu "Default language?" "${efde_props_menu_CONFIG_SET_LENGUAGE[@]}"
+  RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  _mod_.set_var "LENGUAGE" "$RESPONSE"
+}
+
+_mod_.set_efde_global(){
+  local MSG=""
+  local RESPONSE=false
+  MSG=$(common.tasks.message.msg_color warning "Take default settings (Recommended)")
+  common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true
+  _mod_.set_var "CLI_SHOW_DEFAULT" "$RESPONSE"
+  if [ "$RESPONSE" = "false" ]; then
+    MSG=$(common.tasks.message.msg_color warning "Always show executed commands?")
+    common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true || RESPONSE=false
+    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
+    MSG=$(common.tasks.message.msg_color warning "Always show command output?")
+    common.tasks.prompt.confirm_default_yes "$MSG"  && RESPONSE=true || RESPONSE=false
+    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
+  else
+    RESPONSE=false
+    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
+    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
+  fi
+}
+
+_mod_.set_config_version() {
+  echo $(efde.tasks.git.get_current_tag)
+}
+
+_mod_.load_config() {
+  GLOBAL_EFDE_CONFIG['CLI_SHOW_DEFAULT']=$(_mod_.get_var "CLI_SHOW_DEFAULT")
+  GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']=$(_mod_.get_var "CLI_SHOW_CLI")
+  GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']=$(_mod_.get_var "CLI_SHOW_OUTPUT")
+}
+
+_mod_.get_var(){
+  local KEY="$1"
+  echo $(common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_FILE")
+}
+
+_mod_.set_var(){
+  local KEY="$1"
+  local VALUE="$2"
+  common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$CONFIG_PATH_FILE"
+}
+

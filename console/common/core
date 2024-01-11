@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.console_clear() {
+  # Todo: Determinar si es linux,windows, mac
+  clear
+}
+
+_mod_.step(){
+  _mod_.msg_debug "#######################################################################"
+  _mod_.msg_debug "# LOAD MODULES "
+  _mod_.msg_debug "-----------------------------------------------------------------------"
+}
+
+_mod_.msg_debug() {
+  local level="${2:-0}"
+  local end="${3:-0}"
+  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+    if _mod_.essential_run; then
+        common.tasks.message.tree "$1" "$level" "$end" debug
+    else
+      local color_start="\033[1;35m"
+      local color_end="\033[0m"
+      command printf "${color_start}$1${color_end}\n" 2>/dev/null
+    fi
+  fi
+}
+
+_mod_.msg_danger(){
+  local level="${2:-0}"
+  local message="\033[1;31m$1\033[0m"
+
+  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+    _mod_.msg_debug "$message" "$level"
+  else
+    command printf "$message" 2>/dev/null
+  fi
+}
+
+_mod_.load_common_msg(){
+  local PATH_MODULE MODULE_NAME FILE ELEMENT
+  PATH_MODULE=$1
+  MODULE_NAME="common"
+
+  load_module() {
+    local ELEMENT=$1
+    local FILE=$2
+    _mod_.replacemod --file-name="$FILE" --new-name="$MODULE_NAME.$ELEMENT.$FILE" --source-path="$PATH_MODULE/$ELEMENT/$FILE"
+  }
+
+  load_module "props" "colours"
+  load_module "tasks" "message"
+}
+
+_mod_.essential_run() { type "common.tasks.message.echo" &> /dev/null; }
+
+_mod_.load_module(){
+  # ESSENTIAL MODULE !!!!!
+  ! _mod_.essential_run && _mod_.load_common_msg $1
+
+  local PATH_MODULE=$1
+  local elements=("props" "tasks")
+  _mod_.step
+  _mod_.msg_debug "Module: $MODULE_NAME" 1
+
+  for element in "${elements[@]}"; do
+    CHECK_PATH="$PATH_MODULE/$element"
+    if [ -d "$CHECK_PATH" ]; then
+      _mod_.msg_debug "Group: $element" 2
+      for file in $(ls -1 $CHECK_PATH); do
+        [ "$file" == "message" ] && continue
+        _mod_.msg_debug "Element: $file" 3
+        _mod_.replacemod  --file-name="$file" --new-name="$MODULE_NAME.$element.${file%}" --source-path="$CHECK_PATH/$file"
+      done
+    fi
+  done
+}
+
+_mod_.replacemod () {
+  local FILE_NAME NEW_NAME SOURCE_PATH
+  local USE="The $FUNCNAME method must contain the 3 required parameters"
+  USE+="\n--file-name='file"
+  USE+="\n--new-name='common.tasks'"
+  USE+="\n--source-path='path/folder/file"
+  if [[  $# != 3 ]]; then
+    _mod_.msg_danger $USE 3
+    _mod_.msg_debug "$@" 3
+    exit 1;
+  fi
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --file-name=*)    FILE_NAME="${1#*=}";    shift ;;
+      --new-name=*)     NEW_NAME="${1#*=}";     shift ;;
+      --source-path=*)  SOURCE_PATH="${1#*=}";  shift ;;
+      *)
+        _mod_.msg_danger $USE
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$FILE_NAME" || -z "$NEW_NAME" || -z "$SOURCE_PATH"  ]]; then
+    _mod_.msg_danger $USE
+    exit 1
+  fi
+
+  PATH_TARGET="$DIRECTORY_TMP/$NEW_NAME"
+  _mod_.msg_debug "New File: $NEW_NAME" 4
+  _mod_.msg_debug "Path $SOURCE_PATH" 4
+  _mod_.msg_debug "Path Tmp: $PATH_TARGET" 4
+
+
+  if [ "$EFDE_MOD_DEV" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
+    # old only replace functions
+    #sed "s/_mod_/$NEW_NAME/g" "$SOURCE_PATH" > "$PATH_TARGET"
+
+    if echo "$NEW_NAME" | grep -qi ".tasks."; then
+      sed -E "s/_mod_\.([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME}.\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
+    else
+        NEW_NAME_VAR=$(echo "$NEW_NAME" | sed "s/tasks/props/" | tr "." "_")
+        sed -E "s/_mod_([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME_VAR}_\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
+    fi
+
+    if [ ! $? -eq 0 ]; then
+      _mod_.msg_danger "[ERROR] The conversion could not be carried out, report this!" 4
+      _mod_.msg_danger "Source: $SOURCE_PATH" 5
+      _mod_.msg_danger "Target: $PATH_TARGET" 5
+    fi
+  fi
+
+  source "$PATH_TARGET"
+  if [ ! $? -eq 0 ]; then
+    _mod_.msg_danger "[ERROR] The resources were not loaded, report this!" 4
+    _mod_.msg_danger "File: $NEW_NAME" 5
+    _mod_.msg_danger "Path: $PATH_TARGET" 5
+    exit 1
+  fi
+}

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.run() {
+  if [ "$#" -lt 3 ]; then
+    local USE=""
+    USE+="Error: At least three parameters are required:\n"
+    USE+=" - FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE\n"
+    USE+="\n parameters:\n ${@}\n"
+    USE+="\n Example:\n"
+    USE+=" - $FUNCNAME FORCE_SHOW_CLI=true FORCE_SHOW_OUTPUT=true COMMAND_LINE\n"
+    USE+=" - $FUNCNAME 1 0 'cd folder'"
+    common.tasks.message.danger "$USE"
+    return 1
+  fi
+
+  local FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE
+
+  FORCE_SHOW_CLI=$1
+  FORCE_SHOW_OUTPUT=$2
+  shift 2
+  COMMAND_LINE="$@"
+
+  if [ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_DEFAULT']}" = "false" ]; then
+    FORCE_SHOW_CLI=${GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']}
+    FORCE_SHOW_OUTPUT=${GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']}
+  fi
+
+  if [ "${FORCE_SHOW_CLI}" = "true" ]; then
+    common.tasks.message.info "# RUN CLI > ${COMMAND_LINE}"
+  fi
+
+  if [ "${FORCE_SHOW_OUTPUT}" = "true" ]; then
+    eval ${COMMAND_LINE}
+  else
+   eval ${COMMAND_LINE} > /dev/null 2>&1
+  fi
+}

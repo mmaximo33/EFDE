@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.echo() {
+  # shellcheck disable=SC2068
+  local MSG="$(_mod_.msg_color $@)"
+  command printf "$MSG\n"  2>/dev/null
+}
+
+_mod_.msg_color(){
+    local MSG
+    case $1 in
+      success)  shift;  MSG="${B_GREEN}$@${COLOR_RESET}";;
+      info)     shift;  MSG="${B_CYAN}$@${COLOR_RESET}";;
+      warning)  shift;  MSG="${B_YELLOW}$@${COLOR_RESET}";;
+      danger)   shift;  MSG="${B_RED}$@${COLOR_RESET}";;
+      debug)    shift;  MSG="${B_PURPLE}${@}${COLOR_RESET}";;
+      *)                MSG="$@";;
+    esac
+
+    echo "$MSG"
+}
+
+_mod_.msg_type(){
+    local type
+    case $1 in
+      success)  shift;    type="Success";;
+      info)     shift;    type="Info";;
+      error)    shift;    type="Error";;
+      warning)  shift;    type="Warning";;
+      danger)   shift;    type="Danger";;
+      #*)        echo "$@";  return;;
+    esac
+
+    # shellcheck disable=SC2145
+    echo "${BOLD}$type: $@"
+}
+
+_mod_.success(){
+  _mod_.echo success "$@"
+}
+
+_mod_.info(){
+  _mod_.echo info "$@"
+}
+
+_mod_.warning(){
+  _mod_.echo warning "$@"
+}
+
+_mod_.danger(){
+  _mod_.echo danger "$@"
+}
+
+_mod_.debug(){
+  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+    _mod_.echo debug "$@"
+  fi
+}
+
+# USE
+#  common.tasks.message.tree "texto" 1 0 [debug danger warning info]
+#
+#  Response
+#  ├── Module: docker
+#  │   ├── Group: tasks
+#  │   │   ├── Element: main
+#  │   │   │   ├── New File: docker.tasks.main
+#  │   │   │   ├── Path /home/maximo/Documents/efde2/console/docker/tasks/main
+#  │   │   │   ├── Path Tmp: /home/maximo/Documents/efde2/bin/.tmp/docker.tasks.main
+_mod_.tree(){
+  local line prefix=""
+  local level="${2:-0}"
+  local end="${3:-0}"
+  local mode="${4:-}"
+
+  if [ "$level" -eq 1 ]; then
+    prefix+="├──"
+  fi
+  if [ "$level" -gt 1 ]; then
+    for ((i=1; i<level; i++)); do
+      prefix+="│   "
+    done
+    if [ "$end" -eq 0 ]; then
+      prefix+="├──"
+    else
+      prefix+="└──"
+    fi
+  fi
+
+  local LINE="$prefix $1"
+  _mod_.tree_print "$(_mod_.msg_color $mode "$LINE")"
+}
+
+_mod_.tree_print(){
+    # shellcheck disable=SC2145
+    command printf "$@\n" 2>/dev/null
+}
