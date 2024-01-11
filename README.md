@@ -1,20 +1,25 @@
-# Easy and fast development environment (EFDE) [![follow](https://img.shields.io/badge/Follow-Youtube-red.svg)](https://www.youtube.com/@Efde.official)
+# EFDE | Easy and fast development environment [![follow](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@Efde.official)
+![efde type](https://img.shields.io/badge/project-Open_Source-green.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg) 
 
-![efde type](https://img.shields.io/badge/project-OpenSource-green.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg) ![efde version](https://img.shields.io/badge/status-active-green.svg) ![efde version](https://img.shields.io/badge/version-v1.2.0-yellow.svg) ![so debian](https://img.shields.io/badge/SO-Debian-blue.svg)![so ubuntu](https://img.shields.io/badge/Ubuntu-orange.svg)
+![efde version](https://img.shields.io/badge/status-Active-green.svg)
+![efde_lastcommin](https://img.shields.io/github/last-commit/mmaximo33/efde.svg)
+![efde_release](https://img.shields.io/github/release/mmaximo33/efde.svg)
+![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/1.2.0.svg)
 
-## Table of Contents
+
+![issue-open](https://img.shields.io/github/issues/mmaximo33/efde.svg)
+![issue-close](https://img.shields.io/github/issues-closed/mmaximo33/efde.svg)
+![pull-open](https://img.shields.io/github/issues-pr/mmaximo33/efde.svg)
+![pull-close](https://img.shields.io/github/issues-pr-closed/mmaximo33/efde.svg)
+
+## Index
 
 - [Intro](#intro)
-- [Installing and Updating](#install--update)
-  - [Install](#install)
-  - [Update](#update)
+- [Installing or Updating or Uninstall](#install--update)
 - [Usage](#usage)
-- [About](#about)
+- [Mission](#mission)
 - [Documentation](#documentation)
-  - [Code of conduct](#code-of-conduct)
-  - [Maintainers](#maintainers)
-  - [Contributing](#contributing)
-  - [License](#license)
+  - [Code of conduct](#code-of-conduct) | [Maintainers](#maintainers) | [Contributing](#contributing) | [License](#license)
 
 ## Intro
 
@@ -23,96 +28,84 @@ EFDE is a project designed to facilitate the management of local development env
 The objective of the project is to be able to manage implementations with docker such as
 
 ### Released
+[![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](#)
 
-:heavy_check_mark: [Symfony](docs/symfony.md)
+[![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](docs/symfony.md)
 
 ### Coming soon
 
-- Portainer.io
-- Wordpress
-  - WooCommerce
-- Magento
-- Prestashop
-- Django
-- Others
+[![Install Portainer.io](https://img.shields.io/badge/Portainer.io-105f8f?style=for-the-badge&logo=portainer&logoColor=white)](#)
+[![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![Install Magento](https://img.shields.io/badge/Magento-f06835?style=for-the-badge&logo=magento&logoColor=white)](#)
+[![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](#)
+[![Wordpress](https://img.shields.io/badge/Wordpress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](#)
+[![Woocommerce](https://img.shields.io/badge/Woocommerce-8359b5?style=for-the-badge&logo=wordpress&logoColor=white)](#)
+[![Prestashop](https://img.shields.io/badge/prestashop-%23DF0067.svg?&style=for-the-badge&logo=prestashop&logoColor=white)](#)
+
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](#)
+[![Install React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
+[![Install Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)](#)
+[![Install Vue.js](https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vue.js&logoColor=4FC08D)](#)
+
+[![Install Python](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)](#)
+[![Install Django](https://img.shields.io/badge/django-113527?style=for-the-badge&logo=django&logoColor=white)](#)
+
 
 ## Install & Update
 
 ### Requirements
 
-The EFDE installation script. It will check and recommend the installation of the necessary packages for its proper functioning.
+The **EFDE** installation script. It will check and recommend the installation of the necessary packages for its proper functioning.
 Anyway, if you want to know more, you can see the following list with the official documentation
 
-- For download
-  - [CURL](https://curl.se/docs/install.html) or [WGET](https://www.gnu.org/software/wget/)
-- Implement (If you do not have it installed, EFDE manages the installation on Linux)
-  - [GIT](https://git-scm.com/book/en/Getting-Started-Installing-Git) 
-  - [docker](https://docs.docker.com/engine/install/ubuntu/)
-  - [docker compose](https://docs.docker.com/compose/install/other/)
+#### Compatibility
+![Debian](https://img.shields.io/badge/Debian-A81D33?style=for-the-badge&logo=debian&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+
+#### For download
+[![CURL](https://img.shields.io/badge/CURL-212121?style=for-the-badge&logo=CURL&logoColor=white)](https://curl.se/docs/install.html)
+[![WGET](https://img.shields.io/badge/wget-212121?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/wget/)
+
+
+#### Implement (If you do not have it installed, EFDE manages the installation on Linux)
+[![Git](https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/book/en/Getting-Started-Installing-Git)
+[![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/engine/install/ubuntu/)
+[![Docker Compose](https://img.shields.io/badge/Docker_Compose-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/install/other/)
+
 
 ### Install
 
-To **install** EFDE, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
-
-[See Youtube - Short](https://www.youtube.com/shorts/gE3qYC1AUOk)
+Run the following command (**CURL** or **WGET**) to install **EFDE** on your computer
 
 ```sh
-curl -o- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
+curl -o- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh | bash
 ```
 ```sh
-wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/15-migrate-to-full-bash/bin/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh | bash
 ```
-#### What will happen in the installation process?
 
-```sh
+![Efde process install](./docs/media/efde_process_install.gif)
 
-#######################################################################
-# Verifying requirements for EFDE
------------------------------------------------------------------------
-── [OK] Check install GIT
-── [OK] Check install DOCKER
-── [OK] Check install DOCKER-COMPOSE
-── [SUCCESS] Requirements verified
-
-#######################################################################
-# Installing EFDE
------------------------------------------------------------------------
-── The /home/maximo/.efde directory exists without version control (.git)
-─── Do you want to create a backup? [y/N]? y
-──── Creating a backup
-────── [SUCCESS] Backup created in /home/$USER/.efde_bkp_install_20231231123418
-── Downloading EFDE from git to /home/$USER/.efde
-──── Cloning repository
-──── Repository optimization
-────── [SUCCESS] Compression
-────── [SUCCESS] Cleaning
-── Creating symbolic link
-──── Removing symbolic link previous versions (v1.*.*)
-──── In /home/$USER/bin/efde FROM /home/$USER/.efde/bin/efde.sh
-
-#######################################################################
-# EFDE is successfully installed and configured.
-# Select the directory and create your new project
-# By running '$ efde --help'
------------------------------------------------------------------------
-You want to run efde --help now? [Y/n]? 
-```
+### Update & Uninstall
+![efde process update or uninstall](./docs/media/efde_process_update_uninstall.gif)
 
 ### Usage
 
-- Once installed, you can run EFDE from any directory
-- If you are in a project created with EFDE, it will give you the options available for that environment
+**New project**
+- Once **EFDE** is installed
+- Go to the directory where you create your projects (example: `~/Domains`)
+- Run `efde`  in your command console
 
-```sh
-# Run command in console
-efde
-```
+**Created with **EFDE****
+- In case you are in a project created with **EFDE**. Example: `~/Domains/newproject`
+- The menu for that implementation will be displayed (Symfony, Laravel, Magento, Wordpress, WooComerce, Prestashop, React, Angular, Vue, Others)
 
-## Captures
+![efde symfony install](./docs/media/efde_symfony_install.gif)
 
-![efde + symfony](./docs/images/efde_symfony.png)
+![efde symfony use](./docs/media/efde_symfony_use.gif)
 
-## About
+## Mission
 EFDE arises motivated by giving something back to this beautiful community of programmers, computer scientists or curious about technology.
 
 After having gone through some companies, participated in several teams, been a mentor to team members with beginner profiles and even taught this world to family and friends.
@@ -132,29 +125,24 @@ You are invited to join, use or even contribute to the growth of EFDE to give ba
 
 It is NOT something super innovative, but surely more than one will find it interesting.
 
+
 ## Documentation
-
 ### Code of conduct
-
 The collaborators of this project strongly believe in a respectful community.
 For this reason we operate under the following [CODE OF CONDUCT](./CODE_OF_CONDUCT.md)
 
 ### Maintainers
-
 Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time.
 [GOVERNANCE](./GOVERNANCE.md) will be re-evaluated as the project evolves.
 
 ### Contributing
-
 There is still a lot to do with this small project if you are invited to join.
 Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
 
 ### License
-
 The MIT License (MIT). Please see [LICENSE](./LICENSE.md).
 
 ## Collaborate with us
-
 <a href="https://jb.gg/OpenSourceSupport" target="_blank">
   <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height="125" alt="Logotipo de JetBrains (principal) logo.">
 </a>

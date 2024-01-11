@@ -19,7 +19,7 @@
 
   GIT_USER=mmaximo33
   GIT_REPOSITORY=$PROJECT_NAME
-  GIT_BRANCH="15-migrate-to-full-bash"
+  GIT_BRANCH="main"
   GIT_VERSION_LATEST=""
   GIT_URL_REPOSITORY="https://github.com/$GIT_USER/$GIT_REPOSITORY"
 
