@@ -4,7 +4,8 @@
   local PATH_MENU="docker.tasks.menu"
 
   _mod_MAIN=(
-    "$PATH_MENU.build,Build docker, Rebuild the project containers"
+    "$PATH_MENU.build,Build, Build or Re-Build the project containers"
+    "$PATH_MENU.show,Show, Show (start) containers of project"
     "$PATH_MENU.start,Start, Start containers of project"
     "$PATH_MENU.stop,Stop, Stop containers of project"
     "$PATH_MENU.logs,Logs, Inspect environment logs"
@@ -12,6 +13,7 @@
     "$PATH_MENU.command,Run command, Run command in container. Example: bash, cp, rm"
     "$PATH_MENU.stop_all,All Stop, Stops all containers running on the computer"
     "$PATH_MENU.apache_stop,Apache Stop, Apache2 stop service"
-    "$PATH_MENU.down,Down, Destroy all project containers, networks"
+    "$PATH_MENU.down,Down, Destroy all project containers and networks"
+    "$PATH_MENU.recipe_see,See recipe,See recipe docker-compose.yml"
   )
 }

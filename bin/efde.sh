@@ -56,7 +56,7 @@ menu_implementation(){
 main(){
   efde.tasks.config.check_config
   if ! efde.tasks.implemention.has_folder_implementation ; then
-    menu_main
+    efde.tasks.menu.main
   fi
   menu_implementation
 }

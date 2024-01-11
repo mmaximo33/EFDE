@@ -30,9 +30,9 @@ _mod_.run() {
     common.tasks.message.info "# RUN CLI > ${COMMAND_LINE}"
   fi
 
-  if [ "${FORCE_SHOW_OUTPUT}" = "false" ]; then
-    eval ${COMMAND_LINE} > /dev/null 2>&1
+  if [ "${FORCE_SHOW_OUTPUT}" = "true" ]; then
+    eval ${COMMAND_LINE}
   else
-   eval ${COMMAND_LINE}
+   eval ${COMMAND_LINE} > /dev/null 2>&1
   fi
 }

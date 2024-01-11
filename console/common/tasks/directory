@@ -15,7 +15,7 @@ _mod_.create_recursive() {
 _mod_.remove() {
   local FORCE PATH
   FORCE=false
-  [[ "$1" == "force" ]] && { force=true; shift; path="$1"; }
+  [[ "$1" == "force" ]] && { FORCE=true; shift; PATH="$1"; }
 
   local PATH="$1"
   if [[ -z "$PATH" ]]; then

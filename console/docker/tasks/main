@@ -30,7 +30,7 @@ _mod_.dp_stop(){
 _mod_.dp_all_stop(){
   local CONTAINERS=$(docker ps -q)
   if [ -n "$CONTAINERS" ]; then
-    common.tasks.command_line.run false false "docker stop $CONTAINERS"
+    common.tasks.command_line.run true false "docker stop $CONTAINERS"
   else
     common.tasks.message.info "> There are no containers running at this time."
   fi
@@ -47,27 +47,37 @@ _mod_.apache_stop(){
 }
 
 _mod_.dp_down(){
-  _mod_.dp_command_run "down"
+  local QUESTION=$(common.tasks.message.msg_color danger "Do you want to remove services from the project?")
+  _mod_.dp_show_container simple
+  if common.tasks.prompt.confirm_default_no "$QUESTION" ; then
+    _mod_.dp_command_run "down"
+  fi
 }
 
 _mod_.dp_logs(){
-  local COMMAND_RUN VALUES MSG SEARCH
+  local -A MSG
+  local COMMAND_RUN VALUES SEARCH
   COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} logs -f"
   VALUES=""
-  MSG=$(common.tasks.message.msg_color warning 'Enter value to search or press Enter for all:')
+  MSG=(
+    [MAIN]=$(common.tasks.message.msg_color warning 'Enter value to search or press ENTER for all:')
+    [NEXT]=$(common.tasks.message.msg_color warning 'Find another value or ENTER:')
+  )
 
+  common.tasks.message.info "Log monitor"
   while true; do
-      SEARCH=$(common.tasks.prompt.request_input "$MSG")
+    SEARCH=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
 
-      if [[ -z "$SEARCH" ]]; then
-          break
+    if [[ -z "$SEARCH" ]]; then
+      break
+    else
+      if [[ -n "$VALUES" ]]; then
+          VALUES="$VALUES|$SEARCH"
       else
-          if [[ -n "$VALUES" ]]; then
-              VALUES="$VALUES|$SEARCH"
-          else
-              VALUES="$SEARCH"
-          fi
+          VALUES="$SEARCH"
+          MSG[MAIN]="${MSG['NEXT']}"
       fi
+    fi
   done
 
   if [[ -n "$VALUES" ]]; then
@@ -76,12 +86,14 @@ _mod_.dp_logs(){
   common.tasks.command_line.run true true "${COMMAND_RUN}"
 }
 
+
+
 _mod_.dp_show_container(){
-  local COMMAND="ps"
+  local COMMAND="ps -a"
   if [[ $# -gt 0 && "$1" == "simple" ]]; then
-    COMMAND="ps --format \"table {{.Name}}\t{{.Image}}\t{{.Service}}\""
+    COMMAND="ps -a --format \"table {{.Name}}\t{{.Image}}\t{{.Service}}\t{{.Status}}\""
   fi
-  _mod_.dp_command_run "$COMMAND"
+  common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} $COMMAND"
 
 }
 
@@ -116,7 +128,7 @@ _mod_.container_entry(){
   else
     COMMAND_RUN="exec"
   fi
-  _mod_.dp_command_run "$COMMAND_RUN $SERVICE bash"
+  common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} $COMMAND_RUN $SERVICE bash"
 }
 
 _mod_.container_run_command() {
@@ -138,7 +150,7 @@ _mod_.container_run_command() {
     MSG=$(common.tasks.message.msg_color warning 'What command do you want to run?:')
     COMMAND_CUSTOM=$(common.tasks.prompt.request_input "$MSG")
 
-    common.tasks.command_line.run true false "$GLOBAL_DOCKER_COMPOSE_COMMAND $COMMAND_RUN $SERVICE $COMMAND_CUSTOM"
+    common.tasks.command_line.run true true "$GLOBAL_DOCKER_COMPOSE_COMMAND $COMMAND_RUN $SERVICE $COMMAND_CUSTOM"
 
     MSG=$(common.tasks.message.msg_color warning 'Do you want to run another command?')
     if common.tasks.prompt.confirm_default_yes "$MSG"; then

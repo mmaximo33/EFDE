@@ -5,15 +5,15 @@ set -euo pipefail
   local PATH_MENU="efde.tasks"
 
   _mod_MAIN=(
-    "$PATH_MENU.menu.main,Efde config , Settings and configurations"
+    "$PATH_MENU.menu.efde,Efde config , Settings and configurations"
     "symfony.tasks.menu.create_environment,Install Symfony, Dockerization for symfony (WebApp or Apis)"
-    "$PATH_MENU.menu.comming_soon,Coming Soon - Install Laravel, "
-    "$PATH_MENU.menu.comming_soon,Coming Soon - Install Magento, "
-    "$PATH_MENU.menu.comming_soon,Coming Soon - Install Wordpress, "
-    "$PATH_MENU.menu.comming_soon,Coming Soon - Install Woocomerce, "
-    "$PATH_MENU.menu.comming_soon,Coming Soon - Install Prestashop, "
-    "$PATH_MENU.menu.comming_soon,Coming Soon - Install Django, "
-    "$PATH_MENU.menu.comming_soon,Coming Soon - Tools,Tools for developers, "
+    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Laravel, "
+    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Magento, "
+    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Wordpress, "
+    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Woocomerce, "
+    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Prestashop, "
+    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Django, "
+    "$PATH_MENU.menu.coming_soon,Coming Soon - Tools,Tools for developers, "
   )
 
   _mod_EFDE=(

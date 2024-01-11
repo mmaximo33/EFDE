@@ -58,15 +58,17 @@ _mod_.set_efde_global(){
   common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true
   _mod_.set_var "CLI_SHOW_DEFAULT" "$RESPONSE"
   if [ "$RESPONSE" = "false" ]; then
-      MSG=$(common.tasks.message.msg_color warning "Always show executed commands?")
-      common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true || RESPONSE=false
-      _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
-
-      MSG=$(common.tasks.message.msg_color warning "Always show command output?")
-      common.tasks.prompt.confirm_default_yes "$MSG"  && RESPONSE=true || RESPONSE=false
-      _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
+    MSG=$(common.tasks.message.msg_color warning "Always show executed commands?")
+    common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true || RESPONSE=false
+    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
+    MSG=$(common.tasks.message.msg_color warning "Always show command output?")
+    common.tasks.prompt.confirm_default_yes "$MSG"  && RESPONSE=true || RESPONSE=false
+    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
+  else
+    RESPONSE=false
+    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
+    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
   fi
-
 }
 
 _mod_.set_config_version() {
