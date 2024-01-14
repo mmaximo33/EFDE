@@ -23,8 +23,8 @@ _mod_.question_versions(){
   VERSION_SYMFONY=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
   VERSION_PHP=$( [ "$VERSION_SYMFONY" == "5" ] && echo "7.4" || echo "8.1" )
 
-  GLOBAL_SETUP_IMPLEMENTION['IMPLEMENTION']="symfony"
-  GLOBAL_SETUP_IMPLEMENTION['VERSION']="$VERSION_SYMFONY"
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="symfony"
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="$VERSION_SYMFONY"
   GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="$VERSION_PHP"
 }
 
@@ -38,7 +38,7 @@ _mod_.question_type(){
 
 _mod_.get_env_version(){
   local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
-  echo $(common.tasks.env_variable.get_variable "VERSION" "$PATH_ENV")
+  echo $(common.tasks.env_variable.get_variable "EFDE_PROJECT_VERSION" "$PATH_ENV")
 }
 
 _mod_.set_database_variables(){
@@ -70,7 +70,7 @@ _mod_.set_database_variables(){
   fi
 
   # Default variables
-  GLOBAL_SETUP_IMPLEMENTION['PMA_HOST']=db
+  GLOBAL_SETUP_IMPLEMENTION['PMA_HOST']=database
   GLOBAL_SETUP_IMPLEMENTION['PMA_USER']=root
   GLOBAL_SETUP_IMPLEMENTION['PMA_PASSWORD']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']}"
 }

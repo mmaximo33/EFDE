@@ -2,9 +2,9 @@
 set -euo pipefail
 
 declare -gA GLOBAL_SETUP_IMPLEMENTION=(
-  [NAME]=""
-  [CREATE_AT]=""
-  [IMPLEMENTION]=""
+  [EFDE_PROJECT_NAME]=""
+  [EFDE_PROJECT_CREATE_AT]=""
+  [EFDE_PROJECT_IMPLEMENTION]=""
 )
 declare -gA GLOBAL_IMPLEMENTION_EFDE_FOLDER=(
   [FOLDER]=".efde"
@@ -26,7 +26,7 @@ _mod_.clear_global_variables(){
 }
 
 _mod_.get_new_path_project(){
-  echo "$(pwd)/${GLOBAL_SETUP_IMPLEMENTION['NAME']}"
+  echo "$(pwd)/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']}"
 }
 
 _mod_.get_new_path_implemention(){
@@ -68,14 +68,14 @@ _mod.set_all_env(){
   local DATA_ENV="$(common.tasks.env_variable.prepare_string_to_env GLOBAL_SETUP_IMPLEMENTION)"
 
   echo -e "$DATA_ENV" > "$FILE"
+  sort -o "$FILE" "$FILE"
 
   _mod_.create_symbolic_link_env
 }
 
 _mod_.copy_environment(){
-  local ORIGIN="$PATH_CONSOLE/${GLOBAL_SETUP_IMPLEMENTION['IMPLEMENTION']}/environment/"
+  local ORIGIN="$PATH_CONSOLE/implemention/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']}/environment"
   local TARGET="$(_mod_.get_new_path_project)"
-
   shopt -s dotglob
   cp -r "$ORIGIN"/* "$TARGET"
   shopt -u dotglob
@@ -95,8 +95,8 @@ _mod_.project_name(){
 
 _mod_.setup_environment(){
 
-  GLOBAL_SETUP_IMPLEMENTION['NAME']=$(_mod_.project_name)
-  GLOBAL_SETUP_IMPLEMENTION['CREATE_AT']=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']=$(_mod_.project_name)
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_CREATE_AT']=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
 
   _mod_.create_folder
   _mod_.copy_environment
