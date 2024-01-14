@@ -41,7 +41,7 @@ menu_main(){
 
 menu_implementation(){
   local PATH_ENV=$(efde.tasks.implemention.get_current_path_env_file)
-  local IMPLEMENTION=$(common.tasks.env_variable.get_variable "IMPLEMENTION" "$PATH_ENV")
+  local IMPLEMENTION=$(common.tasks.env_variable.get_variable "EFDE_PROJECT_IMPLEMENTION" "$PATH_ENV")
 
 
   RUN_FUNCTION_IMPLEMENTATION_MAIN="$IMPLEMENTION.tasks.menu.main"

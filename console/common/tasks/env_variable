@@ -14,7 +14,7 @@ _mod_.pila_llamada(){
 #   common.tasks.env_variable.set_variable $1 $2 $FILE
 _mod_.set_variable() {
     if [ "$#" -ne 3 ]; then
-        common.tasks.message.danger "[Error]: Se requieren tres parámetros: key, value, file \n" >&2
+        common.tasks.message.danger "[Error]: Three (3) parameters required: key, value, file \n" >&2
         return 1
     fi
 
@@ -39,7 +39,7 @@ _mod_.set_variable() {
 
 _mod_.get_variable() {
     if [ "$#" -ne 2 ]; then
-        common.tasks.message.danger "[Error]: Two parameters required: $KEY, $FILE \n" >&2
+        common.tasks.message.danger "[Error]: Two (2) parameters required: KEY, FILE \n" >&2
         return 1
     fi
 
@@ -54,7 +54,7 @@ _mod_.get_variable() {
             value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/')
             echo -n "$value"
         else
-            common.tasks.message.danger  "No encontrado: " >&2
+            common.tasks.message.danger  "[Error]: Variable not found: \n- FILE: $file \n- KEY: $key" >&2
         fi
     else
         #echo $(common.tasks.module.debug_function_moment) >&2

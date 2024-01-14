@@ -20,7 +20,7 @@ services:
         image: efde/php-${PHP_VERSION}-fpm
         #restart: unless-stopped
         depends_on:
-            - db
+            - database
         expose:
             - 9000
         volumes:
@@ -33,18 +33,17 @@ services:
         image: efde/php-${PHP_VERSION}-cli
         #restart: unless-stopped
         depends_on:
-            - db
+            - database
         ports:
             - 35729:35729
         volumes:
             - ./app/:/app
         networks:
             - symfony
-    db:
+    database:
         image: 'mariadb:10.4'
         command: --default-authentication-plugin=mysql_native_password
         #restart: unless-stopped
-        env_file: .env
         ports:
             - 3306:3306
         networks:
@@ -53,15 +52,14 @@ services:
     phpmyadmin:
         image: phpmyadmin/phpmyadmin:latest
         #restart: unless-stopped
-        env_file: .env
         links:
-            - db
+            - database
         ports:
             - 8080:80
         networks:
             - symfony
         depends_on:
-            - db
+            - database
     #mailhog:
     #    image: mailhog/mailhog
     #    ports:
