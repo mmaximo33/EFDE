@@ -31,8 +31,10 @@ _mod_.run() {
   fi
 
   if [ "${FORCE_SHOW_OUTPUT}" = "true" ]; then
-    eval ${COMMAND_LINE}
+    eval "${COMMAND_LINE}"
   else
-   eval ${COMMAND_LINE} > /dev/null 2>&1
+   eval "${COMMAND_LINE}" > /dev/null 2>&1
   fi
 }
+
+#  COMMAND_LINE="docker compose exec database mysql -uefdeuser -pefdepassword --database=efdedb -hdatabase -e\"select * from pepe;\""

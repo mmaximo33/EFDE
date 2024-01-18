@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+
+  _mod_.get_env_var(){
+    local MYSQL_USER MYSQL_PASSWORD MYSQL_DATABASE MYSQL_HOST MYSQL_QUERY
+    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+
+    MYSQL_HOST=$(common.tasks.env_variable.get_variable "MYSQL_HOST" "$PATH_ENV")
+    MYSQL_USER=$(common.tasks.env_variable.get_variable "MYSQL_USER" "$PATH_ENV")
+    MYSQL_PASSWORD=$(common.tasks.env_variable.get_variable "MYSQL_PASSWORD" "$PATH_ENV")
+    MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
+
+    echo "-h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE"
+  }
+
+  _mod_.env_show(){
+    symfony.tasks.menu.show_config_project
+  }
+
+  _mod_.query_run(){
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
+    local MYSQL_QUERY
+
+    while true; do
+      MYSQL_QUERY="$(common.tasks.prompt.request_input $(common.tasks.message.msg_color warning "Enter the QUERY (press ENTER to exit):"))"
+
+      [ -z "$MYSQL_QUERY" ] || [ "$MYSQL_QUERY" = "q" ] && break
+
+      common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"${MYSQL_QUERY};\""
+      continue
+    done
+  }
+
+  _mod_.container_entry(){
+    docker.tasks.main.container_entry
+  }
+
+  _mod_.database_export(){
+    local PATH_DUMPS="./dumps"
+    local FILE_NAME="$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d_%H-%M").sql"
+    local FILE_PATH="$PATH_DUMPS/$FILE_NAME"
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysqldump $(_mod_.get_env_var)"
+
+    ! common.tasks.directory.exists "$PATH_DUMPS" && common.tasks.directory.create_recursive "$PATH_DUMPS"
+
+    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} --add-drop-database > $FILE_PATH"
+    common.tasks.message.success "Success: The database was exported $FILE_PATH\n"
+  }
+
+  _mod_.database_import(){
+    local MENU_FILES=()
+    local PATH_DUMPS="./dumps"
+    local PATH_FILES_SEARCH=("$PATH_DUMPS"/*.sql)
+    local FILE_NAME FILE_PATH
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec -T database mysql $(_mod_.get_env_var)"
+
+    if ! common.tasks.directory.exists "$PATH_DUMPS"; then
+        common.tasks.message.danger "Directory not found $PATH_DUMPS\n"
+        return
+    fi
+
+    if ! ls "${PATH_FILES_SEARCH}" > /dev/null 2>&1; then
+        common.tasks.message.danger "No files with .sql extension were found $PATH_FILES_SEARCH\n"
+        return
+    fi
+
+    for FILE in $(ls -1t "${PATH_FILES_SEARCH[@]}"); do
+        FILE_NAME=$(basename "$FILE")
+        MENU_FILES+=("$FILE_NAME,$FILE_NAME, ")
+    done
+
+    common.tasks.menu.print_menu "Select an option:" "${MENU_FILES[@]}"
+    FILE_NAME="${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}"
+    FILE_PATH="$PATH_DUMPS/$FILE_NAME"
+
+    local CONFIRM="Import DATABASE"
+    local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
+    local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR':")
+    common.tasks.message.warning "We are about to delete the directory $(common.tasks.message.msg_color info "$FILE_PATH")"
+    local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
+    if [[ "$RESPONSE" == "$CONFIRM" ]]; then
+      common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} < $FILE_PATH"
+      common.tasks.message.success "Success: Import file $FILE_PATH\n"
+    else
+      common.tasks.message.warning "Aborted action."
+    fi
+  }
+
+  _mod_.script_run(){
+    echo "HOLA"
+  }
+
+  _mod_.apply_privilegios(){
+    GRANT ALL PRIVILEGES ON nombre_de_base_de_datos.* TO 'usuario'@'localhost' IDENTIFIED BY 'contraseña';
+    FLUSH PRIVILEGES;
+  }
+
+
+}

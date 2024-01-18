@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+{
+  # shellcheck disable=SC2168
+  local PATH_MENU="mysql.tasks.menu"
+
+  _mod_MAIN=(
+    "$PATH_MENU.env_show,mysql:env:show env, Show variables"
+    "$PATH_MENU.query_run,mysql:run:sql, Run querys SQL"
+    "$PATH_MENU.container_entry,mysql:entry, Entry container"
+    "$PATH_MENU.database_export,mysql:database:export, Dumps database "
+    "$PATH_MENU.database_import,mysql:database:import, Import database "
+    "$PATH_MENU.script_run,mysql:logs, Inspect environment logs"
+  )
+}

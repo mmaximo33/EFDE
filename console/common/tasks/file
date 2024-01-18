@@ -26,7 +26,7 @@ _mod_.remove() {
 
   local CONFIRM="Delete FILE"
   local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
-  local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR'")
+  local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR':")
   common.tasks.message.warning "We are about to delete the file $(common.tasks.message.msg_color info $PATH)"
   local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
   if [[ "$RESPONSE" == "$CONFIRM" ]]; then

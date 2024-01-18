@@ -3,7 +3,7 @@ set -euo pipefail
 
 _mod_.echo() {
   # shellcheck disable=SC2068
-  local MSG="$(_mod_.msg_color $@)"
+  local MSG="$(_mod_.msg_color "$@")"
   command printf "$MSG\n"  2>/dev/null
 }
 
