@@ -21,33 +21,37 @@ _mod_.symfony_console_run_command(){
 
   MSG=(
     [MAIN]=$(common.tasks.message.msg_color warning 'Write the command or press ENTER to search:')
+    [OTHER]=$(common.tasks.message.msg_color warning 'Do you want to run another command?')
     [NEXT]=$(common.tasks.message.msg_color warning 'Write the value to search or press ENTER for the full list:')
     [MORE]=$(common.tasks.message.msg_color warning 'Find another value or ENTER:')
   )
 
   common.tasks.message.info "USE \n Run bin/console <symfony command> "
-  COMMAND_CUSTOM=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
-  if [[ -z "$COMMAND_CUSTOM" ]]; then
-    while true; do
-      SEARCH=$(common.tasks.prompt.request_input "${MSG['NEXT']}")
-        if [[ -z "$SEARCH" ]]; then
-            break
-        else
-            if [[ -n "$VALUES" ]]; then
-                VALUES="$VALUES|$SEARCH"
-            else
-                VALUES="$SEARCH"
-                MSG['NEXT']=${MSG[MORE]}
-            fi
-        fi
-    done
+  while true; do
+    COMMAND_CUSTOM=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
+    if [[ -z "$COMMAND_CUSTOM" ]]; then
+      while true; do
+        SEARCH=$(common.tasks.prompt.request_input "${MSG['NEXT']}")
+          if [[ -z "$SEARCH" ]]; then
+              break
+          else
+              if [[ -n "$VALUES" ]]; then
+                  VALUES="$VALUES|$SEARCH"
+              else
+                  VALUES="$SEARCH"
+                  MSG['NEXT']=${MSG[MORE]}
+              fi
+          fi
+      done
 
-    if [[ -n "$VALUES" ]]; then
-        COMMAND_CUSTOM="list | egrep --color=always \"$VALUES\""
-    else
-        COMMAND_CUSTOM="list"
+      if [[ -n "$VALUES" ]]; then
+          COMMAND_CUSTOM="list | egrep --color=always \"$VALUES\""
+      else
+          COMMAND_CUSTOM="list"
+      fi
     fi
-  fi
 
-  common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
+    common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
+    common.tasks.prompt.confirm_default_yes "${MSG['OTHER']}" || break
+  done
 }
