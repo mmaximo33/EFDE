@@ -2,14 +2,19 @@
 set -euo pipefail
 
 CONFIG_FILE="config.env"
-CONFIG_PATH="$EFDE_PATH_INSTALL/bin"
-CONFIG_PATH_FILE="$CONFIG_PATH/$CONFIG_FILE"
+CONFIG_PATH_FILE="$EFDE_PATH_INSTALL/bin/$CONFIG_FILE"
+GLOBAL_RUN_EFDE="efde"
+
+_mod_.set_run_cli_efde(){
+  GLOBAL_RUN_EFDE=$([ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] && echo "e2")
+}
 
 _mod_.check_config() {
   if ! common.tasks.file.exists "$CONFIG_PATH_FILE"; then
     _mod_.create_config
   fi
   _mod_.load_config
+  _mod_.set_run_cli_efde
 }
 
 _mod_.create_config() {
@@ -63,51 +68,32 @@ _mod_.set_config_cli(){
     "auditor,Auditor,Show executed commands and output"
     "silent,Silent,Do not show executed commands or output"
   )
+
   common.tasks.menu.print_menu "How to see executed commands and outputs" "${TYPE_SETTINGS[@]}"
   RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
   case $RESPONSE in
     default)
-      _mod_.set_var "CLI_DEFAULT" "true"
-      _mod_.set_var "CLI_SHOW_CLI" "true"
-      _mod_.set_var "CLI_SHOW_OUTPUT" "false"
+      _mod_.set_var "CLI_DEFAULT"       "true"
+      _mod_.set_var "CLI_SHOW_CLI"      "true"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
       ;;
     silent)
-      _mod_.set_var "CLI_DEFAULT" "false"
-      _mod_.set_var "CLI_SHOW_CLI" "false"
-      _mod_.set_var "CLI_SHOW_OUTPUT" "false"
+      _mod_.set_var "CLI_DEFAULT"       "false"
+      _mod_.set_var "CLI_SHOW_CLI"      "false"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
       ;;
     training)
-      _mod_.set_var "CLI_DEFAULT" "false"
-      _mod_.set_var "CLI_SHOW_CLI" "true"
-      _mod_.set_var "CLI_SHOW_OUTPUT" "false"
+      _mod_.set_var "CLI_DEFAULT"       "false"
+      _mod_.set_var "CLI_SHOW_CLI"      "true"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
       ;;
     auditor)
-      _mod_.set_var "CLI_DEFAULT" "false"
-      _mod_.set_var "CLI_SHOW_CLI" "true"
-      _mod_.set_var "CLI_SHOW_OUTPUT" "true"
+      _mod_.set_var "CLI_DEFAULT"       "false"
+      _mod_.set_var "CLI_SHOW_CLI"      "true"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "true"
       ;;
   esac
 
-}
-
-_mod_.set_config_cli2(){
-  local MSG=""
-  local RESPONSE=false
-  MSG=$(common.tasks.message.msg_color warning "Take default settings (Recommended)")
-  common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true
-  _mod_.set_var "CLI_DEFAULT" "$RESPONSE"
-  if [ "$RESPONSE" = "false" ]; then
-    MSG=$(common.tasks.message.msg_color warning "Always show executed commands?")
-    common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true || RESPONSE=false
-    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
-    MSG=$(common.tasks.message.msg_color warning "Always show command output?")
-    common.tasks.prompt.confirm_default_yes "$MSG"  && RESPONSE=true || RESPONSE=false
-    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
-  else
-    RESPONSE=false
-    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
-    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
-  fi
 }
 
 _mod_.set_config_version() {

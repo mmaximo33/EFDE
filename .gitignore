@@ -1,3 +1,4 @@
 .idea
-bin/
+bin/.tmp
+bin/config.env
 

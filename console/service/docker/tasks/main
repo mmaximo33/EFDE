@@ -15,7 +15,8 @@ _mod_.dp_command_run(){
   common.tasks.command_line.run true false "${COMMAND_RUN}"
 }
 
-_mod_.dp_up(){
+_mod_.dp_build(){
+  _mod_.dp_all_stop
   _mod_.dp_command_run "up -d --build"
 }
 

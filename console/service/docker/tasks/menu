@@ -6,7 +6,7 @@ _mod_.main(){
 }
 
 _mod_.build(){
-  docker.tasks.main.dp_up
+  docker.tasks.main.dp_build
   _mod_.main
 }
 
