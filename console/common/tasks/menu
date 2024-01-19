@@ -26,7 +26,7 @@ _mod_.print_menu(){
         IFS=',' read -r -a values <<< "$option"
         if [[ ${#values[@]} -ge 2 ]]; then
             titulo=${values[1]}
-            description=$([ "$EFDE_MOD_DEBUG" = "true" ] && echo  ${values[0]} || echo ${values[2]})
+            description=$([ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] && echo  ${values[0]} || echo ${values[2]})
             printf "%-0s. %-35s %s\n" "$i" "$titulo" "$description"
         else
             common.tasks.message.warning "Invalid option: $option"
@@ -42,22 +42,18 @@ _mod_.print_menu(){
         GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['choice']=$MENU_RESPONSE_CHOICE
 
         _mod_.menu_response_asociative "${options[$MENU_RESPONSE_CHOICE]}"
-        common.console_clear
+        common.tasks.os.console_clear
         local RUN_FUNCTION=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
         if common.tasks.module.exists_function "$RUN_FUNCTION" ;then
             _mod_.msg_debug
             ${RUN_FUNCTION}
         fi
-#        else
-#          common.msg_danger "Error: ${RUN_FUNCTION^^} The functions don't exists"
-#          _mod_.print_menu "$question" "${options[@]}"
-#        fi
     else
         [[ "$choice" == "q" ]] && exit 0
         # MMToDo: Bug in return functions
+        #[[ "$choice" == "r" ]] && { common.tasks.os.console_clear; ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}; return; }
         [[ "$choice" == "r" ]] && { common.tasks.message.danger "We detected a BUG, we are working to correct the return"; ${GLOBAL_RUN_EFDE}; }
-        #[[ "$choice" == "r" ]] && { common.console_clear; ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}; return; }
-        common.console_clear
+        common.tasks.os.console_clear
         common.tasks.message.danger "The '$choice' option is not in the list."
         _mod_.print_menu "$question" "${options[@]}"
     fi

@@ -19,7 +19,9 @@
 - [Usage](#usage)
 - [Mission](#mission)
 - [Documentation](#documentation)
+  - [Doc for Developer (Collaborators)](docs/developer.md) 🔥
   - [Code of conduct](#code-of-conduct) | [Maintainers](#maintainers) | [Contributing](#contributing) | [License](#license)
+
 
 ## Intro
 
@@ -36,6 +38,7 @@ The objective of the project is to be able to manage implementations with docker
 ### Coming soon
 
 [![Install Portainer.io](https://img.shields.io/badge/Portainer.io-105f8f?style=for-the-badge&logo=portainer&logoColor=white)](#)
+
 [![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
 [![Install Magento](https://img.shields.io/badge/Magento-f06835?style=for-the-badge&logo=magento&logoColor=white)](#)
 [![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](#)

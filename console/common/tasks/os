@@ -11,3 +11,18 @@ _mod_.get_operating_system() {
   esac
   echo "$os"
 }
+
+_mod_.has() {
+  type "$1" >/dev/null 2>&1
+}
+
+_mod_.console_clear() {
+  if [ -z "${GLOBAL_EFDE_CONFIG:-}" ] || [ -z "${GLOBAL_EFDE_CONFIG['HOST_SO']:-}" ]; then
+    GLOBAL_EFDE_CONFIG['HOST_SO']="$(_mod_.get_operating_system)"
+  fi
+
+  case "${GLOBAL_EFDE_CONFIG['HOST_SO']}" in
+    Linux) clear ;;
+    *) common.tasks.message.danger "Operating system not configured" ;;
+  esac
+}

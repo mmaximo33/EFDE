@@ -4,6 +4,8 @@ set -euo pipefail
   # shellcheck disable=SC2168
   local PATH_MENU="efde.tasks"
 
+  _mod_TITLE="$(printf '%.s═' {1..45})\nEFDE | Easy and Fast Developer Environment\nSelect an option:"
+
   _mod_MAIN=(
     "$PATH_MENU.menu.efde,Efde config , Settings and configurations"
     "symfony.tasks.menu.create_environment,Install Symfony, Dockerization for symfony (WebApp or Apis)"
@@ -36,7 +38,7 @@ set -euo pipefail
     "$PATH_MENU.config.set_config,Set, Set config"
   )
 
-  _mod_CONFIG_SET_LENGUAGE=(
+  _mod_CONFIG_SET_LANGUAGE=(
     "es_ES,es_ES, Spanish"
     "en_US,en_US, English"
     "pt_PT,pt_PT, Portuguese"

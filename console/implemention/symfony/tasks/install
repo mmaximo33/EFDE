@@ -44,7 +44,7 @@ _mod_.get_env_version(){
 _mod_.set_database_variables(){
   local VALUE=""
   local MSG="${GLOBAL_SYMFONY_INSTALL['MESSAGE_DATABASE_VARIABLE']}"
-  local -A KEYS=("MYSQL_ROOT_PASSWORD" "MYSQL_USER" "MYSQL_PASSWORD" "MYSQL_DATABASE")
+  local KEYS=("MYSQL_ROOT_PASSWORD" "MYSQL_USER" "MYSQL_PASSWORD" "MYSQL_DATABASE")
 
 
   common.tasks.message.info "\n${GLOBAL_SYMFONY_INSTALL['MESSAGE_DATABASE']}"

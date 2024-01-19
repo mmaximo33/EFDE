@@ -53,7 +53,7 @@ _mod_.danger(){
 }
 
 _mod_.debug(){
-  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
     _mod_.echo debug "$@"
   fi
 }

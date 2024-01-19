@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-_mod_.console_clear() {
-  # Todo: Determinar si es linux,windows, mac
-  clear
-}
-
 _mod_.step(){
   _mod_.msg_debug "#######################################################################"
   _mod_.msg_debug "# LOAD MODULES "
@@ -15,7 +10,7 @@ _mod_.step(){
 _mod_.msg_debug() {
   local level="${2:-0}"
   local end="${3:-0}"
-  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
     if _mod_.essential_run; then
         common.tasks.message.tree "$1" "$level" "$end" debug
     else
@@ -30,7 +25,7 @@ _mod_.msg_danger(){
   local level="${2:-0}"
   local message="\033[1;31m$1\033[0m"
 
-  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
     _mod_.msg_debug "$message" "$level"
   else
     command printf "$message" 2>/dev/null
@@ -111,7 +106,7 @@ _mod_.replacemod () {
   _mod_.msg_debug "Path Tmp: $PATH_TARGET" 4
 
 
-  if [ "$EFDE_MOD_DEV" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
     # old only replace functions
     #sed "s/_mod_/$NEW_NAME/g" "$SOURCE_PATH" > "$PATH_TARGET"
 

@@ -3,6 +3,8 @@
   # shellcheck disable=SC2168
   local PATH_MENU="docker.tasks.menu"
 
+  _mod_TITLE="$(printf '%.s═' {1..45})\nDocker\nSelect an option:"
+
   _mod_MAIN=(
     "$PATH_MENU.build,Build, Build or Re-Build the project containers"
     "$PATH_MENU.show,Show, Show (start) containers of project"

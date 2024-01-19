@@ -4,7 +4,7 @@ set -euo pipefail
 DIRECTORY_TMP="$PATH_BIN/.tmp"
 
 create_folder_tmp() {
-  [[ "$EFDE_MOD_DEV" = "true" ]] && rm -rf $DIRECTORY_TMP
+  [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && rm -rf $DIRECTORY_TMP
 
   [ ! -d $DIRECTORY_TMP ] && mkdir -p $DIRECTORY_TMP; chmod +x $DIRECTORY_TMP
 }
@@ -16,7 +16,7 @@ create_construct(){
   PATH_SOURCE="$PATH_CONSOLE/$MODULE_NAME/$IMPORT_FILE"
   PATH_TARGET="$DIRECTORY_TMP/$IMPORT_FILE"
 
-  if [ "$EFDE_MOD_DEV" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
       sed "/sed/! s/_mod_/$MODULE_NAME/g" "$PATH_SOURCE" > "$PATH_TARGET"
   fi
 

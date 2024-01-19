@@ -21,7 +21,7 @@ _mod_.run() {
   shift 2
   COMMAND_LINE="$@"
 
-  if [ "${GLOBAL_EFDE_CONFIG['CLI_SHOW_DEFAULT']}" = "false" ]; then
+  if [ "${GLOBAL_EFDE_CONFIG['CLI_DEFAULT']}" = "false" ]; then
     FORCE_SHOW_CLI=${GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']}
     FORCE_SHOW_OUTPUT=${GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']}
   fi

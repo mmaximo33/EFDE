@@ -3,6 +3,8 @@
   # shellcheck disable=SC2168
   local PATH_MENU="symfony.tasks.menu"
 
+  _mod_TITLE="$(printf '%.s═' {1..45})\nSymfony\nSelect an option:"
+
   _mod_MAIN=(
     "$PATH_MENU.show_config_project,Project config,Settings established in the project"
     "$PATH_MENU.console,Console,Symfony Console"
