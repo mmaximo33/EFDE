@@ -72,10 +72,12 @@ If you want to add a new feature you must keep the following rules in mind
 - When executing in glogal symbolic link `~/bin/efde -> ~/.efde/bin/efde`
 - Is loaded `console/init`
   - By default change the CORE `console/common/core` in `bin/.tmp/core` (to work on the transformation)
-  - Loops through all directories recursively on console looking for the initiator file `$path/init`
-  - Transform the files found from that implementation or service (for the tasks or props directories) 
+  - It loops through all the directories within `./console` recursively until it finds a folder called `../task`
+  - At that moment the transformation of the files found in that implementation or service begins `./console/.../wordpress/{tasks | accessories}`
     - `EFDE_MODE_DEVELOP=true`, rename files, methods and variables in a `bin/.temp/{files}` directory
-      - Files: multiple files from `console/efde/tasks/menu` to `bin/.tmp/efde.tasks.menu`
+      - Files: multiple files from 
+        - `console/efde/tasks/menu` to `bin/.tmp/efde.tasks.menu`
+        - `console/efde/props/menu` to `bin/.tmp/efde.props.menu`
       - Methods: from `_mod_.main` to `efde.tasks.menu.main`
       - Variables: from `_mod_MAIN` to `efde_prop_menu_MAIN`
     - `EFDE_MODE_DEVELOP=false`, change the name of methods and variables in `bin/.temp/transformation` (File with all the code)
@@ -83,5 +85,3 @@ If you want to add a new feature you must keep the following rules in mind
 -  Determines whether the launch directory in the `efde` command console has a project created by it or not (search for `$PATH/.efde/`)
    - Is TRUE, loads the implementation menu according to what is established in the `$PATH/.efde/.env` file variable `EFDE_PROJECT_IMPLEMENTION`
    - Is FALSE, load the default menu to configure `efde` or install implementations
-
-##

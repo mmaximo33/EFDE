@@ -17,12 +17,17 @@ _mod_.has() {
 }
 
 _mod_.console_clear() {
+  local COMMAND
   if [ -z "${GLOBAL_EFDE_CONFIG:-}" ] || [ -z "${GLOBAL_EFDE_CONFIG['HOST_SO']:-}" ]; then
     GLOBAL_EFDE_CONFIG['HOST_SO']="$(_mod_.get_operating_system)"
   fi
 
   case "${GLOBAL_EFDE_CONFIG['HOST_SO']}" in
-    Linux) clear ;;
+    Linux) COMMAND="clear" ;;
     *) common.tasks.message.danger "Operating system not configured" ;;
   esac
+
+  if ! "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ; then
+    ${COMMAND}
+  fi
 }

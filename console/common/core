@@ -54,6 +54,8 @@ _mod_.load_module(){
   ! _mod_.essential_run && _mod_.load_common_msg $1
 
   local PATH_MODULE=$1
+  local MODULE_NAME=$(basename "$PATH_MODULE")
+
   local elements=("props" "tasks")
   _mod_.step
   _mod_.msg_debug "Module: $MODULE_NAME" 1
