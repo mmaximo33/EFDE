@@ -27,7 +27,7 @@ _mod_.console_clear() {
     *) common.tasks.message.danger "Operating system not configured" ;;
   esac
 
-  if ! "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ; then
+  if [ ! "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]; then
     ${COMMAND}
   fi
 }

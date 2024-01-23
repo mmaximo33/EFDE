@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.target() {
+  local PARAM="$1"
+
+  for LINE in "${EFDE_SHORTCUTS[@]}"; do
+    IFS=',' read -r -a VALUES <<< "$LINE"
+    if [[ "${VALUES[0]}" == "$PARAM" ]]; then
+      FUNCTION_RUN="${VALUES[1]}"
+      ${FUNCTION_RUN}
+      return 0
+    fi
+  done
+  common.tasks.message.info "The shortcut is not registered: $(common.tasks.message.danger ${PARAM^^})"
+  _mod_.find "$PARAM"
+  return 1
+}
+
+_mod_.find(){
+  local PARAM="$1"
+  common.tasks.message.info "But we found some that may match the desired action:\n"
+
+  local PARTS=(${PARAM//:/ })
+  for ((i = 0; i < ${#PARTS[@]}; i++)); do
+    PATTERN+="${PARTS[i]}"
+    if ((i < ${#PARTS[@]} - 1)); then
+      PATTERN+="|"
+    fi
+  done
+  ${GLOBAL_RUN_EFDE} efde:shortcuts | egrep --color=always "${PATTERN}"
+}
+
+_mod_.show(){
+  local PREV_TITLE=""
+
+  [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" || "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && MODE="debug"
+  common.tasks.message.echo $MODE "$(printf '%.s═' {1..45})"
+  common.tasks.message.info "EFDE | Easy and Fast Developer Environment\nShortcuts"
+
+  IFS=$'\n' sorted_shortcuts=($(sort <<<"${EFDE_SHORTCUTS[*]}"))
+
+  for LINE in "${sorted_shortcuts[@]}"; do
+    IFS=',' read -r -a VALUES <<< "$LINE"
+
+    CURRENT_TITLE="${VALUES[0]%%:*}"
+    if [ "$PREV_TITLE" != "$CURRENT_TITLE" ]; then
+      common.tasks.message.warning "\n$CURRENT_TITLE:"
+      PREV_TITLE="$CURRENT_TITLE"
+    fi
+
+    local SHORTCUT=$(common.tasks.message.success $(_mod_.trim ${VALUES[0]}))
+    local DESCRPTION=$(common.tasks.message.success $(_mod_.trim ${VALUES[3]}))
+    if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
+      local FUNCTION=$(common.tasks.message.echo debug $(_mod_.trim ${VALUES[1]}))
+      printf "  %-45s %-55s\n" "$SHORTCUT" "$FUNCTION"
+    else
+      printf "  %-45s %-55s\n" "$SHORTCUT" "$DESCRPTION"
+    fi
+  done
+}
+
+
+_mod_.trim() {
+    local var="$*"
+    var="$(echo -e "${var}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"  # Eliminar espacios al principio y al final
+    echo -n "$var"
+}

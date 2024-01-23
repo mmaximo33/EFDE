@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 {
   # shellcheck disable=SC2168
-  local PATH_MENU="symfony.tasks.menu"
+  local PATH_MENU="symfony.tasks"
 
-  _mod_TITLE="$(printf '%.s═' {1..45})\nSymfony\nSelect an option:"
+  _mod_TITLE="Symfony https://symfony.com/ \nSelect an option:"
 
   _mod_MAIN=(
-    "$PATH_MENU.show_config_project,Project config,Settings established in the project"
-    "$PATH_MENU.console,Console,Symfony Console"
-    "docker.tasks.menu.main,Docker,Dockerization management in the project"
-    "$PATH_MENU.symfony_fix_permissions,Fix permissions, "
+    "symfony:project:config,      $PATH_MENU.menu.show_config_project,          Project config,       Settings established in the project"
+    "symfony:console,             $PATH_MENU.menu.console,                      Console,              Symfony Console"
+    "symfony:docker,              docker.tasks.menu.main,                       Docker,               Dockerization management in the project"
+    "symfony:permissions:fix,     $PATH_MENU.symfony_fix_permissions,           Fix permissions,      Apply permissions"
   )
 
   _mod_CREATE_ENVIRONMENT=(
-    "symfony.tasks.install.create_new_environment,Create new app, "
-    "symfony.tasks.install.clone_environment,Clone existing app, "
+    "symfony:create,              $PATH_MENU.install.create_new_environment,   Create new app, "
+    "symfony:clone,               $PATH_MENU.install.clone_environment,        Clone existing app,   Clone from http://url.repository"
   )
 
   _mod_CREATE_ENVIRONMENT_VERSION=(
-    "5,Symfony 5.x,This version works with PHP-7.x"
-    "6,Symfony 6.x,This version works with PHP-8.x"
+    "shortcut:off,    5,   Symfony 5.x,   This version works with PHP-7.x"
+    "shortcut:off,    6,   Symfony 6.x,   This version works with PHP-8.x"
   )
 }

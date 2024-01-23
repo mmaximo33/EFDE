@@ -108,7 +108,7 @@ _mod_.docker_start(){
   symfony.tasks.main.permissions_fix
   docker.tasks.main.apache_stop
   docker.tasks.main.dp_all_stop
-  docker.tasks.main.dp_up
+  docker.tasks.main.dp_build
   efde.tasks.implemention.clear_global_variables
   common.tasks.message.success "SUCCES: Project installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
 }

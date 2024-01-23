@@ -109,9 +109,6 @@ _mod_.replacemod () {
 
 
   if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
-    # old only replace functions
-    #sed "s/_mod_/$NEW_NAME/g" "$SOURCE_PATH" > "$PATH_TARGET"
-
     if echo "$NEW_NAME" | grep -qi ".tasks."; then
       sed -E "s/_mod_\.([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME}.\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
     else
@@ -127,6 +124,7 @@ _mod_.replacemod () {
   fi
 
   source "$PATH_TARGET"
+
   if [ ! $? -eq 0 ]; then
     _mod_.msg_danger "[ERROR] The resources were not loaded, report this!" 4
     _mod_.msg_danger "File: $NEW_NAME" 5
@@ -134,3 +132,33 @@ _mod_.replacemod () {
     exit 1
   fi
 }
+
+# Función para extraer valores
+_mod_.generate_shortcuts_file() {
+  local TARGET_SHORTCUTS="$DIRECTORY_TMP/common.props.shortcuts"
+
+  echo -e "#!/usr/bin/env bash\nset -euo pipefail\n" > "$TARGET_SHORTCUTS"
+  echo "EFDE_SHORTCUTS=(" >> "$TARGET_SHORTCUTS"
+
+  for var in $(compgen -A variable); do
+    if [[ "$var" =~ _props_menu_ && "$(declare -p "$var" 2>/dev/null)" =~ "declare -a" ]]; then
+      # shellcheck disable=SC1087
+      eval "ARR=(\"\${$var[@]}\")"
+      for LINE in "${ARR[@]}"; do
+        IFS=',' read -r -a VALUE <<< "$LINE"
+
+        if [[ "${VALUE[0]}" =~ ":" && -n "${VALUE[0]}" && "${VALUE[0]}" != "shortcut:off" ]]; then
+          echo "  \"$LINE\"" >> "$TARGET_SHORTCUTS"
+        fi
+      done
+    fi
+  done
+
+  echo ")" >> "$TARGET_SHORTCUTS"
+
+  source $TARGET_SHORTCUTS
+  _mod_.msg_debug "Shortcuts file created in $TARGET_SHORTCUTS"
+}
+
+
+

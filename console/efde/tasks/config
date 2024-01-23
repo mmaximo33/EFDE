@@ -14,6 +14,7 @@ _mod_.check_config() {
     _mod_.create_config
   fi
   _mod_.load_config
+
   _mod_.set_run_cli_efde
 }
 
@@ -54,7 +55,7 @@ _mod_.show_config() {
 }
 
 _mod_.set_config_language(){
-  common.tasks.menu.print_menu "Default language?" "${efde_props_menu_CONFIG_SET_LANGUAGE[@]}"
+  common.tasks.menu.show "Default language?" "${efde_props_menu_CONFIG_SET_LANGUAGE[@]}"
   RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
   _mod_.set_var "EFDE_LANGUAGE" "$RESPONSE"
 }
@@ -63,13 +64,13 @@ _mod_.set_config_cli(){
   local MSG=""
   local RESPONSE=false
   local TYPE_SETTINGS=(
-    "default,Default (Recommended),Established by implementation"
-    "training,Training,Show executed commands, no output"
-    "auditor,Auditor,Show executed commands and output"
-    "silent,Silent,Do not show executed commands or output"
+    "shortcut:off,  default,    Default (Recommended),    Established by implementation"
+    "shortcut:off,  training,   Training,                 Show executed commands, no output"
+    "shortcut:off,  auditor,    Auditor,                  Show executed commands and output"
+    "shortcut:off,  silent,     Silent,                   Do not show executed commands or output"
   )
 
-  common.tasks.menu.print_menu "How to see executed commands and outputs" "${TYPE_SETTINGS[@]}"
+  common.tasks.menu.show "How to see executed commands and outputs" "${TYPE_SETTINGS[@]}"
   RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
   case $RESPONSE in
     default)
@@ -133,11 +134,11 @@ _mod_.set_config_editor(){
 
   for KEY in "${EDITORS[@]}"; do
     if common.tasks.os.has "$KEY"; then
-      EDITORS_MENU+=("$KEY, $KEY, ")
+      EDITORS_MENU+=("shortcut:off, $KEY, $KEY")
     fi
   done
 
-  common.tasks.menu.print_menu "select EDITOR default" "${EDITORS_MENU[@]}"
+  common.tasks.menu.show "select EDITOR default" "${EDITORS_MENU[@]}"
   RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
   _mod_.set_var "HOST_EDITOR_DEFAULT" "$RESPONSE"
 }

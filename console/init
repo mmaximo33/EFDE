@@ -53,6 +53,7 @@ main() {
   create_folder_tmp
   create_construct
   load_modules $PATH_CONSOLE
+  common.generate_shortcuts_file
 }
 
 main

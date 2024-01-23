@@ -3,7 +3,7 @@ set -euo pipefail
 
 declare -gA GLOBAL_EFDE_CONFIG=(
   [EFDE_MODE_DEBUG]=false           # Debug Messages
-  [EFDE_MODE_DEVELOP]=false          # MMTodo: Prepared for create tmps
+  [EFDE_MODE_DEVELOP]=false         # MMTodo: Prepared for create tmps
 )
 
 resolve_absolute_dir() {
@@ -43,17 +43,22 @@ menu(){
   if ! efde.tasks.implemention.has_folder_implementation ; then
     efde.tasks.menu.main
   fi
+
   menu_implementation
 }
 
 shortcuts(){
   efde.tasks.config.check_config
-  echo "shortcuts"
+  common.tasks.shortcuts.target "$@"
 }
 
 main() {
   init_dirs # IMPORTANT
-  [ $# -gt 0 ] && shortcuts "$@" || menu
+  if [ $# -gt 0 ]; then
+    shortcuts "$@"
+  else
+    menu
+  fi
 }
 
 main "$@"

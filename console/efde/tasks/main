@@ -7,9 +7,9 @@ set -euo pipefail
   }
 
   _mod_.coming_soon(){
-    common.tasks.message.info "We're excited about the upcoming release!"
-    common.tasks.message.info "Our team is hard at work to bring you the latest features and improvements."
-    common.tasks.message.info "Stay tuned for updates and follow the project's progress on $URL_REPOSITORY."
+    common.tasks.message.warning "We're excited about the upcoming release!"
+    common.tasks.message.warning "Our team is hard at work to bring you the latest features and improvements."
+    common.tasks.message.warning "Stay tuned for updates and follow the project's progress on $URL_REPOSITORY."
     common.tasks.message.warning "Thank you for your patience, and remember to check back for the latest developments."
   }
 
@@ -26,23 +26,23 @@ set -euo pipefail
   }
 
   #MMTodo: Review
-  _mod_.start_on_github(){
-    USERNAME="tu_nombre_de_usuario"
-    TOKEN="tu_token_de_acceso"
-    REPO_OWNER="dueño_del_repositorio"
-    REPO_NAME="nombre_del_repositorio"
-
-    # Obtener el token de acceso (puedes generar uno en tu configuración de GitHub)
-    # Más información: https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-
-    # Endpoint de la API de GitHub para dar estrella a un repositorio
-    ENDPOINT="https://api.github.com/user/starred/$REPO_OWNER/$REPO_NAME"
-
-    # Realizar la acción de dar estrella utilizando cURL
-    curl -X PUT -H "Authorization: token $TOKEN" "$ENDPOINT"
-
-    echo "Repositorio estrellado exitosamente."
-  }
+#  _mod_.start_on_github(){
+#    USERNAME="user"
+#    TOKEN="toke"
+#    REPO_OWNER="owner_repo"
+#    REPO_NAME="name_repo"
+#
+#    # Obtener el token de acceso (puedes generar uno en tu configuración de GitHub)
+#    # Más información: https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+#
+#    # Endpoint de la API de GitHub para dar estrella a un repositorio
+#    ENDPOINT="https://api.github.com/user/starred/$REPO_OWNER/$REPO_NAME"
+#
+#    # Realizar la acción de dar estrella utilizando cURL
+#    curl -X PUT -H "Authorization: token $TOKEN" "$ENDPOINT"
+#
+#    echo "Repositorio   exitosamente."
+#  }
 
 
   _mod_.efde_update() {
