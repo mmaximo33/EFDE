@@ -50,7 +50,7 @@ _mod_.show(){
     fi
 
     local SHORTCUT=$(common.tasks.message.success $(_mod_.trim ${VALUES[0]}))
-    local DESCRPTION=$(common.tasks.message.success $(_mod_.trim ${VALUES[3]}))
+    local DESCRPTION=$(common.tasks.message.success $(_mod_.trim ${VALUES[3]:-${VALUES[2]}}))
     if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
       local FUNCTION=$(common.tasks.message.echo debug $(_mod_.trim ${VALUES[1]}))
       printf "  %-45s %-55s\n" "$SHORTCUT" "$FUNCTION"
