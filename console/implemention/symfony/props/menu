@@ -10,6 +10,7 @@
     "symfony:console,             $PATH_MENU.menu.console,                      Console,              Symfony Console"
     "symfony:docker,              docker.tasks.menu.main,                       Docker,               Dockerization management in the project"
     "symfony:permissions:fix,     $PATH_MENU.symfony_fix_permissions,           Fix permissions,      Apply permissions"
+    "symfony:database,            mysql.tasks.menu.main,                        Database,             Database Manager"
   )
 
   _mod_CREATE_ENVIRONMENT=(
