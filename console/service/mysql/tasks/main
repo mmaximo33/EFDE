@@ -3,6 +3,7 @@ set -euo pipefail
 {
 
   _mod_.get_env_var(){
+    local USE_DATABASE="${1:-true}"
     local MYSQL_USER MYSQL_PASSWORD MYSQL_DATABASE MYSQL_HOST MYSQL_QUERY
     local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
 
@@ -10,24 +11,40 @@ set -euo pipefail
     MYSQL_USER=$(common.tasks.env_variable.get_variable "MYSQL_USER" "$PATH_ENV")
     MYSQL_PASSWORD=$(common.tasks.env_variable.get_variable "MYSQL_PASSWORD" "$PATH_ENV")
     MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
+    MYSQL_ROOT_PASSWORD=$(common.tasks.env_variable.get_variable "MYSQL_ROOT_PASSWORD" "$PATH_ENV")
 
-    echo "-h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE"
+    local result="-h$MYSQL_HOST -uroot -p$MYSQL_ROOT_PASSWORD"
+
+    if [ "$USE_DATABASE" = "true" ]; then
+        result="$result $MYSQL_DATABASE"
+    fi
+
+    echo "$result"
   }
 
   _mod_.env_show(){
     symfony.tasks.menu.show_config_project
   }
 
-  _mod_.query_run(){
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
-    local MYSQL_QUERY
+  _mod_.run_query(){
+    if [ "$#" -eq 0 ]; then
+        common.tasks.message.danger "Error: The function $FUNCNAME requires a sql query"
+        return 1
+    fi
 
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
+
+    echo $(common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"$*;\"")
+  }
+
+  _mod_.run_custom_query(){
+    local MYSQL_QUERY
     while true; do
       MYSQL_QUERY="$(common.tasks.prompt.request_input $(common.tasks.message.msg_color warning "Enter the QUERY (press ENTER to exit):"))"
 
       [ -z "$MYSQL_QUERY" ] || [ "$MYSQL_QUERY" = "q" ] && break
 
-      common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"${MYSQL_QUERY};\""
+      _mod_.run_query "${MYSQL_QUERY}"
       continue
     done
   }
@@ -70,7 +87,7 @@ set -euo pipefail
         MENU_FILES+=("$FILE_NAME,$FILE_NAME, ")
     done
 
-    common.tasks.menu.print_menu "Select an option:" "${MENU_FILES[@]}"
+    common.tasks.menu.show "$mysql_props_menu_TITLE" "${MENU_FILES[@]}"
     FILE_NAME="${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}"
     FILE_PATH="$PATH_DUMPS/$FILE_NAME"
 
@@ -80,6 +97,8 @@ set -euo pipefail
     common.tasks.message.warning "We are about to delete the directory $(common.tasks.message.msg_color info "$FILE_PATH")"
     local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
     if [[ "$RESPONSE" == "$CONFIRM" ]]; then
+      _mod_.database_drop
+      _mod_.database_create
       common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} < $FILE_PATH"
       common.tasks.message.success "Success: Import file $FILE_PATH\n"
     else
@@ -87,14 +106,61 @@ set -euo pipefail
     fi
   }
 
+#  _mod_.drop_all_tables_database(){
+#    local QUERY
+#    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
+#    local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
+#
+#
+#    QUERY="SELECT CONCAT('DROP TABLE IF EXISTS ', GROUP_CONCAT(table_name), ';')"
+#    QUERY+=" FROM information_schema.tables"
+#    QUERY+=" WHERE table_schema = '${MYSQL_DATABASE}'"
+#    local DROP_TABLES="$(_mod_.run_query "${QUERY}")"
+#    echo $DROP_TABLES
+#  }
+
   _mod_.script_run(){
     echo "HOLA"
   }
 
-  _mod_.apply_privilegios(){
-    GRANT ALL PRIVILEGES ON nombre_de_base_de_datos.* TO 'usuario'@'localhost' IDENTIFIED BY 'contraseña';
-    FLUSH PRIVILEGES;
+  _mod_.permissions(){
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
+    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+    local MYSQL_HOST=$(common.tasks.env_variable.get_variable "MYSQL_HOST" "$PATH_ENV")
+    local MYSQL_USER=$(common.tasks.env_variable.get_variable "MYSQL_USER" "$PATH_ENV")
+    local MYSQL_PASSWORD=$(common.tasks.env_variable.get_variable "MYSQL_PASSWORD" "$PATH_ENV")
+    local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
+
+    common.tasks.message.info "The privileges will be applied with the following data"
+    common.tasks.message.info "MYSQL_DATABASE=${MYSQL_DATABASE}"
+    common.tasks.message.info "MYSQL_USER=${MYSQL_USER}"
+    common.tasks.message.info "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+
+    if common.tasks.prompt.confirm_default_yes $(common.tasks.message.warning "It's right?"); then
+      local MYSQL_QUERYS=(
+        "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}'"
+        "FLUSH PRIVILEGES"
+      )
+      for QUERY in "${MYSQL_QUERYS[@]}"; do
+        _mod_.run_query "${QUERY}"
+      done
+    fi
   }
 
+  _mod_.database_create(){
+    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+    local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
+    #_mod_.run_query "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE}"
+
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var false)"
+
+    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};\""
+  }
+
+  _mod_.database_drop(){
+    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+    local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
+    _mod_.run_query "DROP DATABASE \\\`${MYSQL_DATABASE}\\\`"
+  }
 
 }

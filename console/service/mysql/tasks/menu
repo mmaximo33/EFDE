@@ -2,13 +2,13 @@
 set -euo pipefail
 
 _mod_.main(){
-  common.tasks.menu.print_menu "Select an option:" "${mysql_props_menu_MAIN[@]}"
+  common.tasks.menu.show "$mysql_props_menu_TITLE" "${mysql_props_menu_MAIN[@]}"
 }
 
 _mod_.env_show(){
   cat "$(efde.tasks.implemention.get_current_path_env_file)" | grep -E "MYSQL|PMA"
   if common.tasks.prompt.confirm_default_yes $(common.tasks.message.msg_color warning "Back to menu?"); then
-    common.console_clear
+    common.tasks.os.console_clear
     _mod_.main
   else
     exit
@@ -16,7 +16,7 @@ _mod_.env_show(){
 }
 
 _mod_.query_run(){
-  mysql.tasks.main.query_run
+  mysql.tasks.main.run_custom_query
   _mod_.main
 }
 
@@ -35,7 +35,13 @@ _mod_.database_import(){
   _mod_.main
 }
 
+_mod_.permissions(){
+  mysql.tasks.main.permissions
+  _mod_.main
+}
+
 _mod_.script_run(){
   mysql.tasks.main.script_run
   _mod_.main
 }
+
