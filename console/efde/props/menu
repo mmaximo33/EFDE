@@ -4,41 +4,44 @@ set -euo pipefail
   # shellcheck disable=SC2168
   local PATH_MENU="efde.tasks"
 
+  _mod_TITLE="EFDE | Easy and Fast Developer Environment\nSelect an option:"
+
   _mod_MAIN=(
-    "$PATH_MENU.menu.efde,Efde config , Settings and configurations"
-    "symfony.tasks.menu.create_environment,Install Symfony, Dockerization for symfony (WebApp or Apis)"
-    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Laravel, "
-    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Magento, "
-    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Wordpress, "
-    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Woocomerce, "
-    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Prestashop, "
-    "$PATH_MENU.menu.coming_soon,Coming Soon - Install Django, "
-    "$PATH_MENU.menu.coming_soon,Coming Soon - Tools,Tools for developers, "
+    "efde:info,             $PATH_MENU.menu.efde,                     Efde config,            Settings and configurations"
+    "symfony:install,       symfony.tasks.menu.create_environment,    Install Symfony,        Dockerization for symfony (WebApp or Apis)"
+    "laravel:install,       $PATH_MENU.menu.coming_soon,              Install Laravel,        Coming Soon"
+    "magento:install,       $PATH_MENU.menu.coming_soon,              Install Magento,        Coming Soon"
+    "wordpress:install,     $PATH_MENU.menu.coming_soon,              Install Wordpress,      Coming Soon"
+    "woocommerce:install,   $PATH_MENU.menu.coming_soon,              Install Woocomerce,     Coming Soon"
+    "prestashop:install,    $PATH_MENU.menu.coming_soon,              Install Prestashop,     Coming Soon"
+    "django:install,        $PATH_MENU.menu.coming_soon,              Install Django,         Coming Soon"
+    "efde:tools,            $PATH_MENU.menu.coming_soon,              Tools for developers,   Coming Soon"
   )
 
   _mod_EFDE=(
-    "$PATH_MENU.main.more_info,More info,Show project EFDE"
-    "$PATH_MENU.menu.config,Global configs,Efde Global Settings"
-    "$PATH_MENU.main.report_github,Report on github , Report Bug | Improvements | New Features | others"
-    "$PATH_MENU.main.efde_update,Update, Check update and downloads"
-    "$PATH_MENU.main.efde_uninstall,Uninstall, Uninstall from computer"
+    "efde:info:github,          $PATH_MENU.main.more_info,                More info,              Show project EFDE"
+    "efde:config,               $PATH_MENU.menu.config,                   Global configs,         Efde Global Settings"
+    "efde:shortcuts,            $PATH_MENU.menu.shortcuts,                Show shortcuts,         Show shortcuts"
+    "efde:report,               $PATH_MENU.main.report_github,            Report on github ,      Report Bug | Improvements | New Features | others"
+    "efde:update,               $PATH_MENU.main.efde_update,              Update,                 Check update and downloads"
+    "efde:uninstall,            $PATH_MENU.main.efde_uninstall,           Uninstall,              Uninstall from computer"
   )
 
   # TOOLS
   _mod_TOOLS=(
-    "portainerfunction,Portainer.io, https://portainer.io/"
-    "domains.function,Local domains, /etc/hosts,"
+    "tools:portainer,   portainerfunction,      Portainer.io,     https://portainer.io/,"
+    "tools:domains,     tools.tasks.domains,    Local domains,    /etc/hosts,"
   )
 
   # CONFIGURATION
   _mod_CONFIG=(
-    "$PATH_MENU.menu.config_show,Show,Show project EFDE"
-    "$PATH_MENU.config.set_config,Set, Set config"
+    "efde:config:show,    $PATH_MENU.menu.config_show,    Show,   Show project EFDE"
+    "efde:config:set,     $PATH_MENU.config.set_config,   Set,    Set config"
   )
 
-  _mod_CONFIG_SET_LENGUAGE=(
-    "es_ES,es_ES, Spanish"
-    "en_US,en_US, English"
-    "pt_PT,pt_PT, Portuguese"
+  _mod_CONFIG_SET_LANGUAGE=(
+    "shortcut:off,    es_ES,    es_ES,    Spanish"
+    "shortcut:off,    en_US,    en_US,    English"
+    "shortcut:off,    pt_PT,    pt_PT,    Portuguese"
   )
 }

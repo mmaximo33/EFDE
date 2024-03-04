@@ -4,7 +4,7 @@ set -euo pipefail
 DIRECTORY_TMP="$PATH_BIN/.tmp"
 
 create_folder_tmp() {
-  [[ "$EFDE_MOD_DEV" = "true" ]] && rm -rf $DIRECTORY_TMP
+  [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && rm -rf $DIRECTORY_TMP
 
   [ ! -d $DIRECTORY_TMP ] && mkdir -p $DIRECTORY_TMP; chmod +x $DIRECTORY_TMP
 }
@@ -16,24 +16,24 @@ create_construct(){
   PATH_SOURCE="$PATH_CONSOLE/$MODULE_NAME/$IMPORT_FILE"
   PATH_TARGET="$DIRECTORY_TMP/$IMPORT_FILE"
 
-  if [ "$EFDE_MOD_DEV" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
       sed "/sed/! s/_mod_/$MODULE_NAME/g" "$PATH_SOURCE" > "$PATH_TARGET"
   fi
 
   load_scripts "$PATH_TARGET"
-  load_scripts "$PATH_CONSOLE/$MODULE_NAME/init"
+  load_scripts "$PATH_CONSOLE/$MODULE_NAME"
 }
 
 load_modules(){
   local PATH_TO_INSPECT="$@"
   DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
   for DIRECTORY in $DIRECTORIES; do
-    PATH_TARGET="$PATH_TO_INSPECT/$DIRECTORY"
     [ "$DIRECTORY" = "common" ] && continue
 
-    local PATH_FILE_INIT="$PATH_TARGET/init"
-    if [ -e "$PATH_FILE_INIT" ]; then
-      load_scripts "$PATH_FILE_INIT"
+    PATH_TARGET="$PATH_TO_INSPECT/$DIRECTORY"
+    local PATH_TASKS_EXISTS="$PATH_TARGET/tasks"
+    if [ -d "$PATH_TASKS_EXISTS" ]; then
+      load_scripts "$PATH_TARGET"
     else
       load_modules "$PATH_TARGET"
     fi
@@ -41,13 +41,19 @@ load_modules(){
 }
 
 load_scripts(){
-  source "$@"
+  local FUNCTION_LOAD="common.load_module"
+  if [ "$(type -t "$FUNCTION_LOAD")" = "function" ] ; then
+    ${FUNCTION_LOAD} "$@"
+  else
+    source "$@"
+  fi
 }
 
 main() {
   create_folder_tmp
   create_construct
   load_modules $PATH_CONSOLE
+  common.generate_shortcuts_file
 }
 
 main

@@ -2,14 +2,20 @@
 set -euo pipefail
 
 CONFIG_FILE="config.env"
-CONFIG_PATH="$EFDE_PATH_INSTALL/bin"
-CONFIG_PATH_FILE="$CONFIG_PATH/$CONFIG_FILE"
+CONFIG_PATH_FILE="$EFDE_PATH_INSTALL/bin/$CONFIG_FILE"
+GLOBAL_RUN_EFDE="efde"
+
+_mod_.set_run_cli_efde(){
+  GLOBAL_RUN_EFDE=$([ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] && echo "e2")
+}
 
 _mod_.check_config() {
   if ! common.tasks.file.exists "$CONFIG_PATH_FILE"; then
     _mod_.create_config
   fi
   _mod_.load_config
+
+  _mod_.set_run_cli_efde
 }
 
 _mod_.create_config() {
@@ -20,19 +26,22 @@ _mod_.create_config() {
 
 _mod_.set_config(){
   _mod_.set_config_language
-  _mod_.set_efde_global
+  _mod_.set_config_editor
+  _mod_.set_config_cli
 
-  _mod_.set_var "SO" "$(common.tasks.os.get_operating_system)"
-  _mod_.set_var "EFDE_VERSION" "$(_mod_.set_config_version)"
-  _mod_.set_var "EFDE_LAST_UPDATE" "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
-
+  _mod_.set_var "HOST_SO"                     "$(common.tasks.os.get_operating_system)"
+  _mod_.set_var "EFDE_VERSION"                "$(_mod_.set_config_version)"
+  _mod_.set_var "EFDE_LAST_UPDATE"            "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
+  _mod_.set_var "EFDE_MODE_DEBUG"             "false"
+  _mod_.set_var "EFDE_MODE_DEVELOP"           "false"
   _mod_.confirm_config
-  ${GLOBAL_RUN_EFDE}
 }
 
 _mod_.confirm_config(){
+    _mod_.sort_var_in_file
     common.tasks.message.success "This is your EFDE configuration"
-    common.tasks.message.info "It is stored in the following file \n > $CONFIG_PATH_FILE \n"
+    common.tasks.message.info "It is stored in the following file \n> $CONFIG_PATH_FILE \n"
+
     _mod_.show_config
     if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "\nReset settings") ; then
       _mod_.set_config
@@ -46,29 +55,46 @@ _mod_.show_config() {
 }
 
 _mod_.set_config_language(){
-  common.tasks.menu.print_menu "Default language?" "${efde_props_menu_CONFIG_SET_LENGUAGE[@]}"
+  common.tasks.menu.show "Default language?" "${efde_props_menu_CONFIG_SET_LANGUAGE[@]}"
   RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
-  _mod_.set_var "LENGUAGE" "$RESPONSE"
+  _mod_.set_var "EFDE_LANGUAGE" "$RESPONSE"
 }
 
-_mod_.set_efde_global(){
+_mod_.set_config_cli(){
   local MSG=""
   local RESPONSE=false
-  MSG=$(common.tasks.message.msg_color warning "Take default settings (Recommended)")
-  common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true
-  _mod_.set_var "CLI_SHOW_DEFAULT" "$RESPONSE"
-  if [ "$RESPONSE" = "false" ]; then
-    MSG=$(common.tasks.message.msg_color warning "Always show executed commands?")
-    common.tasks.prompt.confirm_default_yes "$MSG" && RESPONSE=true || RESPONSE=false
-    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
-    MSG=$(common.tasks.message.msg_color warning "Always show command output?")
-    common.tasks.prompt.confirm_default_yes "$MSG"  && RESPONSE=true || RESPONSE=false
-    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
-  else
-    RESPONSE=false
-    _mod_.set_var "CLI_SHOW_CLI" "$RESPONSE"
-    _mod_.set_var "CLI_SHOW_OUTPUT" "$RESPONSE"
-  fi
+  local TYPE_SETTINGS=(
+    "shortcut:off,  default,    Default (Recommended),    Established by implementation"
+    "shortcut:off,  training,   Training,                 Show executed commands, no output"
+    "shortcut:off,  auditor,    Auditor,                  Show executed commands and output"
+    "shortcut:off,  silent,     Silent,                   Do not show executed commands or output"
+  )
+
+  common.tasks.menu.show "How to see executed commands and outputs" "${TYPE_SETTINGS[@]}"
+  RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  case $RESPONSE in
+    default)
+      _mod_.set_var "CLI_DEFAULT"       "true"
+      _mod_.set_var "CLI_SHOW_CLI"      "true"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
+      ;;
+    silent)
+      _mod_.set_var "CLI_DEFAULT"       "false"
+      _mod_.set_var "CLI_SHOW_CLI"      "false"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
+      ;;
+    training)
+      _mod_.set_var "CLI_DEFAULT"       "false"
+      _mod_.set_var "CLI_SHOW_CLI"      "true"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
+      ;;
+    auditor)
+      _mod_.set_var "CLI_DEFAULT"       "false"
+      _mod_.set_var "CLI_SHOW_CLI"      "true"
+      _mod_.set_var "CLI_SHOW_OUTPUT"   "true"
+      ;;
+  esac
+
 }
 
 _mod_.set_config_version() {
@@ -76,9 +102,15 @@ _mod_.set_config_version() {
 }
 
 _mod_.load_config() {
-  GLOBAL_EFDE_CONFIG['CLI_SHOW_DEFAULT']=$(_mod_.get_var "CLI_SHOW_DEFAULT")
-  GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']=$(_mod_.get_var "CLI_SHOW_CLI")
-  GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']=$(_mod_.get_var "CLI_SHOW_OUTPUT")
+  local EFDE_CONFIGS=(
+    "HOST_SO" "HOST_EDITOR_DEFAULT"
+    "CLI_DEFAULT" "CLI_SHOW_CLI" "CLI_SHOW_OUTPUT"
+    "EFDE_MODE_DEBUG" "EFDE_MODE_DEVELOP"
+  )
+
+  for KEY in "${EFDE_CONFIGS[@]}"; do
+    GLOBAL_EFDE_CONFIG["$KEY"]=$(_mod_.get_var "$KEY")
+  done
 }
 
 _mod_.get_var(){
@@ -92,3 +124,21 @@ _mod_.set_var(){
   common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$CONFIG_PATH_FILE"
 }
 
+_mod_.sort_var_in_file(){
+  sort -o "$CONFIG_PATH_FILE" "$CONFIG_PATH_FILE"
+}
+
+_mod_.set_config_editor(){
+  local EDITORS=("nano" "vim" "nvim")
+  local EDITORS_MENU
+
+  for KEY in "${EDITORS[@]}"; do
+    if common.tasks.os.has "$KEY"; then
+      EDITORS_MENU+=("shortcut:off, $KEY, $KEY")
+    fi
+  done
+
+  common.tasks.menu.show "select EDITOR default" "${EDITORS_MENU[@]}"
+  RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  _mod_.set_var "HOST_EDITOR_DEFAULT" "$RESPONSE"
+}

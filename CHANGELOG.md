@@ -5,27 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] AAAA-MM-DD
+## [2.1.0] 2024-03-04
 
 ### Added
 
+- MySQL: #3 Add service for MySQL management
+- EFDE: #28 Add SHORTCUTS
+
 ### Changed
+
+- EFDE: #15
+  - Refactoring module loading (Remove ../init)
+  - Cleaning the bin/efde
+  - Add configuration for default editor
+  - Improve mode management (debug and develop)
 
 ### Fixed
 
 ### Removed
 
-## [Unreleased] AAAA-MM-DD
-
-### Added
-
-- Docs: Add CoC (Code of conduct)
-- Docs: Add issue template
+## [2.0.0] 2024-01-15
 
 ### Changed
 
-- Docs: Improve contributing
-- Efde: Small change in show_version
+- EFDE: #15 Migrate from PYTHON to full BASH
+  - Refactoring console/{implemention or service}
+  - Improve bin/install.sh
+  - Fixed main script bin/efde.sh
+  - Core refactoring
+  - Auto loading module
+  - Module structure (common efde docker symfony)
+  - Feature management by category or element
+  - module.props.element.variable
+  - module.tasks.element.method
+  - Added debug methods
+  - Fixed documentation
 
 ## [1.2.0] 2022-01-30
 

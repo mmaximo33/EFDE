@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+{
+  # shellcheck disable=SC2168
+  PATH_MENU="mysql.tasks.menu"
+
+  _mod_TITLE="Mysql\nSelect an option:"
+
+  _mod_MAIN=(
+    "mysql:env,               $PATH_MENU.env_show,            Show variables"
+    "mysql:run:query,         $PATH_MENU.query_run,           Run custom query,         Run custom query on your database"
+    "mysql:container,         $PATH_MENU.container_entry,     Entry container"
+    "mysql:db:export,         $PATH_MENU.database_export,     Dumps database,         Export Database in ./dumps"
+    "mysql:db:import,         $PATH_MENU.database_import,     Import database,        Import Database from ./dumps"
+    "mysql:db:permissions,    $PATH_MENU.permissions,         Apply privileges,       Apply DATABASE:USER privileges"
+    "mysql:run:script,        $PATH_MENU.script_run,          Inspect environment logs"
+  )
+}

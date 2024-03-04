@@ -3,17 +3,19 @@
   # shellcheck disable=SC2168
   local PATH_MENU="docker.tasks.menu"
 
+  _mod_TITLE="Docker\nSelect an option:"
+
   _mod_MAIN=(
-    "$PATH_MENU.build,Build, Build or Re-Build the project containers"
-    "$PATH_MENU.show,Show, Show (start) containers of project"
-    "$PATH_MENU.start,Start, Start containers of project"
-    "$PATH_MENU.stop,Stop, Stop containers of project"
-    "$PATH_MENU.logs,Logs, Inspect environment logs"
-    "$PATH_MENU.entry,Entry, Enter the indicated container"
-    "$PATH_MENU.command,Run command, Run command in container. Example: bash, cp, rm"
-    "$PATH_MENU.stop_all,All Stop, Stops all containers running on the computer"
-    "$PATH_MENU.apache_stop,Apache Stop, Apache2 stop service"
-    "$PATH_MENU.down,Down, Destroy all project containers and networks"
-    "$PATH_MENU.recipe_see,See recipe,See recipe docker-compose.yml"
+    "docker:build,        $PATH_MENU.build,         Build,        Build or Re-Build the project containers"
+    "docker:show,         $PATH_MENU.show,          Show,         Show (start) containers of project"
+    "docker:start,        $PATH_MENU.start,         Start,        Start containers of project"
+    "docker:stop,         $PATH_MENU.stop,          Stop,         Stop containers of project"
+    "docker:logs,         $PATH_MENU.logs,          Logs,         Inspect environment logs"
+    "docker:entry,        $PATH_MENU.entry,         Entry,        Enter the indicated container"
+    "docker:commands,     $PATH_MENU.command,       Run command,  Run command in container. Example: bash, cp, rm"
+    "docker:allstop,      $PATH_MENU.stop_all,      All Stop,     Stops all containers running on the computer"
+    "docker:apache:stop,  $PATH_MENU.apache_stop,   Apache Stop,  Apache2 stop service"
+    "docker:down,         $PATH_MENU.down,          Down,         Destroy all project containers and networks"
+    "docker:recipe,       $PATH_MENU.recipe_see,    See recipe,   See recipe docker-compose.yml"
   )
 }

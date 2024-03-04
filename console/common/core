@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-_mod_.console_clear() {
-  # Todo: Determinar si es linux,windows, mac
-  clear
-}
-
 _mod_.step(){
   _mod_.msg_debug "#######################################################################"
   _mod_.msg_debug "# LOAD MODULES "
@@ -15,7 +10,7 @@ _mod_.step(){
 _mod_.msg_debug() {
   local level="${2:-0}"
   local end="${3:-0}"
-  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
     if _mod_.essential_run; then
         common.tasks.message.tree "$1" "$level" "$end" debug
     else
@@ -30,7 +25,7 @@ _mod_.msg_danger(){
   local level="${2:-0}"
   local message="\033[1;31m$1\033[0m"
 
-  if [ "$EFDE_MOD_DEBUG" = "true" ] ; then
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
     _mod_.msg_debug "$message" "$level"
   else
     command printf "$message" 2>/dev/null
@@ -59,6 +54,8 @@ _mod_.load_module(){
   ! _mod_.essential_run && _mod_.load_common_msg $1
 
   local PATH_MODULE=$1
+  local MODULE_NAME=$(basename "$PATH_MODULE")
+
   local elements=("props" "tasks")
   _mod_.step
   _mod_.msg_debug "Module: $MODULE_NAME" 1
@@ -111,10 +108,7 @@ _mod_.replacemod () {
   _mod_.msg_debug "Path Tmp: $PATH_TARGET" 4
 
 
-  if [ "$EFDE_MOD_DEV" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
-    # old only replace functions
-    #sed "s/_mod_/$NEW_NAME/g" "$SOURCE_PATH" > "$PATH_TARGET"
-
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
     if echo "$NEW_NAME" | grep -qi ".tasks."; then
       sed -E "s/_mod_\.([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME}.\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
     else
@@ -130,6 +124,7 @@ _mod_.replacemod () {
   fi
 
   source "$PATH_TARGET"
+
   if [ ! $? -eq 0 ]; then
     _mod_.msg_danger "[ERROR] The resources were not loaded, report this!" 4
     _mod_.msg_danger "File: $NEW_NAME" 5
@@ -137,3 +132,33 @@ _mod_.replacemod () {
     exit 1
   fi
 }
+
+# Función para extraer valores
+_mod_.generate_shortcuts_file() {
+  local TARGET_SHORTCUTS="$DIRECTORY_TMP/common.props.shortcuts"
+
+  echo -e "#!/usr/bin/env bash\nset -euo pipefail\n" > "$TARGET_SHORTCUTS"
+  echo "EFDE_SHORTCUTS=(" >> "$TARGET_SHORTCUTS"
+
+  for var in $(compgen -A variable); do
+    if [[ "$var" =~ _props_menu_ && "$(declare -p "$var" 2>/dev/null)" =~ "declare -a" ]]; then
+      # shellcheck disable=SC1087
+      eval "ARR=(\"\${$var[@]}\")"
+      for LINE in "${ARR[@]}"; do
+        IFS=',' read -r -a VALUE <<< "$LINE"
+
+        if [[ "${VALUE[0]}" =~ ":" && -n "${VALUE[0]}" && "${VALUE[0]}" != "shortcut:off" ]]; then
+          echo "  \"$LINE\"" >> "$TARGET_SHORTCUTS"
+        fi
+      done
+    fi
+  done
+
+  echo ")" >> "$TARGET_SHORTCUTS"
+
+  source $TARGET_SHORTCUTS
+  _mod_.msg_debug "Shortcuts file created in $TARGET_SHORTCUTS"
+}
+
+
+
