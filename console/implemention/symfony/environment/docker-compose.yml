@@ -40,7 +40,6 @@ services:
     depends_on: ['database']
     networks: ['symfony']
 
-
   database:
     image: 'mariadb:10.11.2'
     restart: always

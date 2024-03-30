@@ -10,7 +10,8 @@ _mod_.run_command_app_cli(){
 _mod_.permissions_fix(){
   local PATH_APP="./app"
   ! common.tasks.directory.exists "$PATH_APP" && common.tasks.directory.create_recursive "$PATH_APP"
-  common.tasks.command_line.run true false "sudo chown -R $USER:$USER $PATH_APP"
+  sleep 2 # Important: Probably when the permissions are applied, the construction of the directories is not finished
+  common.tasks.command_line.run true false "sudo chown -R $UID $PATH_APP"
 }
 
 _mod_.symfony_console_run_command(){

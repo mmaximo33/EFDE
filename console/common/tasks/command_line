@@ -33,7 +33,7 @@ _mod_.run() {
   if [ "${FORCE_SHOW_OUTPUT}" = "true" ]; then
     eval "${COMMAND_LINE}"
   else
-   eval "${COMMAND_LINE}" > /dev/null 2>&1
+    eval "${COMMAND_LINE}" > /dev/null 2>&1
   fi
 }
 
