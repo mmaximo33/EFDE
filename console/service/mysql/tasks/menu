@@ -40,8 +40,3 @@ _mod_.permissions(){
   _mod_.main
 }
 
-_mod_.script_run(){
-  mysql.tasks.main.script_run
-  _mod_.main
-}
-

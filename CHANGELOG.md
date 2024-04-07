@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] 2024-xx-xx
+
+### Fixed
+- MYSQL: #3 General fixes for database import and export
+
 ## [2.1.0] 2024-03-04
 
 ### Added
@@ -19,10 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cleaning the bin/efde
   - Add configuration for default editor
   - Improve mode management (debug and develop)
-
-### Fixed
-
-### Removed
 
 ## [2.0.0] 2024-01-15
 
