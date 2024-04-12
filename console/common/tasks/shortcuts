@@ -33,6 +33,7 @@ _mod_.find(){
 
 _mod_.show(){
   local PREV_TITLE=""
+  local MODE="info"
 
   [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" || "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && MODE="debug"
   common.tasks.message.echo $MODE "$(printf '%.s═' {1..45})"

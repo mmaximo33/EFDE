@@ -36,6 +36,7 @@ _mod_.print_options(){
       local TITULO=$(echo ${VALUES[2]})
       local DESCRIPTION=$(echo ${VALUES[3]:-${VALUES[2]}})
       if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
+        VALUES[1]=$(echo "${VALUES[1]}" | sed 's/ //g')
         local DESCRIPTION=$(common.tasks.message.echo debug "${VALUES[1]}")
       fi
 
