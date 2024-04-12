@@ -4,61 +4,52 @@ services:
   nginx:
     build:
       context: ./.docker/nginx
-    image: efde/nginx
     container_name: ${EFDE_PROJECT_NAME}-nginx
     restart: always
     ports: ['80:80']
     volumes:
-      - ./app/:/app
+      - ./app/:/var/www/html
     depends_on: ['app_fpm']
-    networks: ['symfony']
 
   app_fpm:
     build:
-      context: ./.docker/php/${PHP_VERSION}/fpm
-    image: efde/php-${PHP_VERSION}-fpm
+      context: ./.docker/php/fpm
+      args:
+        - PHP_VERSION=${PHP_VERSION}
     container_name: ${EFDE_PROJECT_NAME}-app-fpm
     restart: always
     env_file: .env
-    expose:
-      - 9000
     volumes:
-      - ./app/:/app
+      - ./app/:/var/www/html
     depends_on: ['database']
-    networks: ['symfony']
 
   app_cli:
     build:
-      context: ./.docker/php/${PHP_VERSION}/cli
-    image: efde/php-${PHP_VERSION}-cli
+      context: ./.docker/php/cli
+      args:
+        - PHP_VERSION=${PHP_VERSION}
     container_name: ${EFDE_PROJECT_NAME}-app-cli
     restart: always
     env_file: .env
-    ports: ['35729:35729']
     volumes:
-      - ./app/:/app
+      - ./app/:/var/www/html
     depends_on: ['database']
-    networks: ['symfony']
 
   database:
     image: 'mariadb:10.11.2'
     restart: always
     container_name: ${EFDE_PROJECT_NAME}-database
     env_file: .env
-    ports: ['3306:3306']
     volumes:
       - .docker/database:/var/lib/mysql
-    networks: ['symfony']
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     restart: always
     container_name: ${EFDE_PROJECT_NAME}-phpmyadmin
     env_file: .env
-    links: ['database']
     ports: ['8080:80']
     depends_on: ['database']
-    networks: ['symfony']
 
 #  mailhog:
 #    image: mailhog/mailhog
@@ -69,7 +60,4 @@ services:
 #      - app
 #    tty: true
 
-networks:
-  symfony:
-volumes:
-  symfony:
+

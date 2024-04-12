@@ -34,7 +34,7 @@ The objective of the project is to be able to manage implementations with docker
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](#)
 
 [![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
-[![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](docs/symfony.md)
+[![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](console/implemention/symfony/docs/README.md)
 
 ### Coming soon
 
@@ -103,14 +103,14 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 - Go to the directory where you create your projects (example: `~/Domains`)
 - Run `efde`  in your command console
 
-### Created with **EFDE
+### Created with EFDE
 
 - In case you are in a project created with **EFDE**. Example: `~/Domains/newproject`
 - The menu for that implementation will be displayed (Symfony, Laravel, Magento, Wordpress, WooComerce, Prestashop, React, Angular, Vue, Others)
 
-![efde symfony install](./docs/media/efde_symfony_install.gif)
+![efde symfony install](./console/implemention/symfony/docs/media/install.gif)
 
-![efde symfony use](./docs/media/efde_symfony_use.gif)
+![efde symfony use](./console/implemention/symfony/docs/media/use.gif)
 
 ### Shortcuts
 

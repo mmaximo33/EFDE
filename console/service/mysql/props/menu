@@ -3,7 +3,7 @@
   # shellcheck disable=SC2168
   PATH_MENU="mysql.tasks.menu"
 
-  _mod_TITLE="Mysql\nSelect an option:"
+  _mod_TITLE="MySQL\nSelect an option:"
 
   _mod_MAIN=(
     "mysql:env,               $PATH_MENU.env_show,            Show variables,               Show values in ./.env file"

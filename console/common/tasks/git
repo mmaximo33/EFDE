@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.request_url_and_clone_repository(){
+  local REPOSITORY_REQUEST_URL=$(common.tasks.message.msg_color warning "Enter the url of your repository\nEnter URL (https):")
+  local REPOSITORY_URL=$(common.tasks.prompt.request_input "$REPOSITORY_REQUEST_URL")
+  common.tasks.command_line.run true false "git clone $REPOSITORY_URL $(pwd)/app"
+}

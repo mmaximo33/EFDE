@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.2.0] 2024-xx-xx
 
+### Added
+
+- Symfony: #35 Add new version of Symfony 7.x
+
 ### Fixed
-- MYSQL: #3 General fixes for database import and export
+
+- Symfony: #33 fix application directory permissions application
+- MySQL: #3 General fixes for database import and export
 
 ## [2.1.0] 2024-03-04
 

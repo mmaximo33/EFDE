@@ -29,7 +29,7 @@ set -euo pipefail
   }
 
   _mod_.console(){
-    symfony.tasks.main.symfony_console_run_command
+    symfony.tasks.main.console_run_command
     _mod_.main
   }
 }

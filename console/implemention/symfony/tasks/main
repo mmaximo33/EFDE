@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+_mod_.see_compatibility_versions(){
+  url="https://symfony.com/releases"
+  common.tasks.command_line.run false false "xdg-open $url"
+}
+
 _mod_.run_command_app_cli(){
   # shellcheck disable=SC2145
   docker.tasks.main.dp_command_run "run --rm app_cli ${@}"
@@ -14,7 +19,7 @@ _mod_.permissions_fix(){
   common.tasks.command_line.run true false "sudo chown -R $UID $PATH_APP"
 }
 
-_mod_.symfony_console_run_command(){
+_mod_.console_run_command(){
   local -A MSG
   local COMMAND_RUN COMMAND_CUSTOM VALUES SEARCH
   VALUES=""
@@ -27,7 +32,7 @@ _mod_.symfony_console_run_command(){
     [MORE]=$(common.tasks.message.msg_color warning 'Find another value or ENTER:')
   )
 
-  common.tasks.message.info "USE \n Run bin/console <symfony command> "
+  common.tasks.message.warning "This runs bin/console <command:subcommand> "
   while true; do
     COMMAND_CUSTOM=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
     if [[ -z "$COMMAND_CUSTOM" ]]; then
@@ -54,5 +59,6 @@ _mod_.symfony_console_run_command(){
 
     common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
     common.tasks.prompt.confirm_default_yes "${MSG['OTHER']}" || break
+    VALUES=""
   done
 }
