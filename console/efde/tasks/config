@@ -3,10 +3,10 @@ set -euo pipefail
 
 CONFIG_FILE="config.env"
 CONFIG_PATH_FILE="$EFDE_PATH_INSTALL/bin/$CONFIG_FILE"
-GLOBAL_RUN_EFDE="efde"
 
 _mod_.set_run_cli_efde(){
-  GLOBAL_RUN_EFDE=$([ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] && echo "e2")
+  #GLOBAL_RUN_EFDE=$([ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] && echo "e2" || echo "efde")
+  GLOBAL_RUN_EFDE=$(basename "$0")
 }
 
 _mod_.check_config() {

@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- EFDE: #36 Function info menu not aligned (Debug Mode)
+- EFDE
+  - #37 ASAP! EFDE does not run after installation from v2.1.0
+  - #36 Function info menu not aligned (Debug Mode)
 - Symfony: #33 fix application directory permissions application
 - MySQL: #3 General fixes for database import and export
 
