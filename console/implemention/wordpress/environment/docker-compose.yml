@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  nginx:
+    build:
+      context: ./.docker/nginx
+    container_name: ${EFDE_PROJECT_NAME}-nginx
+    restart: always
+    ports: ['80:80']
+    volumes:
+      - ./app/:/var/www/html
+    depends_on: ['app_fpm']
+
+  app_fpm:
+    image: wordpress:${DOCKER_APP_FPM_VERSION}
+    container_name: ${EFDE_PROJECT_NAME}-app-fpm
+    restart: always
+    env_file: .env
+    volumes:
+      - ./app/:/var/www/html:delegated
+    depends_on: ['database']
+
+  app_cli:
+    image: wordpress:${DOCKER_APP_CLI_VERSION}
+    container_name: ${EFDE_PROJECT_NAME}-app-cli
+    restart: always
+    env_file: .env
+    volumes:
+      - ./app/:/var/www/html:delegated
+    depends_on: ['database']
+
+  database:
+    image: mariadb:latest
+    restart: always
+    container_name: ${EFDE_PROJECT_NAME}-database
+    env_file: .env
+    volumes:
+      - .docker/database:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    container_name: ${EFDE_PROJECT_NAME}-phpmyadmin
+    env_file: .env
+    ports: ['8080:80']
+    depends_on: ['database']
+
+#  mailhog:
+#    image: mailhog/mailhog
+#    ports:
+#      - 1025:1025 # smtp server
+#      - 8025:8025 # web ui
+#    links:
+#      - app
+#    tty: true

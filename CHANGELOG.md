@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Wordpress: #31 Add new implemention
 - Symfony: #35 Add new version of Symfony 7.x
 
 ### Fixed

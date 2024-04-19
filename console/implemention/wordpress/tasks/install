@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.choose_php_versions(){
+  local PHP_VERSION=""
+  # while for call function see versions
+  while [ "$PHP_VERSION" == "" ] || common.tasks.module.exists_function "$PHP_VERSION" ; do
+    wordpress.tasks.menu.create_environment_version
+    PHP_VERSION=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  done
+
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="wordpress"
+  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="$PHP_VERSION"
+  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_FPM_VERSION']="php$PHP_VERSION-fpm"
+  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_CLI_VERSION']="cli-php$PHP_VERSION"
+}
+
+_mod_.set_database_variables(){
+  mysql.tasks.main.set_database_variable_in_env_file
+
+  # Wordpress container
+  GLOBAL_SETUP_IMPLEMENTION['WORDPRESS_DB_HOST']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_HOST']}"
+  GLOBAL_SETUP_IMPLEMENTION['WORDPRESS_DB_USER']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_USER']}"
+  GLOBAL_SETUP_IMPLEMENTION['WORDPRESS_DB_PASSWORD']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_PASSWORD']}"
+  GLOBAL_SETUP_IMPLEMENTION['WORDPRESS_DB_NAME']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_DATABASE']}"
+}
+
+_mod_.prepare_setup_environment(){
+  _mod_.set_database_variables
+  efde.tasks.implemention.setup_environment
+  # IMPORTANT: Siempre entro al proyecto
+  common.tasks.command_line.run false false "cd $(efde.tasks.implemention.get_new_path_project)"
+}
+
+_mod_.docker_start(){
+  docker.tasks.main.apache_stop
+  docker.tasks.main.dp_all_stop
+  docker.tasks.main.dp_build
+}
+
+_mod_.new_environment(){
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="wordpress"
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="latest"
+  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="latest"
+  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_FPM_VERSION']="fpm"
+  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_CLI_VERSION']="cli"
+
+  _mod_.prepare_setup_environment
+  _mod_.docker_start
+  wordpress.tasks.main.permissions_fix
+  common.tasks.message.success "\nProject installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
+  efde.tasks.implemention.clear_global_variables
+}
+
+_mod_.clone_environment(){
+  _mod_.choose_php_versions
+  _mod_.prepare_setup_environment
+  _mod_.docker_start
+  _mod_.clone_repository
+  wordpress.tasks.main.permissions_fix
+  common.tasks.message.warning "Reminder:\n- Review config app/wp-config.php\n- Import project database"
+  common.tasks.message.success "Project installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
+  efde.tasks.implemention.clear_global_variables
+}
+
+_mod_.clone_repository(){
+  sleep 3
+  common.tasks.command_line.run true false "sudo chown -R $UID:www-data ./app"
+  docker.tasks.main.dp_command_run exec app_fpm find /var/www/html/ -mindepth 1 -delete
+
+  common.tasks.git.request_url_and_clone_repository
+
+  [ -e ./app/wp-config.php ] && mv ./app/wp-config.php ./app/wp-config.php.bkp
+
+  # shellcheck disable=SC2072
+  if [[ "${GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']}" > "8.1" ]]; then
+      [ ! -e ./app/wp-config-docker.php ] && docker.tasks.main.dp_command_run "exec app_fpm cp /usr/src/wordpress/wp-config-docker.php /var/www/html/"
+      cp -f ./app/wp-config-docker.php ./app/wp-config.php
+  fi
+}
+
