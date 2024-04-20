@@ -34,8 +34,9 @@ The objective of the project is to be able to manage implementations with docker
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](#)
 
 [![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](console/implemention/laravel/docs/README.md)
 [![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](console/implemention/symfony/docs/README.md)
-[![Wordpress](https://img.shields.io/badge/Wordpress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](console/implemention/wordpress/docs/README.md)
+[![Install Wordpress](https://img.shields.io/badge/Wordpress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](console/implemention/wordpress/docs/README.md)
 
 ### Coming soon
 
@@ -43,7 +44,6 @@ The objective of the project is to be able to manage implementations with docker
 
 [![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
 [![Install Magento](https://img.shields.io/badge/Magento-f06835?style=for-the-badge&logo=magento&logoColor=white)](docs/developer.md)
-[![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](docs/developer.md)
 [![Prestashop](https://img.shields.io/badge/prestashop-%23DF0067.svg?&style=for-the-badge&logo=prestashop&logoColor=white)](docs/developer.md)
 
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](docs/developer.md)

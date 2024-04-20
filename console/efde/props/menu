@@ -8,10 +8,10 @@ set -euo pipefail
 
   _mod_MAIN=(
     "efde:info,             $PATH_MENU.menu.efde,                     Efde config,            Settings and configurations"
+    "laravel:install,       laravel.tasks.menu.create_environment,    Laravel,                Install for Laravel"
     "symfony:install,       symfony.tasks.menu.create_environment,    Symfony,                Install for Symfony (WebApp or Apis)"
     "wordpress:install,     wordpress.tasks.menu.create_environment,  Wordpress,              Install for Wordpress and Woocommerce"
     "                   ,   _______________________________________,  _____________________,  _____________________________________"
-    "laravel:install,       $PATH_MENU.menu.coming_soon,              Install Laravel,        Coming Soon"
     "magento:install,       $PATH_MENU.menu.coming_soon,              Install Magento,        Coming Soon"
     "woocommerce:install,   $PATH_MENU.menu.coming_soon,              Install Woocomerce,     Coming Soon"
     "prestashop:install,    $PATH_MENU.menu.coming_soon,              Install Prestashop,     Coming Soon"

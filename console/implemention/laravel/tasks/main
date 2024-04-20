@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.see_compatibility_versions(){
+  url="https://laravel.com/docs/releases"
+  common.tasks.command_line.run false false "xdg-open $url"
+}
+
+_mod_.run_command_app_cli(){
+  # shellcheck disable=SC2145
+  docker.tasks.main.dp_command_run "run --rm app_cli ${@}"
+}
+
+# ToDo: Review oficial documentation
+_mod_.permissions_fix(){
+  local PATH_APP="./app"
+  ! common.tasks.directory.exists "$PATH_APP" && common.tasks.directory.create_recursive "$PATH_APP"
+  sleep 2 # Important: Probably when the permissions are applied, the construction of the directories is not finished
+  common.tasks.command_line.run true false "sudo chown -R $UID:www-data $PATH_APP"
+  common.tasks.command_line.run true false "find $PATH_APP -type f -exec chmod 644 {} \;"
+  common.tasks.command_line.run true false "find $PATH_APP -type d -exec chmod 755 {} \;"
+  common.tasks.command_line.run true false "chmod -R 775 $PATH_APP/storage 2>/dev/null || true"
+  common.tasks.command_line.run true false "chmod -R 775 $PATH_APP/database 2>/dev/null || true"
+  common.tasks.command_line.run true false "chmod -R 775 $PATH_APP/bootstrap/cache 2>/dev/null || true"
+}
+
+_mod_.console_run_command(){
+  local -A MSG
+  local COMMAND_RUN COMMAND_CUSTOM VALUES SEARCH
+  VALUES=""
+  COMMAND_RUN="./artisan"
+
+  MSG=(
+    [MAIN]=$(common.tasks.message.msg_color warning 'Write the command or press ENTER to search:')
+    [OTHER]=$(common.tasks.message.msg_color warning 'Do you want to run another command?')
+    [NEXT]=$(common.tasks.message.msg_color warning 'Write the value to search or press ENTER for the full list:')
+    [MORE]=$(common.tasks.message.msg_color warning 'Find another value or ENTER:')
+  )
+
+  common.tasks.message.warning "This runs php artisan <command:subcommand> "
+  while true; do
+    COMMAND_CUSTOM=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
+    if [[ -z "$COMMAND_CUSTOM" ]]; then
+      while true; do
+        SEARCH=$(common.tasks.prompt.request_input "${MSG['NEXT']}")
+          if [[ -z "$SEARCH" ]]; then
+              break
+          else
+              if [[ -n "$VALUES" ]]; then
+                  VALUES="$VALUES|$SEARCH"
+              else
+                  VALUES="$SEARCH"
+                  MSG['NEXT']=${MSG[MORE]}
+              fi
+          fi
+      done
+
+      if [[ -n "$VALUES" ]]; then
+          COMMAND_CUSTOM="list | egrep --color=always \"$VALUES\""
+      else
+          COMMAND_CUSTOM="list"
+      fi
+    fi
+
+    common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
+    common.tasks.prompt.confirm_default_yes "${MSG['OTHER']}" || break
+    VALUES=""
+  done
+}

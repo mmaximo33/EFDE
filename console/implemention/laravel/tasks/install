@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+declare -gA GLOBAL_LARAVEL_INSTALL=(
+  [MESSAGE_CLONE_GIT]="Enter the url of your repository"
+  [MESSAGE_CLONE_URL]=$(common.tasks.message.msg_color warning "Enter URL (https):")
+)
+
+_mod_.run_app_cli(){
+    # shellcheck disable=SC2145
+    laravel.tasks.main.run_command_app_cli "$@"
+}
+
+_mod_.choose_php_versions(){
+  local VERSION_PHP
+  local VERSION_LARAVEL=""
+
+  # while for call function see versions
+  while [ "$VERSION_LARAVEL" == "" ] || common.tasks.module.exists_function "$VERSION_LARAVEL" ; do
+    laravel.tasks.menu.create_environment_version
+    VERSION_LARAVEL=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  done
+
+  # https://laravel.com/docs/11.x/releases
+  #VERSION_PHP=$( [ "$VERSION_LARAVEL" == "5" ] && echo "7.4" || echo "8.2" )
+  VERSION_PHP="8.2"
+
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="laravel"
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="$VERSION_LARAVEL"
+  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="$VERSION_PHP"
+}
+
+_mod_.get_env_version(){
+  local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+  echo $(common.tasks.env_variable.get_variable "EFDE_PROJECT_VERSION" "$PATH_ENV")
+}
+
+_mod_.set_database_variables(){
+  mysql.tasks.main.set_database_variable_in_env_file
+}
+
+_mod_.prepare_setup_environment(){
+  _mod_.set_database_variables
+  efde.tasks.implemention.setup_environment
+  # IMPORTANT: Siempre entro al proyecto
+  common.tasks.command_line.run false false "cd $(efde.tasks.implemention.get_new_path_project)"
+}
+
+_mod_.docker_start(){
+  docker.tasks.main.apache_stop
+  docker.tasks.main.dp_all_stop
+  docker.tasks.main.dp_build
+}
+
+_mod_.new_environment(){
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="laravel"
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="11"
+  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="8.2"
+
+  _mod_.prepare_setup_environment
+  _mod_.docker_start
+  _mod_.run_app_cli "composer create-project laravel/laravel:$(_mod_.get_env_version).* ."
+
+  laravel.tasks.main.permissions_fix
+
+  common.tasks.message.success "\nProject installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
+  efde.tasks.implemention.clear_global_variables
+}
+
+_mod_.clone_environment(){
+  _mod_.choose_php_versions
+  _mod_.prepare_setup_environment
+  _mod_.docker_start
+  _mod_.clone_repository
+  laravel.tasks.main.permissions_fix
+
+  common.tasks.message.warning "Reminder:\n- Review config app/.env\n- Import project database"
+  common.tasks.message.success "Project installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
+  efde.tasks.implemention.clear_global_variables
+}
+
+_mod_.clone_repository(){
+  common.tasks.command_line.run true false "sudo chown -R $UID ./app"
+  common.tasks.git.request_url_and_clone_repository
+}
