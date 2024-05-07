@@ -80,6 +80,41 @@ Anyway, if you want to know more, you can see the following list with the offici
 [![Docker Compose](https://img.shields.io/badge/Docker_Compose-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/install/other/)
 
 ### Install
+#### Manual 
+For manual installation you must
+<details>
+<summary>Distro debian/ubuntu</summary>
+
+```sh
+mkdir -p ~/.efde
+cd $_
+git clone https://github.com/mmaximo33/EFDE.git .
+
+# In case you want to test a branch
+# git switch <branch>
+
+ln -sfT ~/.efde/bin/efde.sh ~/bin/efde
+chmod +x $_
+```
+</details>
+
+<details>
+<summary>In Windows</summary>
+
+```sh
+Coming soon
+```
+</details>
+
+<details>
+<summary>In MacOS</summary>
+
+```sh
+Coming soon
+```
+</details>
+
+#### For script 
 
 Run the following command (**CURL** or **WGET**) to install **EFDE** on your computer
 
