@@ -3,7 +3,7 @@ set -euo pipefail
 
 _mod_.step(){
   _mod_.msg_debug "#######################################################################"
-  _mod_.msg_debug "# LOAD MODULES "
+  _mod_.msg_debug "# LOAD $1 "
   _mod_.msg_debug "-----------------------------------------------------------------------"
 }
 
@@ -57,7 +57,7 @@ _mod_.load_module(){
   local MODULE_NAME=$(basename "$PATH_MODULE")
 
   local elements=("props" "tasks")
-  _mod_.step
+  _mod_.step "MODULES"
   _mod_.msg_debug "Module: $MODULE_NAME" 1
 
   for element in "${elements[@]}"; do
@@ -116,6 +116,10 @@ _mod_.replacemod () {
         sed -E "s/_mod_([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME_VAR}_\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
     fi
 
+    # translation
+    #sed -i "s/Select an option/hola/g" "$PATH_TARGET"
+
+
     if [ ! $? -eq 0 ]; then
       _mod_.msg_danger "[ERROR] The conversion could not be carried out, report this!" 4
       _mod_.msg_danger "Source: $SOURCE_PATH" 5
@@ -133,7 +137,6 @@ _mod_.replacemod () {
   fi
 }
 
-# Función para extraer valores
 _mod_.generate_shortcuts_file() {
   local TARGET_SHORTCUTS="$DIRECTORY_TMP/common.props.shortcuts"
 
@@ -157,8 +160,44 @@ _mod_.generate_shortcuts_file() {
   echo ")" >> "$TARGET_SHORTCUTS"
 
   source $TARGET_SHORTCUTS
+  _mod_.step "SHORTCUTS"
   _mod_.msg_debug "Shortcuts file created in $TARGET_SHORTCUTS"
 }
 
+# MMTodo:
+# Improve this feature so that
+#   - Take all characters enclosed in double quotes (\n or \")
+#   - Do not consider spaces between origin and destination ("origin",              "destination")
+_mod_.generate_transactions(){
+  local PATH_TO_INSPECT="${1:-$PATH_CONSOLE}"
+  local LANGUAGE_DEFAULT=${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']}
+  local LANGUAGE_CONFIG=$(efde.tasks.config.get_var "EFDE_LANGUAGE")
+  if [ "$LANGUAGE_DEFAULT" != "$LANGUAGE_CONFIG" ]; then
+      DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
+      for DIRECTORY in $DIRECTORIES; do
 
+        local PATH_TARGET="$PATH_TO_INSPECT/$DIRECTORY"
+        local PATH_TASKS_EXISTS="$PATH_TARGET/tasks"
+
+        if [ ! -d "$PATH_TASKS_EXISTS" ]; then
+          _mod_.generate_transactions "$PATH_TARGET"
+        else
+          local FILE_i18n="$PATH_TARGET/i18n/$LANGUAGE_CONFIG"
+          if common.tasks.file.exists "$FILE_i18n"; then
+            while IFS= read -r line || [ -n "$line" ]; do
+                [ -z "$line" ] && continue
+
+                line=$(echo "$line" | sed 's/^"//; s/"$//')
+                text_old=$(echo "$line" | awk -F '","' '{print $1}')
+                text_new=$(echo "$line" | awk -F '","' '{print $2}')
+
+                if [ -n "$text_old" ] && [ -n "$text_new" ]; then
+                    find "$DIRECTORY_TMP" -type f -name "$DIRECTORY.*" -exec sh -c "sed -i 's#$text_old#$text_new#g' {};" \;
+                fi
+            done < "$FILE_i18n"
+          fi
+        fi
+      done
+  fi
+}
 

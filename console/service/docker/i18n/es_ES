@@ -1,0 +1,26 @@
+"Select an option","Seleccione una opción"
+"Build or Re-Build the project containers","Construir o reconstruir los contenedores del proyecto"
+"Show (start) containers of project","Mostrar (iniciar) contenedores del proyecto"
+"Start containers of project","Iniciar contenedores del proyecto"
+"Stop containers of project","Detener contenedores del proyecto"
+"Inspect environment logs","Inspeccionar logs del ambiente"
+"Enter the indicated container","Ingresar al contenedor"
+"Run command in container. Example: bash, cp, rm","Ejecute el comando en el contenedor. Ejemplo: bash, cp, rm"
+"Stops all containers running on the computer","Detiene todos los contenedores que se ejecutan en el ordenador"
+"Apache2 stop service","Detiene servicio de apache2"
+"Destroy all project containers and networks","Destruye todos los contenedores y redes del proyecto"
+"See recipe docker-compose.yml","Ver receta docker-compose.yml"
+"There are no containers running at this time","No hay contenedores en ejecución en este momento"
+"APACHE2 is ON, do you want to turn it OFF?","APACHE2 está activado, ¿quieres desactivarlo?"
+"Do you want to remove services from the project?","¿Quieres eliminar servicios del proyecto?"
+"Enter value to search or press ENTER for show all","Ingrese el valor para buscar o presione ENTER para ver todos"
+"Find another value or ENTER","Busca otro valor o ENTER"
+"Log monitor","Monitor de log"
+"Enter service name:","Ingresar el nombre del servicio"
+"You want to open a new instance? RUN=Y or EXEC=N","¿Quieres abrir una nueva instancia? RUN=Y o EXEC=N"
+"What command do you want to run?","¿Que comando deseas ejecutar?"
+"Do you want to run another command?","¿Quieres ejecutar otro comando?"
+
+
+
+

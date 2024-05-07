@@ -5,15 +5,15 @@ declare -gA GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE #VARIABLE GLOBAL - HIGH SOLUTIO
 
 _mod_.msg_debug() {
   if [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]]; then
-    common.msg_debug "#######################################################################"
-    common.msg_debug "# MENU "
-    common.msg_debug "GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE:" 1
-    common.msg_debug "title: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']}" 2
-    common.msg_debug "description: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']}" 2
-    common.msg_debug "functions:" 2
-    common.msg_debug "new: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}" 3
-    common.msg_debug "old: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}" 3 1
-    common.msg_debug "-----------------------------------------------------------------------"
+    common.core.msg_debug "#######################################################################"
+    common.core.msg_debug "# MENU "
+    common.core.msg_debug "GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE:" 1
+    common.core.msg_debug "title: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']}" 2
+    common.core.msg_debug "description: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']}" 2
+    common.core.msg_debug "functions:" 2
+    common.core.msg_debug "new: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}" 3
+    common.core.msg_debug "old: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}" 3 1
+    common.core.msg_debug "-----------------------------------------------------------------------"
   fi
 }
 
@@ -42,7 +42,7 @@ _mod_.print_options(){
 
       printf "%-0s. %-25s %s\n" "$i" "$TITULO" "$DESCRIPTION"
     else
-      common.tasks.message.warning "\nInvalid menu option: Requieres minimum: \"shortcut, function, name\" \n- For: $OPTION"
+      common.tasks.message.warning "\nInvalid menu option: Requieres minimum: \'shortcut, function, name\' \n- For: $OPTION"
     fi
   done
 }
@@ -100,7 +100,7 @@ _mod_.chosen_option(){
     GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']="${VALUES[3]:-${VALUES[2]}}"
 
   else
-    common.tasks.message.danger "Error: Formato de entrada incorrecto"
+    common.tasks.message.danger "Error: Incorrect input format"
     exit 1
   fi
 }

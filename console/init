@@ -3,7 +3,7 @@ set -euo pipefail
 
 DIRECTORY_TMP="$PATH_BIN/.tmp"
 
-create_folder_tmp() {
+create_folder_tmp(){
   [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && rm -rf $DIRECTORY_TMP
 
   [ ! -d $DIRECTORY_TMP ] && mkdir -p $DIRECTORY_TMP; chmod +x $DIRECTORY_TMP
@@ -14,10 +14,10 @@ create_construct(){
   MODULE_NAME="common"
   IMPORT_FILE="core"
   PATH_SOURCE="$PATH_CONSOLE/$MODULE_NAME/$IMPORT_FILE"
-  PATH_TARGET="$DIRECTORY_TMP/$IMPORT_FILE"
+  PATH_TARGET="$DIRECTORY_TMP/$MODULE_NAME.$IMPORT_FILE"
 
   if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
-      sed "/sed/! s/_mod_/$MODULE_NAME/g" "$PATH_SOURCE" > "$PATH_TARGET"
+      sed "/sed/! s/_mod_/$MODULE_NAME.$IMPORT_FILE/g" "$PATH_SOURCE" > "$PATH_TARGET"
   fi
 
   load_scripts "$PATH_TARGET"
@@ -41,7 +41,7 @@ load_modules(){
 }
 
 load_scripts(){
-  local FUNCTION_LOAD="common.load_module"
+  local FUNCTION_LOAD="common.core.load_module"
   if [ "$(type -t "$FUNCTION_LOAD")" = "function" ] ; then
     ${FUNCTION_LOAD} "$@"
   else
@@ -53,7 +53,6 @@ main() {
   create_folder_tmp
   create_construct
   load_modules $PATH_CONSOLE
-  common.generate_shortcuts_file
 }
 
 main

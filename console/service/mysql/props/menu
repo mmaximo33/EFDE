@@ -12,6 +12,6 @@
     "mysql:db:import,         $PATH_MENU.database_import,     Import database,              Import Database from ./dumps"
     "mysql:db:permissions,    $PATH_MENU.permissions,         Apply privileges,             Apply DATABASE:USER privileges"
     "mysql:container,         $PATH_MENU.container_entry,     Entry container,"
-    "mysql:run:script,        docker.tasks.menu.command,      Run command line,             Run command in 'database' container"
+    "mysql:run:script,        docker.tasks.menu.command,      Run command line,             Run command in database container"
   )
 }

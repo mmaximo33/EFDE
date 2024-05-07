@@ -41,8 +41,8 @@ set -euo pipefail
   )
 
   _mod_CONFIG_SET_LANGUAGE=(
-    "shortcut:off,    es_ES,    es_ES,    Spanish"
     "shortcut:off,    en_US,    en_US,    English"
+    "shortcut:off,    es_ES,    es_ES,    Spanish"
     "shortcut:off,    pt_PT,    pt_PT,    Portuguese"
   )
 }

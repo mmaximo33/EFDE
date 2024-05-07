@@ -13,6 +13,8 @@
 ![pull-open](https://img.shields.io/github/issues-pr/mmaximo33/efde.svg)
 ![pull-close](https://img.shields.io/github/issues-pr-closed/mmaximo33/efde.svg)
 
+![efde version](https://img.shields.io/badge/language-grey.svg) ![en_US](https://img.shields.io/badge/en.US-blue.svg) ![es_ES](https://img.shields.io/badge/es.ES-blue.svg) ![pt_PT](https://img.shields.io/badge/pt.PT-blue.svg)
+
 ## Index
 
 - [Intro](#intro)

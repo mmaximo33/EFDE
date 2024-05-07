@@ -86,7 +86,7 @@ _mod_.project_name(){
 
   if ! [[ "$value" =~ ^[[:alnum:][:space:]]+$ ]]; then
     common.tasks.message.danger "The entered value can only contain letters or numbers."
-    common.tasks.message.info "Cancel to [ctrl + c] "
+    common.tasks.message.info "Cancel to [ctrl + c]"
     _mod_.project_name
   fi
 

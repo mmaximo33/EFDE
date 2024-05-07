@@ -12,7 +12,7 @@ set -euo pipefail
     local KEYS=("MYSQL_ROOT_PASSWORD" "MYSQL_USER" "MYSQL_PASSWORD" "MYSQL_DATABASE")
 
     common.tasks.message.info "\n${MESSAGES['INTRO']}"
-    if common.tasks.prompt.confirm_default_yes "${MESSAGES['DEFAULT']}" ; then
+    if ! common.tasks.prompt.confirm_default_no "${MESSAGES['DEFAULT']}" ; then
       GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']=toor
       GLOBAL_SETUP_IMPLEMENTION['MYSQL_USER']=efdeuser
       GLOBAL_SETUP_IMPLEMENTION['MYSQL_PASSWORD']=efdepassword

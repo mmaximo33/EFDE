@@ -2,8 +2,9 @@
 set -euo pipefail
 
 declare -gA GLOBAL_EFDE_CONFIG=(
-  [EFDE_MODE_DEBUG]=false           # Debug Messages
-  [EFDE_MODE_DEVELOP]=false         # MMTodo: Prepared for create tmps
+  [LANGUAGE_DEFAULT]="en_US"
+  [EFDE_MODE_DEBUG]=false          # Debug Messages
+  [EFDE_MODE_DEVELOP]=false        # MMTodo: Prepared for create tmps
 )
 
 resolve_absolute_dir() {
@@ -38,8 +39,18 @@ menu_implementation(){
   fi
 }
 
-menu(){
+generate_extra_elements(){
   efde.tasks.config.check_config
+  common.core.generate_shortcuts_file
+
+  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]; then
+    if [ ${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']} != "$(efde.tasks.config.get_var "EFDE_LANGUAGE")" ]; then
+      common.core.generate_transactions
+    fi
+  fi
+}
+
+menu(){
   if ! efde.tasks.implemention.has_folder_implementation ; then
     efde.tasks.menu.main
   fi
@@ -48,12 +59,12 @@ menu(){
 }
 
 shortcuts(){
-  efde.tasks.config.check_config
   common.tasks.shortcuts.target "$@"
 }
 
 main() {
   init_dirs # IMPORTANT
+  generate_extra_elements
   if [ $# -gt 0 ]; then
     shortcuts "$@"
   else

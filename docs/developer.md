@@ -85,3 +85,14 @@ If you want to add a new feature you must keep the following rules in mind
 -  Determines whether the launch directory in the `efde` command console has a project created by it or not (search for `$PATH/.efde/`)
    - Is TRUE, loads the implementation menu according to what is established in the `$PATH/.efde/.env` file variable `EFDE_PROJECT_IMPLEMENTION`
    - Is FALSE, load the default menu to configure `efde` or install implementations
+
+## Translations
+- Translations must be incorporated into each implementation with the **i18n** directory
+- The languages available so far are
+    - en_US (Default)
+    - es_ES
+    - pt_PT
+- They must follow the following pattern ```
+"text_en_us","text_translations"```
+- Considerations
+  - You cannot use characters like ```\ \"```

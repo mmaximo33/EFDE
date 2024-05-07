@@ -61,7 +61,7 @@ _mod_.dp_logs(){
   COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} logs -f"
   VALUES=""
   MSG=(
-    [MAIN]=$(common.tasks.message.msg_color warning 'Enter value to search or press ENTER for all:')
+    [MAIN]=$(common.tasks.message.msg_color warning 'Enter value to search or press ENTER for show all:')
     [NEXT]=$(common.tasks.message.msg_color warning 'Find another value or ENTER:')
   )
 
