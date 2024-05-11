@@ -90,11 +90,10 @@ mkdir -p ~/.efde
 cd $_
 git clone https://github.com/mmaximo33/EFDE.git .
 
+ln -sfT $PWD/bin/efde.sh ~/bin/efde
+
 # In case you want to test a branch
 # git switch <branch>
-
-ln -sfT ~/.efde/bin/efde.sh ~/bin/efde
-chmod +x $_
 ```
 </details>
 
