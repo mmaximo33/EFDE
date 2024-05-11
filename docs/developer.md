@@ -44,6 +44,18 @@ git status
 git push origin <issue-new-feature> --force-with-lease
 ```
 
+### Full developer
+To have all the developer features activated modify `bin/efde.sh`
+
+```sh
+declare -gA GLOBAL_EFDE_CONFIG=(
+...
+[EFDE_MODE_DEBUG]=true          # Debug Messages
+[EFDE_MODE_DEVELOP]=true        # MMTodo: Prepared for create tmps
+..
+)
+```
+
 ## Admin
 ### To Develop
 ```sh
@@ -51,7 +63,7 @@ git switch develop
 git fetch origin <issue-new-feature>
 git merge <issue-new-feature>
 
-# Remember to update the CHANGELOG.md
+# Remember to update the docs CHANGELOG.md, README.md 
 git add CHANGELOG.md 
 git commit -m "fix (doc): update changelog" 
 
@@ -63,8 +75,8 @@ git push origin develop --force-with-lease
 # See https://semver.org/
 git fetch --tags
 
-git tag <major.minor.patch> -m "<major.minor.patch> comments" 
-# git 1.0.0 -m "1.0.0 comments" 
+git tag -a <major.minor.patch> -m "<major.minor.patch> comments" 
+# git tag -a 1.0.0 -m "1.0.0 comments" 
 
 git push origin <major.minor.patch>
 
