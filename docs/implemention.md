@@ -29,5 +29,4 @@ ls -la .env       # Symbolic link for docker recipe
 Below we show you some of the characteristics that all implementations have. 
 This may vary depending on the framework, language or technology, adjusting to the needs of each type of project.
 
-
-![efde symfony use](./media/efde_symfony_use.gif)
+![efde symfony use](./console/implemention/symfony/docs/media/use.gif)

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] 2024-xx-xx
+
+### Added
+- EFDE: #32 Translation system (en_US es_ES pt_PT)
+- Laravel: #5 Add new implemention
+- Wordpress: #31 Add new implemention
+- Symfony: #35 Add new version of Symfony 7.x
+
+### Fixed
+
+- EFDE
+  - #37 ASAP! EFDE does not run after installation from v2.1.0
+  - #36 Function info menu not aligned (Debug Mode)
+- Symfony: #33 fix application directory permissions application
+- MySQL: #3 General fixes for database import and export
+
 ## [2.1.0] 2024-03-04
 
 ### Added
@@ -19,10 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cleaning the bin/efde
   - Add configuration for default editor
   - Improve mode management (debug and develop)
-
-### Fixed
-
-### Removed
 
 ## [2.0.0] 2024-01-15
 

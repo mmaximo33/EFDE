@@ -1,6 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
 {
+  _mod_.set_database_variable_in_env_file(){
+    local VALUE=""
+    local -A MESSAGES=(
+      [INTRO]="MYSQL AND PHPMYADMIN Variables"
+      [DEFAULT]=$(common.tasks.message.msg_color warning "Do you want to set variables for DATABASE?")
+      [SET_VARIABLE]=$(common.tasks.message.msg_color warning "Enter value for variable [VALUE]:")
+      [VALIDATE]="You must enter a value greater than 4 characters"
+    )
+    local KEYS=("MYSQL_ROOT_PASSWORD" "MYSQL_USER" "MYSQL_PASSWORD" "MYSQL_DATABASE")
+
+    common.tasks.message.info "\n${MESSAGES['INTRO']}"
+    if ! common.tasks.prompt.confirm_default_no "${MESSAGES['DEFAULT']}" ; then
+      GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']=toor
+      GLOBAL_SETUP_IMPLEMENTION['MYSQL_USER']=efdeuser
+      GLOBAL_SETUP_IMPLEMENTION['MYSQL_PASSWORD']=efdepassword
+      GLOBAL_SETUP_IMPLEMENTION['MYSQL_DATABASE']=efdedb
+    else
+      for KEY in "${KEYS[@]}"; do
+        local MSG_CUSTOM=$(echo "${MESSAGES['SET_VARIABLE']}" | sed "s/VALUE/$KEY/g")
+        while true; do
+          VALUE=$(common.tasks.prompt.request_input "$MSG_CUSTOM")
+          if [ -n "$VALUE" ] && [ "${#VALUE}" -ge 4 ]; then
+            break
+          else
+            common.tasks.message.danger "${MESSAGES['VALIDATE']}"
+          fi
+        done
+
+        GLOBAL_SETUP_IMPLEMENTION["$KEY"]="$VALUE"
+      done
+    fi
+
+    # Default variables
+    GLOBAL_SETUP_IMPLEMENTION['MYSQL_HOST']=database
+    GLOBAL_SETUP_IMPLEMENTION['PMA_HOST']=${GLOBAL_SETUP_IMPLEMENTION['MYSQL_HOST']}
+    GLOBAL_SETUP_IMPLEMENTION['PMA_USER']=root
+    GLOBAL_SETUP_IMPLEMENTION['PMA_PASSWORD']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']}"
+  }
 
   _mod_.get_env_var(){
     local USE_DATABASE="${1:-true}"
@@ -15,9 +53,7 @@ set -euo pipefail
 
     local result="-h$MYSQL_HOST -uroot -p$MYSQL_ROOT_PASSWORD"
 
-    if [ "$USE_DATABASE" = "true" ]; then
-        result="$result $MYSQL_DATABASE"
-    fi
+    [[ "$USE_DATABASE" == "true" ]] && result="$result $MYSQL_DATABASE"
 
     echo "$result"
   }
@@ -32,15 +68,16 @@ set -euo pipefail
         return 1
     fi
 
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var)"
 
-    echo $(common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"$*;\"")
+    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"$*;\""
   }
 
   _mod_.run_custom_query(){
     local MYSQL_QUERY
+    common.tasks.message.info "Enter query example: show tables\nPress ENTER or Q to exit"
     while true; do
-      MYSQL_QUERY="$(common.tasks.prompt.request_input $(common.tasks.message.msg_color warning "Enter the QUERY (press ENTER to exit):"))"
+      MYSQL_QUERY="$(common.tasks.prompt.request_input $(common.tasks.message.msg_color warning "Custom query:"))"
 
       [ -z "$MYSQL_QUERY" ] || [ "$MYSQL_QUERY" = "q" ] && break
 
@@ -57,7 +94,7 @@ set -euo pipefail
     local PATH_DUMPS="./dumps"
     local FILE_NAME="$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d_%H-%M").sql"
     local FILE_PATH="$PATH_DUMPS/$FILE_NAME"
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysqldump $(_mod_.get_env_var)"
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb-dump $(_mod_.get_env_var)"
 
     ! common.tasks.directory.exists "$PATH_DUMPS" && common.tasks.directory.create_recursive "$PATH_DUMPS"
 
@@ -70,7 +107,7 @@ set -euo pipefail
     local PATH_DUMPS="./dumps"
     local PATH_FILES_SEARCH=("$PATH_DUMPS"/*.sql)
     local FILE_NAME FILE_PATH
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec -T database mysql $(_mod_.get_env_var)"
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec -T database mariadb $(_mod_.get_env_var)"
 
     if ! common.tasks.directory.exists "$PATH_DUMPS"; then
         common.tasks.message.danger "Directory not found $PATH_DUMPS\n"
@@ -84,7 +121,7 @@ set -euo pipefail
 
     for FILE in $(ls -1t "${PATH_FILES_SEARCH[@]}"); do
         FILE_NAME=$(basename "$FILE")
-        MENU_FILES+=("$FILE_NAME,$FILE_NAME, ")
+        MENU_FILES+=("shortcut:off,$FILE_NAME,$FILE_NAME, ")
     done
 
     common.tasks.menu.show "$mysql_props_menu_TITLE" "${MENU_FILES[@]}"
@@ -106,25 +143,8 @@ set -euo pipefail
     fi
   }
 
-#  _mod_.drop_all_tables_database(){
-#    local QUERY
-#    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
-#    local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
-#
-#
-#    QUERY="SELECT CONCAT('DROP TABLE IF EXISTS ', GROUP_CONCAT(table_name), ';')"
-#    QUERY+=" FROM information_schema.tables"
-#    QUERY+=" WHERE table_schema = '${MYSQL_DATABASE}'"
-#    local DROP_TABLES="$(_mod_.run_query "${QUERY}")"
-#    echo $DROP_TABLES
-#  }
-
-  _mod_.script_run(){
-    echo "HOLA"
-  }
-
   _mod_.permissions(){
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var)"
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var)"
     local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
     local MYSQL_HOST=$(common.tasks.env_variable.get_variable "MYSQL_HOST" "$PATH_ENV")
     local MYSQL_USER=$(common.tasks.env_variable.get_variable "MYSQL_USER" "$PATH_ENV")
@@ -150,9 +170,7 @@ set -euo pipefail
   _mod_.database_create(){
     local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
-    #_mod_.run_query "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE}"
-
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mysql $(_mod_.get_env_var false)"
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var false)"
 
     common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};\""
   }
@@ -160,7 +178,8 @@ set -euo pipefail
   _mod_.database_drop(){
     local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
-    _mod_.run_query "DROP DATABASE \\\`${MYSQL_DATABASE}\\\`"
-  }
+    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var false)"
 
+    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"DROP DATABASE IF EXISTS \\\`${MYSQL_DATABASE}\\\`;\""
+  }
 }

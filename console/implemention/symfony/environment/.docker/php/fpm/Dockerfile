@@ -1,8 +1,11 @@
-FROM php:7.4-cli
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-fpm
 
 ARG TIMEZONE
-ARG APP_PATH=/app
-ARG COMPOSER_VERSION=2.5.1
+ARG APP_PATH=/var/www/html
+
+COPY php.ini /usr/local/etc/php/conf.d/docker-php-config.ini
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -23,7 +26,8 @@ RUN apt-get update && apt-get install -y \
     acl
 
 # Extra
-RUN apt-get update && apt-get install -y mc neovim
+RUN apt-get update && apt-get install -y \
+    mc neovim
 
 # Configure the gd library
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype 
@@ -36,15 +40,9 @@ RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} >
     && printf '[PHP]\ndate.timezone = "%s"\n', ${TIMEZONE} > /usr/local/etc/php/conf.d/tzone.ini \
     && "date"
 
-# Get composer installed to /usr/local/bin/composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=${COMPOSER_VERSION} \
-    && composer --version
-
 # APP path container project
-RUN mkdir -p ${APP_PATH}
 RUN groupadd -g 1000 www && useradd -g 1000 -u 1000 -d ${APP_PATH} -s /bin/bash www
+
 VOLUME ${APP_PATH}
 
 WORKDIR ${APP_PATH}
-
-CMD ["bash"]

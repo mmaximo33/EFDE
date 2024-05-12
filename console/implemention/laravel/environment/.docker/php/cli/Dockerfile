@@ -1,7 +1,9 @@
-FROM php:8.1-cli
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-cli
 
 ARG TIMEZONE
-ARG APP_PATH=/app
+ARG APP_PATH=/var/www/html
 ARG COMPOSER_VERSION=2.5.1
 
 # Install dependencies
@@ -41,8 +43,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     && composer --version
 
 # APP path container project
-RUN mkdir -p ${APP_PATH}
 RUN groupadd -g 1000 www && useradd -g 1000 -u 1000 -d ${APP_PATH} -s /bin/bash www
+
 VOLUME ${APP_PATH}
 
 WORKDIR ${APP_PATH}

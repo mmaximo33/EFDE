@@ -1,7 +1,9 @@
-FROM php:7.4-fpm
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-fpm
 
 ARG TIMEZONE
-ARG APP_PATH=/app
+ARG APP_PATH=/var/www/html
 
 COPY php.ini /usr/local/etc/php/conf.d/docker-php-config.ini
 
@@ -23,7 +25,7 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     acl
 
-# Extra
+# EFDE
 RUN apt-get update && apt-get install -y \
     mc neovim
 
@@ -39,8 +41,8 @@ RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} >
     && "date"
 
 # APP path container project
-RUN mkdir -p ${APP_PATH}
 RUN groupadd -g 1000 www && useradd -g 1000 -u 1000 -d ${APP_PATH} -s /bin/bash www
+
 VOLUME ${APP_PATH}
 
 WORKDIR ${APP_PATH}

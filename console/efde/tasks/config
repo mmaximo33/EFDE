@@ -3,25 +3,32 @@ set -euo pipefail
 
 CONFIG_FILE="config.env"
 CONFIG_PATH_FILE="$EFDE_PATH_INSTALL/bin/$CONFIG_FILE"
-GLOBAL_RUN_EFDE="efde"
 
 _mod_.set_run_cli_efde(){
-  GLOBAL_RUN_EFDE=$([ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] && echo "e2")
+  #GLOBAL_RUN_EFDE=$([ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] && echo "e2" || echo "efde")
+  GLOBAL_RUN_EFDE=$(basename "$0")
 }
 
 _mod_.check_config() {
+  _mod_.set_run_cli_efde
   if ! common.tasks.file.exists "$CONFIG_PATH_FILE"; then
     _mod_.create_config
   fi
   _mod_.load_config
-
-  _mod_.set_run_cli_efde
 }
 
 _mod_.create_config() {
   common.tasks.message.info "Your first time with EFDE?"
   common.tasks.message.info "We will create the basic configurations"
   _mod_.set_config
+
+
+  if [ "${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']}" != "$(efde.tasks.config.get_var "EFDE_LANGUAGE")" ]; then
+    common.core.generate_transactions
+    common.tasks.message.info "The translation configuration has been applied, we need to restart EFDE"
+    common.tasks.message.success "Run on your console \n$ $GLOBAL_RUN_EFDE"
+    exit # Reload for translations
+  fi
 }
 
 _mod_.set_config(){
@@ -102,15 +109,19 @@ _mod_.set_config_version() {
 }
 
 _mod_.load_config() {
-  local EFDE_CONFIGS=(
-    "HOST_SO" "HOST_EDITOR_DEFAULT"
-    "CLI_DEFAULT" "CLI_SHOW_CLI" "CLI_SHOW_OUTPUT"
-    "EFDE_MODE_DEBUG" "EFDE_MODE_DEVELOP"
-  )
-
-  for KEY in "${EFDE_CONFIGS[@]}"; do
+  mapfile -t EFDE_CONFIG < <(grep -o '^[^=]\+' "$CONFIG_PATH_FILE")
+  for KEY in "${EFDE_CONFIG[@]}"; do
     GLOBAL_EFDE_CONFIG["$KEY"]=$(_mod_.get_var "$KEY")
   done
+
+  if [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]]; then
+    common.tasks.message.debug "#######################################################################"
+    common.tasks.message.debug "# LOAD CONFIG "
+    common.tasks.message.debug "-----------------------------------------------------------------------"
+    for clave in "${!GLOBAL_EFDE_CONFIG[@]}"; do
+        common.tasks.message.tree "$clave: ${GLOBAL_EFDE_CONFIG[$clave]}" 1 0 debug
+    done
+  fi
 }
 
 _mod_.get_var(){

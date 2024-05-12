@@ -86,7 +86,7 @@ _mod_.project_name(){
 
   if ! [[ "$value" =~ ^[[:alnum:][:space:]]+$ ]]; then
     common.tasks.message.danger "The entered value can only contain letters or numbers."
-    common.tasks.message.info "Cancel to [ctrl + c] "
+    common.tasks.message.info "Cancel to [ctrl + c]"
     _mod_.project_name
   fi
 
@@ -94,7 +94,6 @@ _mod_.project_name(){
 }
 
 _mod_.setup_environment(){
-
   GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']=$(_mod_.project_name)
   GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_CREATE_AT']=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
 

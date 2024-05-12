@@ -5,13 +5,15 @@
 ![efde version](https://img.shields.io/badge/status-Active-green.svg)
 ![efde_lastcommin](https://img.shields.io/github/last-commit/mmaximo33/efde.svg)
 ![efde_release](https://img.shields.io/github/release/mmaximo33/efde.svg)
-![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/2.0.0.svg)
+![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/2.1.0.svg)
 ![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/1.2.0.svg)
 
 ![issue-open](https://img.shields.io/github/issues/mmaximo33/efde.svg)
 ![issue-close](https://img.shields.io/github/issues-closed/mmaximo33/efde.svg)
 ![pull-open](https://img.shields.io/github/issues-pr/mmaximo33/efde.svg)
 ![pull-close](https://img.shields.io/github/issues-pr-closed/mmaximo33/efde.svg)
+
+![efde version](https://img.shields.io/badge/language-grey.svg) ![en_US](https://img.shields.io/badge/en.US-blue.svg) ![es_ES](https://img.shields.io/badge/es.ES-blue.svg) ![pt_PT](https://img.shields.io/badge/pt.PT-blue.svg)
 
 ## Index
 
@@ -34,7 +36,9 @@ The objective of the project is to be able to manage implementations with docker
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](#)
 
 [![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
-[![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](docs/symfony.md)
+[![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](console/implemention/laravel/docs/README.md)
+[![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](console/implemention/symfony/docs/README.md)
+[![Install Wordpress](https://img.shields.io/badge/Wordpress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](console/implemention/wordpress/docs/README.md)
 
 ### Coming soon
 
@@ -42,9 +46,6 @@ The objective of the project is to be able to manage implementations with docker
 
 [![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
 [![Install Magento](https://img.shields.io/badge/Magento-f06835?style=for-the-badge&logo=magento&logoColor=white)](docs/developer.md)
-[![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](docs/developer.md)
-[![Wordpress](https://img.shields.io/badge/Wordpress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](docs/developer.md)
-[![Woocommerce](https://img.shields.io/badge/Woocommerce-8359b5?style=for-the-badge&logo=wordpress&logoColor=white)](docs/developer.md)
 [![Prestashop](https://img.shields.io/badge/prestashop-%23DF0067.svg?&style=for-the-badge&logo=prestashop&logoColor=white)](docs/developer.md)
 
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](docs/developer.md)
@@ -79,6 +80,40 @@ Anyway, if you want to know more, you can see the following list with the offici
 [![Docker Compose](https://img.shields.io/badge/Docker_Compose-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/install/other/)
 
 ### Install
+#### Manual 
+For manual installation you must
+<details>
+<summary>Distro debian/ubuntu</summary>
+
+```sh
+mkdir -p ~/.efde
+cd $_
+git clone https://github.com/mmaximo33/EFDE.git .
+
+ln -sfT $PWD/bin/efde.sh ~/bin/efde
+
+# In case you want to test a branch
+# git switch <branch>
+```
+</details>
+
+<details>
+<summary>In Windows</summary>
+
+```sh
+Coming soon
+```
+</details>
+
+<details>
+<summary>In MacOS</summary>
+
+```sh
+Coming soon
+```
+</details>
+
+#### For script 
 
 Run the following command (**CURL** or **WGET**) to install **EFDE** on your computer
 
@@ -103,14 +138,14 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 - Go to the directory where you create your projects (example: `~/Domains`)
 - Run `efde`  in your command console
 
-### Created with **EFDE
+### Created with EFDE
 
 - In case you are in a project created with **EFDE**. Example: `~/Domains/newproject`
 - The menu for that implementation will be displayed (Symfony, Laravel, Magento, Wordpress, WooComerce, Prestashop, React, Angular, Vue, Others)
 
-![efde symfony install](./docs/media/efde_symfony_install.gif)
+![efde symfony install](./console/implemention/symfony/docs/media/install.gif)
 
-![efde symfony use](./docs/media/efde_symfony_use.gif)
+![efde symfony use](./console/implemention/symfony/docs/media/use.gif)
 
 ### Shortcuts
 

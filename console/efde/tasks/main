@@ -7,9 +7,9 @@ set -euo pipefail
   }
 
   _mod_.coming_soon(){
-    common.tasks.message.warning "We're excited about the upcoming release!"
+    common.tasks.message.warning "We are excited about the upcoming release!"
     common.tasks.message.warning "Our team is hard at work to bring you the latest features and improvements."
-    common.tasks.message.warning "Stay tuned for updates and follow the project's progress on $URL_REPOSITORY."
+    common.tasks.message.warning "Stay tuned for updates and follow the projects progress on $URL_REPOSITORY."
     common.tasks.message.warning "Thank you for your patience, and remember to check back for the latest developments."
   }
 

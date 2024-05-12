@@ -23,13 +23,13 @@ set -euo pipefail
     fi
   }
 
-  _mod_.symfony_fix_permissions(){
+  _mod_.fix_permissions(){
     symfony.tasks.main.permissions_fix
     _mod_.main
   }
 
   _mod_.console(){
-    symfony.tasks.main.symfony_console_run_command
+    symfony.tasks.main.console_run_command
     _mod_.main
   }
 }
