@@ -103,6 +103,7 @@ ln -sfT $PWD/bin/efde.sh ~/bin/efde
 ```sh
 Coming soon
 ```
+
 </details>
 
 <details>
@@ -111,6 +112,7 @@ Coming soon
 ```sh
 Coming soon
 ```
+
 </details>
 
 #### For script 
