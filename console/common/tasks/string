@@ -8,3 +8,19 @@ _mod_.convert_string_to_camelcase(){
   local input="$@"
   echo "$input" | awk 'BEGIN{OFS=""};{for(j=1;j<=NF;j++){ if(j==1){$j=tolower($j)} else {$j=toupper(substr($j,1,1)) tolower(substr($j,2)) }}}1'
 }
+
+# Usage
+# Call:       _mod_.convert_string_to_lowercase "This IS TEST"
+# Response:   this is test
+_mod_.convert_string_to_lowercase(){
+  local input="$@"
+  echo "$input" | tr '[:upper:]' '[:lower:]'
+}
+
+# Usage
+# Call:       _mod_.convert_string_to_uppercase "This IS TEST"
+# Response:   THIS IS TEST
+_mod_.convert_string_to_uppercase(){
+  local input="$@"
+  echo "$input" | tr '[:lower:]' '[:upper:]'
+}
