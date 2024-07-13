@@ -82,15 +82,26 @@ _mod_.copy_environment(){
 }
 
 _mod_.project_name(){
-  local value=$(common.tasks.prompt.request_input "$(common.tasks.message.warning "Enter the project name\nProject name:") ")
+  local -A MSG
+  local value
 
-  if ! [[ "$value" =~ ^[[:alnum:][:space:]]+$ ]]; then
-    common.tasks.message.danger "The entered value can only contain letters or numbers."
-    common.tasks.message.info "Cancel to [ctrl + c]"
-    _mod_.project_name
-  fi
+  MSG=(
+    [MAIN]=""
+    [START]=$(common.tasks.message.warning "Enter the project name\nProject name:")
+    [ERROR]=$(common.tasks.message.danger "The entered value can only contain letters, numbers, dots, hyphens, and underscores (no spaces allowed).")
+    [EXIT]=$(common.tasks.message.info "Cancel with [ctrl + c]")
+  )
+  MSG['MAIN']=${MSG['START']}
+  while true; do
+    value=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
+    if [[ "$value" =~ ^[[:alnum:]._-]+$ ]]; then
+      break
+    else
+      MSG['MAIN']="${MSG['ERROR']}\n${MSG['EXIT']}\n${MSG['START']}"
+    fi
+  done
 
-  echo "$(common.tasks.string.convert_string_to_camelcase "$value")"
+  echo "$(common.tasks.string.convert_string_to_lowercase "$value")"
 }
 
 _mod_.setup_environment(){

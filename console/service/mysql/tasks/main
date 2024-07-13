@@ -134,7 +134,7 @@ set -euo pipefail
     common.tasks.message.warning "We are about to delete the directory $(common.tasks.message.msg_color info "$FILE_PATH")"
     local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
     if [[ "$RESPONSE" == "$CONFIRM" ]]; then
-      _mod_.database_drop
+      #_mod_.database_drop
       _mod_.database_create
       common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} < $FILE_PATH"
       common.tasks.message.success "Success: Import file $FILE_PATH\n"

@@ -16,7 +16,8 @@ _mod_.permissions_fix(){
   local PATH_APP="./app"
   ! common.tasks.directory.exists "$PATH_APP" && common.tasks.directory.create_recursive "$PATH_APP"
   sleep 2 # Important: Probably when the permissions are applied, the construction of the directories is not finished
-  common.tasks.command_line.run true false "sudo chown -R $UID:www-data $PATH_APP"
+  common.tasks.command_line.run true false "sudo usermod -aG www-data $USER"
+  common.tasks.command_line.run true false "sudo chown -R $USER:www-data $PATH_APP"
   common.tasks.command_line.run true false "find $PATH_APP -type f -exec chmod 644 {} \;"
   common.tasks.command_line.run true false "find $PATH_APP -type d -exec chmod 755 {} \;"
   common.tasks.command_line.run true false "chmod -R 775 $PATH_APP/storage 2>/dev/null || true"
