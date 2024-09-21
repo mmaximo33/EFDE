@@ -11,7 +11,7 @@ _mod_.build(){
 }
 
 _mod_.show(){
-  docker.tasks.main.dp_show_container
+  docker.tasks.main.dp_show_container --quit true
   _mod_.main
 }
 

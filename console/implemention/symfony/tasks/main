@@ -8,7 +8,7 @@ _mod_.see_compatibility_versions(){
 
 _mod_.run_command_app_cli(){
   # shellcheck disable=SC2145
-  docker.tasks.main.dp_command_run "run --rm app_cli ${@}"
+  docker.tasks.main.dp_command_run --cli "run --rm app_cli ${@}"
 }
 
 # ToDo: Review oficial documentation
@@ -57,7 +57,7 @@ _mod_.console_run_command(){
       fi
     fi
 
-    common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
+    docker.tasks.main.dp_command_run -i true -o true -c "run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
     common.tasks.prompt.confirm_default_yes "${MSG['OTHER']}" || break
     VALUES=""
   done

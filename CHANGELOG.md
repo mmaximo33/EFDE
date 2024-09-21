@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - EFDE: 
   - #39 error project name folder creation
+  - #41 Correct use of the docker-compose command in implemention
 
 ## [2.2.0] 2024-05-12
 

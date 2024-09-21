@@ -68,9 +68,9 @@ set -euo pipefail
         return 1
     fi
 
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var)"
+    local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var)"
 
-    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"$*;\""
+    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"$*;\""
   }
 
   _mod_.run_custom_query(){
@@ -94,11 +94,11 @@ set -euo pipefail
     local PATH_DUMPS="./dumps"
     local FILE_NAME="$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d_%H-%M").sql"
     local FILE_PATH="$PATH_DUMPS/$FILE_NAME"
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb-dump $(_mod_.get_env_var)"
+    local MYSQL_QUERY_BASE="exec database mariadb-dump $(_mod_.get_env_var)"
 
     ! common.tasks.directory.exists "$PATH_DUMPS" && common.tasks.directory.create_recursive "$PATH_DUMPS"
 
-    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} --add-drop-database > $FILE_PATH"
+    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} --add-drop-database > $FILE_PATH"
     common.tasks.message.success "Success: The database was exported $FILE_PATH\n"
   }
 
@@ -107,7 +107,7 @@ set -euo pipefail
     local PATH_DUMPS="./dumps"
     local PATH_FILES_SEARCH=("$PATH_DUMPS"/*.sql)
     local FILE_NAME FILE_PATH
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec -T database mariadb $(_mod_.get_env_var)"
+    local MYSQL_QUERY_BASE="exec -T database mariadb $(_mod_.get_env_var)"
 
     if ! common.tasks.directory.exists "$PATH_DUMPS"; then
         common.tasks.message.danger "Directory not found $PATH_DUMPS\n"
@@ -136,7 +136,7 @@ set -euo pipefail
     if [[ "$RESPONSE" == "$CONFIRM" ]]; then
       #_mod_.database_drop
       _mod_.database_create
-      common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} < $FILE_PATH"
+      docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} < $FILE_PATH"
       common.tasks.message.success "Success: Import file $FILE_PATH\n"
     else
       common.tasks.message.warning "Aborted action."
@@ -144,7 +144,6 @@ set -euo pipefail
   }
 
   _mod_.permissions(){
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var)"
     local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
     local MYSQL_HOST=$(common.tasks.env_variable.get_variable "MYSQL_HOST" "$PATH_ENV")
     local MYSQL_USER=$(common.tasks.env_variable.get_variable "MYSQL_USER" "$PATH_ENV")
@@ -170,18 +169,17 @@ set -euo pipefail
   _mod_.database_create(){
     local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var false)"
+    local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var false)"
 
-    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};\""
+    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};\""
   }
 
   _mod_.database_drop(){
     local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
-    local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var false)"
+    local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var false)"
 
-    common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"DROP DATABASE IF EXISTS \\\`${MYSQL_DATABASE}\\\`;\""
-
+    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"DROP DATABASE IF EXISTS \\\`${MYSQL_DATABASE}\\\`;\""
   }
 
   _mod_.env_show(){
