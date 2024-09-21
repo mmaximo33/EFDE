@@ -14,6 +14,10 @@ declare -gA GLOBAL_IMPLEMENTION_EFDE_FOLDER=(
 ################################
 # CURRENT PROJECT
 #-------------------------------
+_mod_.get_current_path_efde(){
+  echo "$(pwd)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}"
+}
+
 _mod_.get_current_path_env_file(){
   echo "$(pwd)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
 }
@@ -104,6 +108,40 @@ _mod_.project_name(){
   echo "$(common.tasks.string.convert_string_to_lowercase "$value")"
 }
 
+_mod_.create_shortcuts_example(){
+  local PATH_FOLDER_SHORTCUTS="$(_mod_.get_new_path_implemention)/shortcuts"
+  local PATH_FILE_LIST="$PATH_FOLDER_SHORTCUTS/list"
+  common.tasks.directory.create_recursive "$PATH_FOLDER_SHORTCUTS/folder"
+
+  file_content='#!/usr/bin/env bash
+  {
+    CUSTOM_SHORTCUTS=(
+  #   "action,          path/file,                Description action"
+  #   "folder:file      folder/folder/file        Description action"
+      "info,            info,                     Info custom shortcuts"
+      "folder:test,     folder/info,              Run folder/info"
+    )
+  }
+  '
+  echo "$file_content" > $PATH_FILE_LIST
+
+
+  file_content='#!/usr/bin/env bash
+echo "";echo "> Example custom scripts";
+echo "";echo "> Current path"
+pwd
+echo "";echo "> Check custom shortcuts $(pwd)/.efde/shortcuts"
+ls -lha .efde/shortcuts
+echo "";echo "> Check config"
+cat .efde/shortcuts/list
+echo "";echo "> Check this script"
+cat .efde/shortcuts/info
+'
+
+  echo "$file_content" > "$PATH_FOLDER_SHORTCUTS/info"
+  echo "$file_content" > "$PATH_FOLDER_SHORTCUTS/folder/info"
+}
+
 _mod_.setup_environment(){
   GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']=$(_mod_.project_name)
   GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_CREATE_AT']=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
@@ -111,6 +149,7 @@ _mod_.setup_environment(){
   _mod_.create_folder
   _mod_.copy_environment
   _mod.set_all_env
+  _mod_.create_shortcuts_example
 }
 
 

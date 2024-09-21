@@ -151,6 +151,10 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 
 ### Shortcuts
 
+Since version 2.2.1, CUSTOM shortcuts are available per project. You can see the list by running `efde custom`
+
+![efde_shortcuts_custom.png](./docs/media/efde_shortcuts_custom.png)
+
 Since version 2.1.0, shortcuts are available. You can see the list by running `efde efde:shortcuts`
 
 ![efde shortcuts](./docs/media/efde_shortcuts.gif)

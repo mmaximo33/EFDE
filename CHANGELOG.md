@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.3.0] 2024-xx-xx
 
+### Added
+- EFDE:
+  - #43 Add custom shortcuts / commands line
+
+### Changed
+- EFDE: 
+  - #42 Don't show menu after shortcuts
+
 ### Fixed
 - EFDE: 
   - #39 error project name folder creation
@@ -26,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - #36 Function info menu not aligned (Debug Mode)
 - Symfony: #33 fix application directory permissions application
 - MySQL: #3 General fixes for database import and export
-
+ 
 ## [2.1.0] 2024-03-04
 
 ### Added
