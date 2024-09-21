@@ -41,7 +41,6 @@ menu_implementation(){
 
 generate_extra_elements(){
   efde.tasks.config.check_config
-  common.core.generate_shortcuts_file
 
   if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]; then
     if [ ${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']} != "$(efde.tasks.config.get_var "EFDE_LANGUAGE")" ]; then

@@ -121,7 +121,7 @@ set -euo pipefail
 
     for FILE in $(ls -1t "${PATH_FILES_SEARCH[@]}"); do
         FILE_NAME=$(basename "$FILE")
-        MENU_FILES+=("shortcut:off,$FILE_NAME,$FILE_NAME, ")
+        MENU_FILES+=("$FILE_NAME,$FILE_NAME, ")
     done
 
     common.tasks.menu.show "$mysql_props_menu_TITLE" "${MENU_FILES[@]}"
@@ -181,5 +181,10 @@ set -euo pipefail
     local MYSQL_QUERY_BASE="${GLOBAL_DOCKER_COMPOSE_COMMAND} exec database mariadb $(_mod_.get_env_var false)"
 
     common.tasks.command_line.run true true "${MYSQL_QUERY_BASE} -e\"DROP DATABASE IF EXISTS \\\`${MYSQL_DATABASE}\\\`;\""
+
+  }
+
+  _mod_.env_show(){
+    cat "$(efde.tasks.implemention.get_current_path_env_file)" | grep -E "MYSQL|PMA"
   }
 }

@@ -13,8 +13,8 @@ set -euo pipefail
     common.tasks.menu.show "$wordpress_props_menu_TITLE" "${wordpress_props_menu_CREATE_ENVIRONMENT_VERSION[@]}"
   }
 
-  _mod_.show_config_project(){
-    cat "$(efde.tasks.implemention.get_current_path_env_file)"
+  _mod_.config_show(){
+    efde.tasks.project.config_show
     if common.tasks.prompt.confirm_default_yes $(common.tasks.message.msg_color warning "Back to menu?"); then
       common.tasks.os.console_clear
       _mod_.main
@@ -23,7 +23,7 @@ set -euo pipefail
     fi
   }
 
-  _mod_.fix_permissions(){
+  _mod_.permissions_fix(){
     wordpress.tasks.main.permissions_fix
     _mod_.main
   }

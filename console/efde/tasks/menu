@@ -28,7 +28,7 @@ set -euo pipefail
     _mod_.main
   }
 
-  _mod_.shortcuts(){
+  _mod_.shortcuts_show(){
     common.tasks.shortcuts.show
   }
 }

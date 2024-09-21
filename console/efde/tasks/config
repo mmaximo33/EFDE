@@ -71,10 +71,10 @@ _mod_.set_config_cli(){
   local MSG=""
   local RESPONSE=false
   local TYPE_SETTINGS=(
-    "shortcut:off,  default,    Default (Recommended),    Established by implementation"
-    "shortcut:off,  training,   Training,                 Show executed commands, no output"
-    "shortcut:off,  auditor,    Auditor,                  Show executed commands and output"
-    "shortcut:off,  silent,     Silent,                   Do not show executed commands or output"
+    "default,    Default (Recommended),    Established by implementation"
+    "training,   Training,                 Show executed commands, no output"
+    "auditor,    Auditor,                  Show executed commands and output"
+    "silent,     Silent,                   Do not show executed commands or output"
   )
 
   common.tasks.menu.show "How to see executed commands and outputs" "${TYPE_SETTINGS[@]}"
@@ -145,7 +145,7 @@ _mod_.set_config_editor(){
 
   for KEY in "${EDITORS[@]}"; do
     if common.tasks.os.has "$KEY"; then
-      EDITORS_MENU+=("shortcut:off, $KEY, $KEY")
+      EDITORS_MENU+=("$KEY, $KEY,")
     fi
   done
 

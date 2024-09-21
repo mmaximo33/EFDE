@@ -32,17 +32,17 @@ _mod_.print_options(){
     OPTION=${OPTIONS[i]}
     IFS=',' read -r -a VALUES <<< "$OPTION"
 
-    if [[ ${#VALUES[@]} -ge 3 ]]; then
-      local TITULO=$(echo ${VALUES[2]})
-      local DESCRIPTION=$(echo ${VALUES[3]:-${VALUES[2]}})
+    if [[ ${#VALUES[@]} -ge 2 ]]; then
+      local TITULO=$(echo ${VALUES[1]})
+      local DESCRIPTION=$(echo ${VALUES[2]:-${VALUES[1]}})
       if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
-        VALUES[1]=$(echo "${VALUES[1]}" | sed 's/ //g')
-        local DESCRIPTION=$(common.tasks.message.echo debug "${VALUES[1]}")
+        VALUES[0]=$(echo "${VALUES[0]}" | sed 's/ //g')
+        local DESCRIPTION=$(common.tasks.message.echo debug "${VALUES[0]}")
       fi
 
       printf "%-0s. %-25s %s\n" "$i" "$TITULO" "$DESCRIPTION"
     else
-      common.tasks.message.warning "\nInvalid menu option: Requieres minimum: \'shortcut, function, name\' \n- For: $OPTION"
+      common.tasks.message.warning "\nInvalid menu option: Requieres minimum: \'function, name\' \n- For: $OPTION"
     fi
   done
 }
@@ -95,9 +95,9 @@ _mod_.chosen_option(){
       GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']="${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}"
     fi
 
-    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']=$(echo ${VALUES[1]})
-    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']="${VALUES[2]}"
-    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']="${VALUES[3]:-${VALUES[2]}}"
+    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']=$(echo ${VALUES[0]})
+    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']="${VALUES[1]}"
+    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']="${VALUES[2]:-${VALUES[1]}}"
 
   else
     common.tasks.message.danger "Error: Incorrect input format"

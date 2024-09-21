@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+{
+  # shellcheck disable=SC2168
+  local IMPLEMENT="Docker"
+  # shellcheck disable=SC2168
+  local PREFIX_MAIN="${IMPLEMENT,,}.tasks.main"
+
+  _mod_ITEMS=(
+    "${IMPLEMENT,,}:build,        $PREFIX_MAIN.dp_build,                Build or Re-Build the project containers"
+    "${IMPLEMENT,,}:ps,           $PREFIX_MAIN.dp_show_container,       Show Process Status"
+    "${IMPLEMENT,,}:start,        $PREFIX_MAIN.dp_start,                Start containers of project"
+    "${IMPLEMENT,,}:restart,      $PREFIX_MAIN.dp_restart,              Restart containers of project"
+    "${IMPLEMENT,,}:stop,         $PREFIX_MAIN.dp_stop,                 Stop containers of project"
+    "${IMPLEMENT,,}:logs,         $PREFIX_MAIN.dp_logs,                 Inspect environment logs"
+    "${IMPLEMENT,,}:entry,        $PREFIX_MAIN.container_entry,         Enter the indicated container"
+    "${IMPLEMENT,,}:commands,     $PREFIX_MAIN.container_run_command,   Run command in container. Example: bash, cp, rm"
+    "${IMPLEMENT,,}:allstop,      $PREFIX_MAIN.dp_all_stop,             Stops all containers running on the computer"
+    "${IMPLEMENT,,}:down,         $PREFIX_MAIN.dp_down,                 Destroy all project containers and networks"
+    "${IMPLEMENT,,}:recipe,       $PREFIX_MAIN.recipe_see,              See recipe docker-compose.yml"
+
+    "apache:stop,                 $PREFIX_MAIN.apache_stop,             Apache2 stop service"
+  )
+}

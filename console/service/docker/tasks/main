@@ -28,6 +28,10 @@ _mod_.dp_stop(){
   _mod_.dp_command_run "stop"
 }
 
+_mod_.dp_restart(){
+  _mod_.dp_command_run "restart"
+}
+
 _mod_.dp_all_stop(){
   local CONTAINERS=$(docker ps -q | tr '\n' ' ')
   if [ -n "$CONTAINERS" ]; then
@@ -49,7 +53,7 @@ _mod_.apache_stop(){
 
 _mod_.dp_down(){
   local QUESTION=$(common.tasks.message.msg_color danger "Do you want to remove services from the project?")
-  _mod_.dp_show_container simple
+  _mod_.dp_show_container
   if common.tasks.prompt.confirm_default_no "$QUESTION" ; then
     _mod_.dp_command_run "down"
   fi
@@ -90,19 +94,20 @@ _mod_.dp_logs(){
 
 
 _mod_.dp_show_container(){
-  local COMMAND="ps -a"
-  if [[ $# -gt 0 && "$1" == "simple" ]]; then
-    COMMAND="ps -a --format \"table {{.Name}}\t{{.Image}}\t{{.Service}}\t{{.Status}}\""
-  fi
-  common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} $COMMAND"
+  local COMMAND="ps -a --format \"table {{.Service}}\t{{.Name}}\t{{.Ports}}\t{{.Status}}\t{{.Image}}\""
 
+  if [[ $# -gt 0 && "$1" == "full" ]]; then
+    COMMAND="ps -a"
+  fi
+
+  common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} $COMMAND"
 }
 
 #_mod_.container_select() {
 #  local MSG SERVICE
-#  _mod_.dp_show_container simple
-#
-#  local MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+#  _mod_.dp_show_container
+#q
+#  local MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
 #  local SERVICE
 #  SERVICE=$(common.tasks.prompt.request_input "$MSG")
 #
@@ -115,12 +120,11 @@ _mod_.dp_show_container(){
 #  echo "$SERVICE"
 #}
 
-
 _mod_.container_entry(){
   local COMMAND_RUN VALUES MSG SERVICE
 
-  _mod_.dp_show_container simple
-  MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+  _mod_.dp_show_container
+  MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
   SERVICE=$(common.tasks.prompt.request_input "$MSG")
 
   MSG=$(common.tasks.message.msg_color warning 'You want to open a new instance? RUN=Y or EXEC=N')
@@ -135,9 +139,9 @@ _mod_.container_entry(){
 _mod_.container_run_command() {
   local COMMAND_RUN COMMAND_CUSTOM MSG SERVICE
 
-  _mod_.dp_show_container simple
+  _mod_.dp_show_container
 
-  MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+  MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
   SERVICE=$(common.tasks.prompt.request_input "$MSG")
 
   MSG=$(common.tasks.message.msg_color warning 'You want to open a new instance? RUN=Y or EXEC=N')
@@ -160,5 +164,10 @@ _mod_.container_run_command() {
       break
     fi
   done
+}
+
+_mod_.recipe_see(){
+  cat docker-compose.yml
+  _mod_.main
 }
 

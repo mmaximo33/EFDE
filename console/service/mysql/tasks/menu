@@ -6,7 +6,7 @@ _mod_.main(){
 }
 
 _mod_.env_show(){
-  cat "$(efde.tasks.implemention.get_current_path_env_file)" | grep -E "MYSQL|PMA"
+  mysql.tasks.main.env_show
   if common.tasks.prompt.confirm_default_yes $(common.tasks.message.msg_color warning "Back to menu?"); then
     common.tasks.os.console_clear
     _mod_.main
