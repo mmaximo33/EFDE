@@ -20,6 +20,7 @@ _mod_.msg_debug() {
 _mod_.print_options(){
   local MODE="info"
   local QUESTION="$1"
+  local IDENTATION_DEFAULT=25
   shift
   local OPTIONS=("$@")
 
@@ -40,7 +41,9 @@ _mod_.print_options(){
         local DESCRIPTION=$(common.tasks.message.echo debug "${VALUES[0]}")
       fi
 
-      printf "%-0s. %-25s %s\n" "$i" "$TITULO" "$DESCRIPTION"
+      IDENTATION=$(( i > 9 ? IDENTATION_DEFAULT - 1 : IDENTATION_DEFAULT ))
+
+      printf "%-0s. %-${IDENTATION}s %s\n" "$i" "$TITULO" "$DESCRIPTION"
     else
       common.tasks.message.warning "\nInvalid menu option: Requieres minimum: \'function, name\' \n- For: $OPTION"
     fi
