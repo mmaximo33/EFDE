@@ -44,7 +44,7 @@ generate_extra_elements(){
 
   if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]; then
     if [ ${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']} != "$(efde.tasks.config.get_var "EFDE_LANGUAGE")" ]; then
-      common.core.generate_transactions
+      common.core.generate_translation
     fi
   fi
 }
