@@ -22,9 +22,8 @@ _mod_.create_config() {
   common.tasks.message.info "We will create the basic configurations"
   _mod_.set_config
 
-
   if [ "${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']}" != "$(efde.tasks.config.get_var "EFDE_LANGUAGE")" ]; then
-    common.core.generate_transactions
+    common.core.generate_translation
     common.tasks.message.info "The translation configuration has been applied, we need to restart EFDE"
     common.tasks.message.success "Run on your console \n$ $GLOBAL_RUN_EFDE"
     exit # Reload for translations
@@ -62,8 +61,12 @@ _mod_.show_config() {
 }
 
 _mod_.set_config_language(){
-  common.tasks.menu.show "Default language?" "${efde_props_menu_CONFIG_SET_LANGUAGE[@]}"
-  RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  common.tasks.menu.show \
+    --title "Default language?" \
+    --data "${efde_props_menu_CONFIG_SET_LANGUAGE[@]}" \
+    --isfunction false
+
+  RESPONSE=$(common.tasks.menu.get_selected_value)
   _mod_.set_var "EFDE_LANGUAGE" "$RESPONSE"
 }
 
@@ -77,8 +80,12 @@ _mod_.set_config_cli(){
     "silent,     Silent,                   Do not show executed commands or output"
   )
 
-  common.tasks.menu.show "How to see executed commands and outputs" "${TYPE_SETTINGS[@]}"
-  RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  common.tasks.menu.show \
+    --title "How to see executed commands and outputs" \
+    --data "${TYPE_SETTINGS[@]}" \
+    --isfunction false
+
+  RESPONSE=$(common.tasks.menu.get_selected_value)
   case $RESPONSE in
     default)
       _mod_.set_var "CLI_DEFAULT"       "true"
@@ -115,9 +122,9 @@ _mod_.load_config() {
   done
 
   if [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]]; then
-    common.tasks.message.debug "#######################################################################"
+    common.tasks.message.debug "$(printf '%.s#' {1..75})"
     common.tasks.message.debug "# LOAD CONFIG "
-    common.tasks.message.debug "-----------------------------------------------------------------------"
+    common.tasks.message.debug "$(printf '%.s-' {1..75})"
     for clave in "${!GLOBAL_EFDE_CONFIG[@]}"; do
         common.tasks.message.tree "$clave: ${GLOBAL_EFDE_CONFIG[$clave]}" 1 0 debug
     done
@@ -149,7 +156,11 @@ _mod_.set_config_editor(){
     fi
   done
 
-  common.tasks.menu.show "select EDITOR default" "${EDITORS_MENU[@]}"
-  RESPONSE=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+  common.tasks.menu.show \
+    --title "select EDITOR default" \
+    --data "${EDITORS_MENU[@]}" \
+    --isfunction false
+
+  RESPONSE=$(common.tasks.menu.get_selected_value)
   _mod_.set_var "HOST_EDITOR_DEFAULT" "$RESPONSE"
 }

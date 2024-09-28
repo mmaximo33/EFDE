@@ -3,15 +3,21 @@ set -euo pipefail
 {
   _mod_.main(){
     common.tasks.os.console_clear
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_MAIN[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${efde_props_menu_MAIN[@]}"
   }
 
   _mod_.efde(){
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_EFDE[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${efde_props_menu_EFDE[@]}"
   }
 
   _mod_.config(){
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_CONFIG[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${efde_props_menu_CONFIG[@]}"
   }
 
   _mod_.config_show(){
@@ -20,7 +26,9 @@ set -euo pipefail
   }
 
   _mod_.tools(){
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_TOOLS[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${efde_props_menu_TOOLS[@]}"
   }
 
   _mod_.coming_soon(){

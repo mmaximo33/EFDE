@@ -2,7 +2,9 @@
 set -euo pipefail
 
 _mod_.main(){
-  common.tasks.menu.show "$docker_props_menu_TITLE" "${docker_props_menu_MAIN[@]}"
+  common.tasks.menu.show \
+    --title "$docker_props_menu_TITLE" \
+    --data "${docker_props_menu_MAIN[@]}"
 }
 
 _mod_.build(){

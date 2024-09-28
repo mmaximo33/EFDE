@@ -2,15 +2,21 @@
 set -euo pipefail
 {
   _mod_.main(){
-    common.tasks.menu.show "$wordpress_props_menu_TITLE" "${wordpress_props_menu_MAIN[@]}"
+    common.tasks.menu.show \
+      --title "$wordpress_props_menu_TITLE" \
+      --data "${wordpress_props_menu_MAIN[@]}"
   }
 
   _mod_.create_environment(){
-    common.tasks.menu.show "$wordpress_props_menu_TITLE" "${wordpress_props_menu_CREATE_ENVIRONMENT[@]}"
+    common.tasks.menu.show \
+      --title "$wordpress_props_menu_TITLE" \
+      --data "${wordpress_props_menu_CREATE_ENVIRONMENT[@]}"
   }
 
   _mod_.create_environment_version(){
-    common.tasks.menu.show "$wordpress_props_menu_TITLE" "${wordpress_props_menu_CREATE_ENVIRONMENT_VERSION[@]}"
+    common.tasks.menu.show \
+      --title "$wordpress_props_menu_TITLE" \
+      --data "${wordpress_props_menu_CREATE_ENVIRONMENT_VERSION[@]}"
   }
 
   _mod_.config_show(){

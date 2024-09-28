@@ -2,7 +2,9 @@
 set -euo pipefail
 
 _mod_.main(){
-  common.tasks.menu.show "$mysql_props_menu_TITLE" "${mysql_props_menu_MAIN[@]}"
+  common.tasks.menu.show \
+    --title "$mysql_props_menu_TITLE" \
+    --data "${mysql_props_menu_MAIN[@]}"
 }
 
 _mod_.env_show(){

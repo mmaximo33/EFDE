@@ -14,10 +14,9 @@ _mod_.choose_php_versions(){
   local VERSION_PHP
   local VERSION_LARAVEL=""
 
-  # while for call function see versions
-  while [ "$VERSION_LARAVEL" == "" ] || common.tasks.module.exists_function "$VERSION_LARAVEL" ; do
+  while [ "$VERSION_LARAVEL" == "" ]; do
     laravel.tasks.menu.create_environment_version
-    VERSION_LARAVEL=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+    VERSION_LARAVEL=$(common.tasks.menu.get_selected_value)
   done
 
   # https://laravel.com/docs/11.x/releases

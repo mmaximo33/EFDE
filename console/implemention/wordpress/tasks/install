@@ -3,10 +3,10 @@ set -euo pipefail
 
 _mod_.choose_php_versions(){
   local PHP_VERSION=""
-  # while for call function see versions
-  while [ "$PHP_VERSION" == "" ] || common.tasks.module.exists_function "$PHP_VERSION" ; do
+
+  while [ "$PHP_VERSION" == "" ]; do
     wordpress.tasks.menu.create_environment_version
-    PHP_VERSION=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+    PHP_VERSION=$(common.tasks.menu.get_selected_value)
   done
 
   GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="wordpress"

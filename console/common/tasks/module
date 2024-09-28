@@ -6,7 +6,13 @@ _mod_.check() {
 }
 
 _mod_.exists_function(){
-  [ "$(type -t "$1")" = "function" ]
+  local FUNCTION_NAME=$1
+  if [ "$(type -t "$FUNCTION_NAME")" = "function" ]; then
+    return 0
+  else
+    common.tasks.message.danger "Error: Function '$FUNCTION_NAME' does not exist."
+    return 1
+  fi
 }
 
 # MMTodo: Prepare for debug

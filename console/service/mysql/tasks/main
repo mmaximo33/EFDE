@@ -124,8 +124,12 @@ set -euo pipefail
         MENU_FILES+=("$FILE_NAME,$FILE_NAME, ")
     done
 
-    common.tasks.menu.show "$mysql_props_menu_TITLE" "${MENU_FILES[@]}"
-    FILE_NAME="${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}"
+    common.tasks.menu.show \
+      --title "$mysql_props_menu_TITLE" \
+      --data "${MENU_FILES[@]}" \
+      --isfuntion false
+
+    FILE_NAME=$(common.tasks.menu.get_selected_value)
     FILE_PATH="$PATH_DUMPS/$FILE_NAME"
 
     local CONFIRM="Import DATABASE"

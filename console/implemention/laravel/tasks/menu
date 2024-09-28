@@ -2,15 +2,21 @@
 set -euo pipefail
 {
   _mod_.main(){
-    common.tasks.menu.show "$laravel_props_menu_TITLE" "${laravel_props_menu_MAIN[@]}"
+    common.tasks.menu.show \
+      --title "$laravel_props_menu_TITLE" \
+      --data "${laravel_props_menu_MAIN[@]}"
   }
 
   _mod_.create_environment(){
-    common.tasks.menu.show "$laravel_props_menu_TITLE" "${laravel_props_menu_CREATE_ENVIRONMENT[@]}"
+    common.tasks.menu.show \
+      --title "$laravel_props_menu_TITLE" \
+      --data "${laravel_props_menu_CREATE_ENVIRONMENT[@]}"
   }
 
   _mod_.create_environment_version(){
-    common.tasks.menu.show "$laravel_props_menu_TITLE" "${laravel_props_menu_CREATE_ENVIRONMENT_VERSION[@]}"
+    common.tasks.menu.show \
+      --title "$laravel_props_menu_TITLE" \
+      --data "${laravel_props_menu_CREATE_ENVIRONMENT_VERSION[@]}"
   }
 
   _mod_.config_show(){
