@@ -2,9 +2,9 @@
 set -euo pipefail
 
 _mod_.step(){
-  _mod_.msg_debug "#######################################################################"
+  _mod_.msg_debug "$(printf '%.s#' {1..75})"
   _mod_.msg_debug "# LOAD $1 "
-  _mod_.msg_debug "-----------------------------------------------------------------------"
+  _mod_.msg_debug "$(printf '%.s-' {1..75})"
 }
 
 _mod_.msg_debug() {
@@ -12,7 +12,11 @@ _mod_.msg_debug() {
   local end="${3:-0}"
   if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
     if _mod_.essential_run; then
-        common.tasks.message.tree "$1" "$level" "$end" debug
+
+        #common.tasks.message.tree "$1" "$level" "$end" debug
+        common.tasks.message.tree \
+          "$(printf '%s' "$1" | sed 's/\\n/\\\\n/g')" \
+          "$level" "$end" debug
     else
       local color_start="\033[1;35m"
       local color_end="\033[0m"
@@ -178,21 +182,43 @@ _mod_.generate_shortcuts_file() {
 # Improve this feature so that
 #   - Take all characters enclosed in double quotes (\n or \")
 #   - Do not consider spaces between origin and destination ("origin",              "destination")
-_mod_.generate_transactions(){
-  local PATH_TO_INSPECT="${1:-$PATH_CONSOLE}"
+_mod_.generate_translation(){
+  local PATH_TO_INSPECT="$PATH_CONSOLE"
+  local IS_INIT=true
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --path)
+        PATH_TO_INSPECT="$2"
+        shift 2
+        ;;
+      --isinit)
+        IS_INIT="$2"
+        shift 2
+        ;;
+      *)
+        echo "Invalid option: $1"
+        return 1
+        ;;
+    esac
+  done
+
   local LANGUAGE_DEFAULT=${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']}
   local LANGUAGE_CONFIG=$(efde.tasks.config.get_var "EFDE_LANGUAGE")
+  
   if [ "$LANGUAGE_DEFAULT" != "$LANGUAGE_CONFIG" ]; then
+      [[ "$IS_INIT" == "true" ]] && _mod_.step "TRANSLATIONS from $LANGUAGE_DEFAULT to $LANGUAGE_CONFIG"
       DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
       for DIRECTORY in $DIRECTORIES; do
-
         local PATH_TARGET="$PATH_TO_INSPECT/$DIRECTORY"
         local PATH_TASKS_EXISTS="$PATH_TARGET/tasks"
 
         if [ ! -d "$PATH_TASKS_EXISTS" ]; then
-          _mod_.generate_transactions "$PATH_TARGET"
+          _mod_.generate_translation --path "$PATH_TARGET" --isinit false
         else
           local FILE_i18n="$PATH_TARGET/i18n/$LANGUAGE_CONFIG"
+          _mod_.msg_debug "CHECK DIRECTORY $PATH_TARGET" 1
+          _mod_.msg_debug "TRANSLATIONS FILE $FILE_i18n" 2
           if common.tasks.file.exists "$FILE_i18n"; then
             while IFS= read -r line || [ -n "$line" ]; do
                 [ -z "$line" ] && continue
@@ -202,6 +228,7 @@ _mod_.generate_transactions(){
                 text_new=$(echo "$line" | awk -F '","' '{print $2}')
 
                 if [ -n "$text_old" ] && [ -n "$text_new" ]; then
+                    _mod_.msg_debug "$text_old > $text_new" 3
                     find "$DIRECTORY_TMP" -type f -name "$DIRECTORY.*" -exec sh -c "sed -i 's#$text_old#$text_new#g' {};" \;
                 fi
             done < "$FILE_i18n"
