@@ -117,7 +117,7 @@ _mod_.create_shortcuts_example(){
   {
     CUSTOM_SHORTCUTS=(
   #   "action,          path/file,                Description action"
-  #   "folder:file      folder/folder/file        Description action"
+  #   "folder:file,     folder/folder/file,       Description action"
       "info,            info,                     Info custom shortcuts"
       "folder:test,     folder/info,              Run folder/info"
     )
@@ -132,9 +132,9 @@ echo "";echo "> Current path"
 pwd
 echo "";echo "> Check custom shortcuts $(pwd)/.efde/shortcuts"
 ls -lha .efde/shortcuts
-echo "";echo "> Check config"
+echo "";echo "> Check LIST"
 cat .efde/shortcuts/list
-echo "";echo "> Check this script"
+echo "";echo "> Check this SCRIPT"
 cat .efde/shortcuts/info
 '
 

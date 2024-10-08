@@ -15,6 +15,7 @@ to begin following up on the request.
 To prepare the EFDE development environment, see the following steps according to the corresponding role.
 
 ## Collaborators
+
 ```sh
 # Prepare environment
 mkdir -p ~/Domains
@@ -44,17 +45,145 @@ git status
 git push origin <issue-new-feature> --force-with-lease
 ```
 
-### Full developer
-To have all the developer features activated modify `bin/efde.sh`
+### Settings
+
+#### For full developer
+
+To have all developer features enabled, modify the `bin/config.env` file generated after the first run 
 
 ```sh
-declare -gA GLOBAL_EFDE_CONFIG=(
-...
-[EFDE_MODE_DEVELOP]=true        # MMTodo: Prepared for create tmps
-[EFDE_MODE_DEBUG]=true          # Debug Messages
-..
-)
+
+EFDE_MODE_DEBUG="false"             # Debug general (It is required for the rest of MODE)
+EFDE_MODE_DEBUG_CONFIG="false"      # Debug load config
+EFDE_MODE_DEBUG_MODULE="false"      # Debug load modules
+EFDE_MODE_DEBUG_SHORTCUTS="false"   # Debug load shortcuts
+EFDE_MODE_DEBUG_I18N="false"        # Debug load translations
+EFDE_MODE_DEBUG_MENU="false"        # Debug load menu
+
 ```
+<details>
+<summary>Debug Essential</summary>
+
+![efde_mode_debug_essential.png](media/efde_mode_debug_essential.png)
+</details>
+
+<details>
+
+<summary>Debug CONFIG</summary>
+
+![efde_mode_debug_config.png](media/efde_mode_debug_config.png)
+</details>
+
+<details>
+
+<summary>Debug MODULES</summary>
+
+![efde_mode_debug_modules.png](media/efde_mode_debug_modules.png)
+</details>
+<details>
+
+<summary>Debug SHORTCUTS</summary>
+
+![efde_mode_debug_shortcuts.png](media/efde_mode_debug_shortcuts.png)
+</details>
+<details>
+
+<summary>Debug I18N</summary>
+
+![efde_mode_debug_i18n.png](media/efde_mode_debug_i18n.png)
+</details>
+<details>
+
+<summary>Debug MENU</summary>
+
+![efde_mode_debug_menu.png](media/efde_mode_debug_menu.png)
+</details>
+
+### EFDE_MODE_DEBUG
+
+|                                                    |                                                                                  | 
+|----------------------------------------------------|----------------------------------------------------------------------------------|
+| Shows additional information for debugging actions | On each run, clean the `bin/.tmp` directory and transform the files individually | 
+| ![Efde mode debug](./media/efde_mode_debug.png)    | ![Efde mode debug](./media/efde_mode_debug_files.png)                            |       
+
+
+### Rules for developer
+If you want to add a new feature you must keep the following rules in mind
+- Define type
+  - **Service**: (docker, mysql, phpmyadmin, mailhog, others)
+  - **Implementation**: frameworks, cms, others (symfony, laravel, magento, woordpress, prestashop, others)
+- Inside `console/{Implementation | Service}`, create a directory named after your new implementation or service (example: `myserv`)
+  - In `console/service/myserv`
+  - Create the directories
+    - `./tasks`
+      - Create your files, the methods here must start with `_mod_.FUNCTION_NAME`
+      - You can call other methods as appropriate to your location `common.tasks.menu.FUNCTION_NAME`
+    - `./props`
+      - Create your files, the properties here must start with `_mod_PROPERTY_NAME`
+        - **Important**: It does not have the point in the middle like the methods `_mod_.` vs `_mod_` 
+
+### Shortcuts
+If you want to add shortcuts to your new deployment, just add the file in `console/service/myserv/props/shortcuts`
+The file must contain the following format, where each column represents a piece of data.
+
+**Important**: DO NOT CHANGE VARIABLE NAME `_mod_ITEMS`
+```bash
+#!/usr/bin/env bash
+{
+  _mod_ITEMS=(
+    "shortcut,                  path.of.a.function,                   Description"          
+    "myserv:test,               myserv.tasks.file.function,           This is a shortcut test"
+  )
+}
+```
+
+### Translations
+- Translations must be incorporated into each implementation with the **i18n** directory
+- The languages available so far are
+    - en_US (Default)
+    - es_ES
+    - pt_PT
+- They must follow the following pattern `
+"text_en_us","text_translations"`
+- **Important**: You cannot use characters like `\ \"`
+
+
+### Boot sequence | Workflow
+
+#### Basic 
+- Load essential elements
+- Load `bin/config.env` configuration
+- Load modules
+- Build shortcuts
+- Apply translations
+- Load menu
+
+#### Details
+Taking into account the installation carried out previously.
+
+- When executing in glogal symbolic link `~/bin/efdev -> ~/Domains/bin/efde.sh`
+- Is loaded `console/init`
+  - By default change the CORE `console/common/core` in `bin/.tmp/common.core` **(to work on the transformation)**
+  - It loops through all the directories within `./console` recursively until it finds a folder called `../task`
+  - At that moment the transformation of the files found in that implementation or service begins `./console/.../wordpress/{tasks | props |  accessories}`
+    - Renaming methods and variables according to the rules mentioned before
+      - Files: multiple files from
+        - `console/efde/tasks/menu` to `bin/.tmp/efde.tasks.menu`
+        - `console/efde/props/menu` to `bin/.tmp/efde.props.menu`
+      - Methods: from `_mod_.main` to `efde.tasks.menu.main`
+      - Variables: from `_mod_MAIN` to `efde_prop_menu_MAIN`
+  - Generate the shortcuts
+    - Finds all files in `../props/shortcuts` locations and merges them into `~/Domains/bin/.tmp/common.props.shortcuts` to improve speed on future runs
+  - Apply translations
+    - Translations apply only if
+      - The language set `bin/config.env HOST_I18N` is different from the default `en_US`
+      - If the variable EFDE_MODE_DEBUG is true in `bin/config.env`
+    - It goes through all the files looking for text matches and replacing them with the established ones, when finished it restarts EFDE 
+
+
+- Determines whether the launch directory in the `efdev` command console has a project created by it or not (search for `$PATH_PROJECT/.efde/`)
+  - Is TRUE, loads the implementation menu according to what is established in the `$PATH_PROJECT/.efde/.env` file variable `EFDE_PROJECT_IMPLEMENTION`
+  - Is FALSE, load the default menu to configure `efdev` or install implementations
 
 ## Admin
 ### To Develop
@@ -82,96 +211,3 @@ git push origin <major.minor.patch>
 
 # Create new pull request in github
 ```
-
-# Configurations
-**EFDE** has its own configurations which it uses in each new execution
-
-These configurations are established on the first run and are stored in the file `bin/config.env`
-
-## All Settings
-```sh
-# CORE
-EFDE_CORE_LAST_UPDATE="2024-01-20"
-EFDE_CORE_VERSION="2.2.0"
-
-# HOST
-HOST_SO="Linux | windows | macOS"
-HOST_EDITOR="nano | vim | nvim"
-HOST_I18N="en_US | es_ES | pt_PT"
-
-CLI_DEFAULT="false"                    
-CLI_SHOW_CLI="true"
-CLI_SHOW_OUTPUT="true"
-
-# Only Developer
-EFDE_MODE_DEVELOPER=false               # Transformation multifiles 
-EFDE_MODE_DEBUG=false                   # Messages debug
-EFDE_MODE_DEBUG_CONFIG=false            # Show debug load config
-EFDE_MODE_DEBUG_I18N=false              # Show debug load translations
-EFDE_MODE_DEBUG_MODULE=false            # Show debug load module
-EFDE_MODE_DEBUG_MENU=false              # Show debug load menu
-
-```
-
-## Command line Settings
-
-|              | CLI_DEFAULT                     | CLI_SHOW_CLI            | CLI_SHOW_OUTPUT           |
-|--------------|---------------------------------|-------------------------|---------------------------|
-| **Mode**     | Established by implementation   | Command executed        | Command output            |
-| **Default**  | True                            | n/a                     | n/a                       |
-| **Training** | False                           | True                    | False                     |
-| **Auditor**  | False                           | True                    | True                      |
-| **Silent**   | False                           | False                   | False                     |
-
-## EFDE Modes Settings (for EFDE collaborators)
-
-| EFDE_MODE_DEBUG                                    | EFDE_MODE_DEVELOP                                                                | 
-|----------------------------------------------------|----------------------------------------------------------------------------------|
-| Shows additional information for debugging actions | On each run, clean the `bin/.tmp` directory and transform the files individually | 
-| ![Efde mode debug](./media/efde_mode_debug.png)    | ![Efde mode debug](./media/efde_mode_developer.png)                              |  
-
-
-# Rules 
-If you want to add a new feature you must keep the following rules in mind
-- Define type
-  - Service: (docker, mysql, phpmyadmin, mailhog, others)
-  - Implementation: frameworks, cms, others (symfony, laravel, magento, woordpress, prestashop, others)
-- Inside `console/{Implemention | Service}` creates the directory with your name (example: `wordpress`)
-  - In `console/implemention/wordpress`
-  - Add the init file to the root of the directory `./init`, 
-  - Create the directories
-    - `./tasks`
-      - Create your bash files, the methods here must start with `_mod_.FUNCTION_NAME`
-      - You can call other methods as appropriate to your location `common.tasks.menu.FUNCTION_NAME`
-    - `./props`
-      - Create your bash files, the properties here must start with `_mod_PROPERTY_NAME`
-        - **Important**: It does not have the point in the middle like the methods `_mod_.` vs `_mod_` 
-
-# Workflow
-- When executing in glogal symbolic link `~/bin/efde -> ~/.efde/bin/efde`
-- Is loaded `console/init`
-  - By default change the CORE `console/common/core` in `bin/.tmp/core` (to work on the transformation)
-  - It loops through all the directories within `./console` recursively until it finds a folder called `../task`
-  - At that moment the transformation of the files found in that implementation or service begins `./console/.../wordpress/{tasks | accessories}`
-    - `EFDE_MODE_DEVELOP=true`, rename files, methods and variables in a `bin/.temp/{files}` directory
-      - Files: multiple files from 
-        - `console/efde/tasks/menu` to `bin/.tmp/efde.tasks.menu`
-        - `console/efde/props/menu` to `bin/.tmp/efde.props.menu`
-      - Methods: from `_mod_.main` to `efde.tasks.menu.main`
-      - Variables: from `_mod_MAIN` to `efde_prop_menu_MAIN`
-    - `EFDE_MODE_DEVELOP=false`, change the name of methods and variables in `bin/.temp/transformation` (File with all the code)
-      - File: single file
--  Determines whether the launch directory in the `efde` command console has a project created by it or not (search for `$PATH/.efde/`)
-   - Is TRUE, loads the implementation menu according to what is established in the `$PATH/.efde/.env` file variable `EFDE_PROJECT_IMPLEMENTION`
-   - Is FALSE, load the default menu to configure `efde` or install implementations
-
-# Translations
-- Translations must be incorporated into each implementation with the **i18n** directory
-- The languages available so far are
-    - en_US (Default)
-    - es_ES
-    - pt_PT
-- They must follow the following pattern ```
-"text_en_us","text_translations"```
-- Considerations
-  - You cannot use characters like ```\ \"```

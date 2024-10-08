@@ -10,10 +10,35 @@
 Distributing configurations for local deployments between different team members is easy with **EFDE**
 
 ### Global config
-The global **EFDE** configurations can be found in
-```sh
-cat ~/.efde/bin/config.env 
+The global **EFDE** configurations can be found in this file `bin/config.env`
+
+```bash
+# Core
+EFDE_CORE_LAST_UPDATE="2024-10-07"
+EFDE_CORE_VERSION="2.2.0"
+
+# Host
+HOST_EDITOR_DEFAULT="nvim"
+HOST_I18N="en_US"
+HOST_SO="Linux"
+
+# CLI 
+CLI_DEFAULT="true"
+CLI_SHOW_CLI="true"
+CLI_SHOW_OUTPUT="false"
+
 ```
+
+#### Command line Settings
+
+|              | CLI_DEFAULT                     | CLI_SHOW_CLI            | CLI_SHOW_OUTPUT           |
+|--------------|---------------------------------|-------------------------|---------------------------|
+| **Mode**     | Established by implementation   | Command executed        | Command output            |
+| **Default**  | True                            | n/a                     | n/a                       |
+| **Training** | False                           | True                    | False                     |
+| **Auditor**  | False                           | True                    | True                      |
+| **Silent**   | False                           | False                   | False                     |
+
 
 ### Project config
 Configurations for implementations installed with **EFDE** are located in
