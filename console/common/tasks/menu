@@ -3,14 +3,14 @@ set -euo pipefail
 
 declare -ga GLOBAL_MENU_CORE_DATA=()
 
-declare -gA GLOBAL_MENU_CORE=( #VARIABLE GLOBAL - HIGH SOLUTION ;)
+declare -gA GLOBAL_MENU_CORE=(
   ['title']=""
   ['isfunction']=false
   ['history']=""
   ['identation']=25
 )
 
-declare -gA GLOBAL_MENU_CURRENT_OPTION=( #VARIABLE GLOBAL - HIGH SOLUTION ;)
+declare -gA GLOBAL_MENU_CURRENT_OPTION=(
   ['title']="init"
   ['description']="init"
   ['function']="init"
@@ -22,26 +22,21 @@ declare -gA GLOBAL_MENU_CURRENT_OPTION=( #VARIABLE GLOBAL - HIGH SOLUTION ;)
 ## Debug menu
 ##########################
 _mod_.msg_debug() {
-  if [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]]; then
-    common.core.msg_debug "$(printf '%.s#' {1..75})"
-    common.core.msg_debug "# MENU "
-    common.core.msg_debug "$(printf '%.s-' {1..75})"
-    common.core.msg_debug "GLOBAL_MENU_CORE:" 1
-    common.core.msg_debug "GLOBAL_MENU_CORE_DATA:" 2
+  if common.tasks.config.get_efde_mode_debug_menu; then
+    common.tasks.message.debug_manager_title "MENU"
+    common.tasks.message.debug_manager_tree "GLOBAL_MENU_CORE_DATA:" 1
     for key in "${!GLOBAL_MENU_CORE_DATA[@]}"; do
-      common.core.msg_debug "${key^^}: ${GLOBAL_MENU_CORE_DATA[$key]}" 3
-    done
-    for key in "${!GLOBAL_MENU_CORE[@]}"; do
-      local VALUE=$(printf "%s: %s" \
-        "${key^^}" \
-        "$(printf '%s' "${GLOBAL_MENU_CORE[$key]}" | sed 's/\\n/\\\\n/g')"
-      )
-      common.core.msg_debug "$VALUE" 2
+      common.tasks.message.debug_manager_tree "${key^^}: ${GLOBAL_MENU_CORE_DATA[$key]}" 2
     done
 
-    common.core.msg_debug "GLOBAL_MENU_CURRENT_OPTION:" 1
+    common.tasks.message.debug_manager_tree "GLOBAL_MENU_CORE:" 1
+    for key in "${!GLOBAL_MENU_CORE[@]}"; do
+      common.tasks.message.debug_manager_tree "${key^^}: ${GLOBAL_MENU_CORE[$key]}" 2
+    done
+
+    common.tasks.message.debug_manager_tree "GLOBAL_MENU_CURRENT_OPTION:" 1
     for key in "${!GLOBAL_MENU_CURRENT_OPTION[@]}"; do
-      common.core.msg_debug "${key^^}: ${GLOBAL_MENU_CURRENT_OPTION[$key]}" 2
+      common.tasks.message.debug_manager_tree "${key^^}: ${GLOBAL_MENU_CURRENT_OPTION[$key]}" 2
     done
   fi
 }
@@ -62,11 +57,8 @@ _mod_.get_core_identation(){
 }
 
 _mod_.get_core_isfunction(){
-  if [[ "${GLOBAL_MENU_CORE['isfunction']}" == "true" ]]; then
-    return 0  # true
-  else
-    return 1  # false
-  fi
+  # return 0 (true) or 1 (false)
+  [[ "${GLOBAL_MENU_CORE['isfunction']}" == "true" ]] || return 1
 }
 
 _mod_.set_core_isfunction(){
@@ -123,7 +115,7 @@ _mod_.set_option_choice(){
 
 _mod_.set_validate(){
   if [[ "$#" -ne 1 || -z "$1" ]]; then
-    common.tasks.message.danger "Error: Se espera un solo argumento (string) que no puede estar vacío."
+    common.tasks.message.danger "Error: A SINGLE argument (string) is expected and cannot be empty."
     return 1
   fi
 }
@@ -139,7 +131,7 @@ _mod_.show(){
 }
 
 _mod_.validate_params(){
-  local help_message="Usage: ${FUNCNAME[1]} --title \"newtitle\" --data \'\${menu_data[@]} --isfunction false
+  local HELPER="Usage: ${FUNCNAME[1]} --title \"newtitle\" --data \'\${menu_data[@]} --isfunction false
 
 Options:
   --title Title to display.
@@ -169,7 +161,7 @@ Options:
         ;;
       *)
         common.tasks.message.danger "Unknown option: $1"
-        common.tasks.message.warning "$help_message"
+        common.tasks.message.warning "$HELPER"
         return 1
         ;;
     esac
@@ -177,7 +169,6 @@ Options:
 }
 
 _mod_.print_options(){
-    local MODE="info"
     local IDENTATION_DEFAULT=$(_mod_.get_core_identation)
     local QUESTION="$(_mod_.get_core_title)"
     local OPTIONS=()
@@ -185,10 +176,7 @@ _mod_.print_options(){
         OPTIONS+=("$line")
     done < <(_mod_.get_core_data)
 
-    [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" || "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && MODE="debug"
-
-    common.tasks.message.echo $MODE "$(printf '%.s═' {1..45})"
-    common.tasks.message.info "$QUESTION\n"
+    common.tasks.message.title "$QUESTION"
 
     for i in "${!OPTIONS[@]}"; do
         OPTION=${OPTIONS[i]}
@@ -202,7 +190,7 @@ _mod_.print_options(){
         if [[ ${#VALUES[@]} -ge 2 ]]; then
             local TITULO=$(echo ${VALUES[1]} | sed 's/^ *//;s/ *$//')
             local DESCRIPTION=$(echo ${VALUES[2]:-${VALUES[1]}} | sed 's/^ *//;s/ *$//')
-            if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
+            if common.tasks.config.get_efde_mode_debug; then
                 VALUES[0]=$(echo "${VALUES[0]}" | sed 's/ //g')
                 local DESCRIPTION=$(common.tasks.message.echo debug "${VALUES[0]}")
             fi
@@ -364,7 +352,7 @@ _mod_.history_go_to_last_item(){
   fi
 
   common.tasks.os.console_clear
-  _mod_.check_function_exists $FUNCTION_NAME
+  _mod_.check_function_exists "$FUNCTION_NAME"
 }
 
 _mod_.get_selected_value(){

@@ -24,10 +24,16 @@ _mod_.console_clear() {
 
   case "${GLOBAL_EFDE_CONFIG['HOST_SO']}" in
     Linux) COMMAND="clear" ;;
-    *) common.tasks.message.danger "Operating system not configured" ;;
+    *)
+      common.tasks.message.danger "Operating system not configured"
+      return 1
+      ;;
   esac
 
-  if [ ! "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]; then
+  # MMTodo: DANGER
+  # if compact brings error when setting debug and running efde
+  # ! common.tasks.config.get_efde_mode_debug && ${COMMAND}
+  if ! common.tasks.config.get_efde_mode_debug; then
     ${COMMAND}
   fi
 }

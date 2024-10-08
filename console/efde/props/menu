@@ -35,16 +35,4 @@ set -euo pipefail
     "portainerfunction,      Portainer.io,     https://portainer.io/,"
     "tools.tasks.domains,    Local domains,    /etc/hosts,"
   )
-
-  # CONFIGURATION
-  _mod_CONFIG=(
-    "$PREFIX_TASKS.menu.config_show,    Show,   Show project $IMPLEMENT"
-    "$PREFIX_TASKS.config.set_config,   Set,    Set config"
-  )
-
-  _mod_CONFIG_SET_LANGUAGE=(
-    "en_US,    en_US,    English"
-    "es_ES,    es_ES,    Spanish"
-    "pt_PT,    pt_PT,    Portuguese"
-  )
 }

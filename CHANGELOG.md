@@ -14,12 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - EFDE: 
   - #42 Don't show menu after shortcuts
+  - #46 Refactor EFDE_MODE_* validation
 
 ### Fixed
 - EFDE: 
   - #39 error project name folder creation
   - #41 Correct use of the docker-compose command in implemention
   - #44 Adjust indentation in the menu
+  - #45 Fix menu return
+  - #47 Improve translation debugging
 
 ## [2.2.0] 2024-05-12
 

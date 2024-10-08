@@ -50,8 +50,8 @@ To have all the developer features activated modify `bin/efde.sh`
 ```sh
 declare -gA GLOBAL_EFDE_CONFIG=(
 ...
-[EFDE_MODE_DEBUG]=true          # Debug Messages
 [EFDE_MODE_DEVELOP]=true        # MMTodo: Prepared for create tmps
+[EFDE_MODE_DEBUG]=true          # Debug Messages
 ..
 )
 ```
@@ -90,20 +90,27 @@ These configurations are established on the first run and are stored in the file
 
 ## All Settings
 ```sh
+# CORE
+EFDE_CORE_LAST_UPDATE="2024-01-20"
+EFDE_CORE_VERSION="2.2.0"
+
+# HOST
 HOST_SO="Linux | windows | macOS"
 HOST_EDITOR="nano | vim | nvim"
-
-EFDE_LAST_UPDATE="2024-01-20"
-EFDE_LANGUAGE="en_US | es_ES | pt_PT"
-EFDE_VERSION="2.0.0"
+HOST_I18N="en_US | es_ES | pt_PT"
 
 CLI_DEFAULT="false"                    
 CLI_SHOW_CLI="true"
 CLI_SHOW_OUTPUT="true"
 
-# Only Developer 
-EFDE_MODE_DEBUG=false                  # Messages debug
-EFDE_MODE_DEVELOPER=false              # Transformation multifiles
+# Only Developer
+EFDE_MODE_DEVELOPER=false               # Transformation multifiles 
+EFDE_MODE_DEBUG=false                   # Messages debug
+EFDE_MODE_DEBUG_CONFIG=false            # Show debug load config
+EFDE_MODE_DEBUG_I18N=false              # Show debug load translations
+EFDE_MODE_DEBUG_MODULE=false            # Show debug load module
+EFDE_MODE_DEBUG_MENU=false              # Show debug load menu
+
 ```
 
 ## Command line Settings

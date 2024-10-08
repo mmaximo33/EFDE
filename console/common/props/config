@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  # shellcheck disable=SC2168
+  local IMPLEMENT="Common"
+  # shellcheck disable=SC2168
+  local PREFIX_TASKS="${IMPLEMENT,,}.tasks"
+
+  # CONFIGURATION
+  _mod_CONFIG=(
+    "$PREFIX_TASKS.config.show,         Show,   Show $IMPLEMENT"
+    "$PREFIX_TASKS.config.set_config,   Set,    Set config"
+  )
+
+  _mod_SET_LANGUAGE=(
+    "en_US,   en_US,    English"
+    "es_ES,   es_ES,    Spanish"
+    "pt_PT,   pt_PT,    Portuguese"
+  )
+
+  _mod_SET_EDITOR=(
+    "nano,    nano,     nano"
+    "vim,     vim,      vim"
+    "nvim,    nvim,     nvim"
+  )
+}

@@ -11,7 +11,7 @@ set -euo pipefail
   }
 
   _mod_.target() {
-    local PARAM="$1"
+    local PARAM="$@"
 
     if [[ "$PARAM" == custom:* ]]; then
       _mod_.target_custom $PARAM
@@ -38,11 +38,8 @@ set -euo pipefail
   # EFDE
   _mod_.show_efde(){
     local PREV_TITLE=""
-    local MODE="info"
 
-    [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" || "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && MODE="debug"
-    common.tasks.message.echo $MODE "$(printf '%.s═' {1..45})"
-    common.tasks.message.info "EFDE | Easy and Fast Developer Environment\nShortcuts"
+    common.tasks.message.title "EFDE | Easy and Fast Developer Environment\nShortcuts"
 
     IFS=$'\n' sorted_shortcuts=($(sort <<<"${EFDE_SHORTCUTS[*]}"))
 
@@ -57,7 +54,7 @@ set -euo pipefail
 
       local SHORTCUT=$(common.tasks.message.success $(_mod_.trim ${VALUES[0]}))
       local DESCRPTION=$(common.tasks.message.echo $(_mod_.trim ${VALUES[3]:-${VALUES[2]}}))
-      if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
+      if common.tasks.config.get_efde_mode_debug; then
         local FUNCTION=$(common.tasks.message.echo debug $(_mod_.trim ${VALUES[1]}))
         printf "  %-45s %-55s\n" "$SHORTCUT" "$FUNCTION"
       else
@@ -67,7 +64,8 @@ set -euo pipefail
   }
 
   _mod_.target_efde(){
-    local PARAM="$1"
+    local PARAM="$@"
+
     for LINE in "${EFDE_SHORTCUTS[@]}"; do
       IFS=',' read -r -a VALUES <<< "$LINE"
       if [[ "${VALUES[0]}" == "$PARAM" ]]; then
@@ -76,9 +74,9 @@ set -euo pipefail
         return 0
       fi
     done
-    common.tasks.message.info "The shortcut is not registered: $(common.tasks.message.danger ${PARAM^^})"
+    common.tasks.message.warning "The shortcut is not registered: $(common.tasks.message.danger \'${PARAM^^}\')"
     _mod_.find "$PARAM"
-    return 1
+    exit 1
   }
 
   # CUSTOM
@@ -99,12 +97,9 @@ set -euo pipefail
 
   _mod_.show_custom() {
     local PREV_TITLE=""
-    local MODE="info"
     local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implemention.get_current_path_efde)/$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS_LIST"
     local PATH_RELATIVE=$(echo "$PATH_ABSOLUTE_SHORTCUTS" | awk -F'/' '{print $(NF-3) "/" $(NF-2) "/" $(NF-1) "/" $NF}')
     local CURRENT_TITLE="custom"
-
-    [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" || "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && MODE="debug"
 
     _mod_.load_custom_shortcuts
 
@@ -128,7 +123,7 @@ set -euo pipefail
       local ITEM=$(common.tasks.message.success "$CURRENT_TITLE:$(_mod_.trim "${VALUES[0]}")")
       local DESCRIPTION=$(common.tasks.message.echo $(_mod_.trim "${VALUES[2]}"))
 
-      if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]; then
+      if common.tasks.config.get_efde_mode_debug; then
         local PATH_FILE=$(common.tasks.message.echo debug $(_mod_.trim "${VALUES[1]}"))
         printf "  %-45s %-55s\n" "$ITEM" "$PATH_FILE"
       else
@@ -178,7 +173,7 @@ set -euo pipefail
   # EXTRA
   _mod_.trim() {
     local var="$*"
-    var="$(echo -e "${var}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"  # Eliminar espacios al principio y al final
+    var="$(echo -e "${var}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
     echo -n "$var"
   }
 }

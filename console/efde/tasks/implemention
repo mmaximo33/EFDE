@@ -78,7 +78,7 @@ _mod.set_all_env(){
 }
 
 _mod_.copy_environment(){
-  local ORIGIN="$PATH_CONSOLE/implemention/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']}/environment"
+  local ORIGIN="${EFDE_CORE_PATH['CONSOLE']}/implemention/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']}/environment"
   local TARGET="$(_mod_.get_new_path_project)"
   shopt -s dotglob
   cp -r "$ORIGIN"/* "$TARGET"

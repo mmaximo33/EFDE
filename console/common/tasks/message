@@ -53,9 +53,18 @@ _mod_.danger(){
 }
 
 _mod_.debug(){
-  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
-    _mod_.echo debug "$@"
+  common.tasks.config.get_efde_mode_debug && _mod_.echo debug "$@"
+}
+
+_mod_.title(){
+  local FUNCTION=""
+  if common.tasks.config.get_efde_mode_debug; then
+    FUNCTION="_mod_.debug"
+  else
+    FUNCTION="_mod_.info"
   fi
+  ${FUNCTION} "$(printf '%.s═' {1..50})"
+  _mod_.info "$@\n"
 }
 
 # USE
@@ -93,6 +102,25 @@ _mod_.tree(){
 }
 
 _mod_.tree_print(){
-    # shellcheck disable=SC2145
-    command printf "$@\n" 2>/dev/null
+  # shellcheck disable=SC2145
+  command printf "$@\n" 2>/dev/null
+}
+
+
+_mod_.debug_manager_title(){
+  if common.tasks.config.get_efde_mode_debug; then
+    _mod_.debug "$(printf '%.s#' {1..75})"
+    _mod_.debug "# LOAD $1"
+    _mod_.debug "$(printf '%.s-' {1..75})"
+  fi
+}
+
+_mod_.debug_manager_tree(){
+  if common.tasks.config.get_efde_mode_debug; then
+    local level="${2:-0}"
+    local end="${3:-0}"
+    common.tasks.message.tree \
+      "$(printf '%s' "$1" | sed 's/\\n/\\\\n/g')" \
+      "$level" "$end" debug
+  fi
 }

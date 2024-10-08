@@ -1,83 +1,230 @@
 #!/usr/bin/env bash
+###########################################################
+# DANGER WARNING
+# In this file YOU SHOULD NOT USE module calls
+#   efde.tasks.*
+###########################################################
 set -euo pipefail
 
-_mod_.step(){
-  _mod_.msg_debug "$(printf '%.s#' {1..75})"
-  _mod_.msg_debug "# LOAD $1 "
-  _mod_.msg_debug "$(printf '%.s-' {1..75})"
+declare -gA ESSENTIAL_MODULES=(
+  [DEBUG]="false"
+  [PROPS]="config colours"
+  [TASKS]="config message menu os datetime git prompt file env_variable"
+)
+
+declare -gA ESSENTIAL_FUNCTIONS=(
+  [DEBUG_TITLE]="common.tasks.message.debug_manager_title"
+  [DEBUG_TREE]="common.tasks.message.debug_manager_tree"
+  [DEBUG_MODULES]="common.tasks.config.get_efde_mode_debug_modules"
+  [DEBUG_SHORTCUTS]="common.tasks.config.get_efde_mode_debug_shortcuts"
+  [DEBUG_I18N]="common.tasks.config.get_efde_mode_debug_i18n"
+  [MSG_DANGER]="common.tasks.message.danger"
+  [MSG_WARNING]="common.tasks.message.warning"
+)
+
+###########################################################
+# DEBUG
+###########################################################
+_mod_.debug_step(){
+  local HELPER="Usage: ${FUNCNAME[0]} --type \"MODULE\"
+Options:
+  --type  Type of step"
+
+  if [ "$#" -ne 2 ] || [ "$1" != "--type" ]; then
+    _mod_.msg --type danger --msg "$HELPER"
+    exit 1
+  fi
+
+  local TYPE="$2"
+  case "$TYPE" in
+    "MODULES")
+      ${ESSENTIAL_FUNCTIONS['DEBUG_MODULES']} && \
+        ${ESSENTIAL_FUNCTIONS['DEBUG_TITLE']} "$TYPE"
+      return 0
+      ;;
+    "SHORTCUTS")
+      ${ESSENTIAL_FUNCTIONS['DEBUG_SHORTCUTS']} && \
+        ${ESSENTIAL_FUNCTIONS['DEBUG_TITLE']} "$TYPE"
+      return 0
+      ;;
+    "I18N")
+      ${ESSENTIAL_FUNCTIONS['DEBUG_I18N']} && \
+        ${ESSENTIAL_FUNCTIONS['DEBUG_TITLE']} "$TYPE"
+      return 0
+      ;;
+    *)
+      _mod_.msg --type danger --msg "ERROR call ${FUNCNAME[0]} from ${FUNCNAME[1]}: $TYPE the data sent does not correspond"
+      exit 1
+  esac
+}
+_mod_.validate_paramsa(){
+  echo "coca"
+}
+_mod_.debug_msg() {
+  local TYPE="" MSG="" LEVEL="0" END="0"
+  local HELPER="Usage: ${FUNCNAME[0]} --type \"MODULE\" --msg \"NEW ACTION\""
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --type)     TYPE="$2";              shift 2 ;;
+      --msg)      MSG="$2";               shift 2 ;;
+      --level)    LEVEL="$2";             shift 2 ;;
+      --end)      END="$2";               shift 2 ;;
+      *)          echo "$HELPER";       exit 1 ;;
+    esac
+  done
+
+  [[ -z "$TYPE" || -z "$MSG" ]] && { echo "$HELPER"; exit 1; }
+
+  case "$TYPE" in
+    "MODULES")
+      # Fix for ESSENTIAL
+      if _mod_.exists_function "${ESSENTIAL_FUNCTIONS['DEBUG_MODULES']}" && \
+        _mod_.exists_function "${ESSENTIAL_FUNCTIONS['DEBUG_TREE']}"; then
+        ${ESSENTIAL_FUNCTIONS['DEBUG_MODULES']} && \
+           ${ESSENTIAL_FUNCTIONS['DEBUG_TREE']} "$MSG" "$LEVEL" "$END" debug
+      fi
+      return 0
+      ;;
+    "SHORTCUTS")
+      ${ESSENTIAL_FUNCTIONS['DEBUG_SHORTCUTS']} && \
+        ${ESSENTIAL_FUNCTIONS['DEBUG_TREE']} "$MSG" "$LEVEL" "$END" debug
+      return 0
+      ;;
+    "I18N")
+      ${ESSENTIAL_FUNCTIONS['DEBUG_I18N']} && \
+        ${ESSENTIAL_FUNCTIONS['DEBUG_TREE']} "$MSG" "$LEVEL" "$END" debug
+      return 0
+      ;;
+    *)
+      _mod_.msg --type danger --msg "ERROR call ${FUNCNAME[0]} from ${FUNCNAME[1]}: $TYPE the data sent does not correspond"
+      exit 1
+  esac
 }
 
-_mod_.msg_debug() {
-  local level="${2:-0}"
-  local end="${3:-0}"
-  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
-    if _mod_.essential_run; then
-
-        #common.tasks.message.tree "$1" "$level" "$end" debug
-        common.tasks.message.tree \
-          "$(printf '%s' "$1" | sed 's/\\n/\\\\n/g')" \
-          "$level" "$end" debug
-    else
-      local color_start="\033[1;35m"
-      local color_end="\033[0m"
-      command printf "${color_start}$1${color_end}\n" 2>/dev/null
-    fi
+###########################################################
+# ESSENTIAL TO RUN
+###########################################################
+_mod_.essential_to_run_check() {
+  if ! type "common.tasks.message.echo" &> /dev/null; then
+    _mod_.essential_to_run_load
+    _mod_.debug_step --type "MODULES"
   fi
 }
 
-_mod_.msg_danger(){
-  local level="${2:-0}"
-  local message="\033[1;31m$1\033[0m"
-
-  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
-    _mod_.msg_debug "$message" "$level"
-  else
-    command printf "$message" 2>/dev/null
-  fi
-}
-
-_mod_.load_common_msg(){
-  local PATH_MODULE MODULE_NAME FILE ELEMENT
-  PATH_MODULE=$1
-  MODULE_NAME="common"
+_mod_.essential_to_run_load() {
+  local MODULE_NAME="common"
+  local CONSOLE_PATH="${EFDE_CORE_PATH['CONSOLE']}"
+  local -A ACTIONS=(
+    [TASKS]="${ESSENTIAL_MODULES['TASKS']}"
+    [PROPS]="${ESSENTIAL_MODULES['PROPS']}"
+  )
+  _mod_.essential_to_run_msg --type "STEP" --msg "LOAD ${MODULE_NAME^^} (ESSENTIAL TO RUN)"
 
   load_module() {
-    local ELEMENT=$1
-    local FILE=$2
-    _mod_.replacemod --file-name="$FILE" --new-name="$MODULE_NAME.$ELEMENT.$FILE" --source-path="$PATH_MODULE/$ELEMENT/$FILE"
+    local element="$1"
+    local file="$2"
+    _mod_.replacemod --file-name="$file" \
+                     --new-name="$MODULE_NAME.$element.$file" \
+                     --source-path="$CONSOLE_PATH/$MODULE_NAME/$element/$file"
   }
 
-  load_module "props" "colours"
-  load_module "tasks" "message"
+  _mod_.essential_to_run_msg --type "MSG" --msg "├── Module ${MODULE_NAME^^} "
+  for element in "${!ACTIONS[@]}"; do
+    _mod_.essential_to_run_msg --type "MSG" --msg "│   ├── $element"
+    for file in ${ACTIONS[$element]}; do
+      _mod_.essential_to_run_msg --type "MSG" --msg "│   │   ├── $file"
+      load_module "${element,,}" "$file"
+    done
+  done
+
+  # GET ALL CONFIG
+  common.tasks.config.check_config
 }
 
-_mod_.essential_run() { type "common.tasks.message.echo" &> /dev/null; }
+_mod_.essential_to_run_msg() {
+  local TYPE="" MSG=""
+  local HELPER="Usage: ${FUNCNAME[0]} --type \"[STEP || MSG]\" --msg \"NEW ACTION\""
 
+  ! [[  "${ESSENTIAL_MODULES['DEBUG']}" == "true" ]] && return 0
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --type)   TYPE="$2";            shift 2 ;;
+      --msg)    MSG="$2";             shift 2 ;;
+      *)        _mod_.msg --type danger --msg "$HELPER";     exit 1 ;;
+    esac
+  done
+
+  [[ -z "$TYPE" || -z "$MSG" ]] && { _mod_.msg --type danger --msg "$HELPER"; exit 1; }
+
+  print_message() {
+    local color="$1"
+    shift
+    printf "\033[${color}m%s\033[0m\n" "$@" 2>/dev/null
+  }
+
+  case "${TYPE^^}" in
+    "STEP")
+      print_message "1;35" "$(printf '#%.0s' {1..75})"
+      print_message "1;35" "# $MSG"
+      print_message "1;35" "$(printf '#%.0s' {1..75})"
+      ;;
+    "MSG")
+      print_message "1;35" "$MSG"
+      ;;
+    *)
+      print_message "1;31" "ERROR: COMMON ESSENTIAL TO RUN"
+      return 1
+      ;;
+  esac
+}
+
+_mod_.generate_extra_elements(){
+  _mod_.generate_shortcuts_file
+  if common.tasks.config.get_efde_mode_debug; then
+    _mod_.generate_translation
+  fi
+}
+
+###########################################################
+# MODULES
+###########################################################
 _mod_.load_module(){
   # ESSENTIAL MODULE !!!!!
-  ! _mod_.essential_run && _mod_.load_common_msg $1
+  _mod_.essential_to_run_check
+  # ESSENTIAL MODULE !!!!!
 
   local PATH_MODULE=$1
   local MODULE_NAME=$(basename "$PATH_MODULE")
 
   local elements=("props" "tasks")
-  _mod_.step "MODULES"
-  _mod_.msg_debug "Module: $MODULE_NAME" 1
+
+  _mod_.debug_msg --type "MODULES" --msg "Module ${MODULE_NAME^^}" --level 1
 
   for element in "${elements[@]}"; do
     CHECK_PATH="$PATH_MODULE/$element"
     if [ -d "$CHECK_PATH" ]; then
-      _mod_.msg_debug "Group: $element" 2
+      _mod_.debug_msg --type "MODULES" --msg "${element^^}" --level 2
       for file in $(ls -1 $CHECK_PATH); do
-        [ "$file" == "message" ] && continue
-        _mod_.msg_debug "Element: $file" 3
+
+        [[ " ${ESSENTIAL_MODULES[${element^^}]} " =~ " $file "  && "$MODULE_NAME" == "common" ]] && continue
+
+        _mod_.debug_msg --type "MODULES" --msg "${file}" --level 3
 
         NEW_NAME_FILE="$MODULE_NAME.$element.${file%}"
         PATH_TARGET="$DIRECTORY_TMP/$NEW_NAME_FILE"
         if [ ! -f "$PATH_TARGET" ]; then
-          _mod_.replacemod  --file-name="$file" --new-name="$NEW_NAME_FILE" --source-path="$CHECK_PATH/$file"
+          _mod_.replacemod  --file-name="$file" \
+                            --new-name="$NEW_NAME_FILE" \
+                            --source-path="$CHECK_PATH/$file"
         else
-          source "$PATH_TARGET"
+          if ! source "$PATH_TARGET"; then
+            _mod_.msg --type danger --msg "[ERROR] The resources were not loaded, report this!"
+            _mod_.msg --type danger --msg "File: $file"
+            _mod_.msg --type danger --msg "Target: $PATH_TARGET"
+            exit 1
+          fi
         fi
       done
     fi
@@ -86,14 +233,15 @@ _mod_.load_module(){
 
 _mod_.replacemod () {
   local FILE_NAME NEW_NAME SOURCE_PATH
-  local USE="The $FUNCNAME method must contain the 3 required parameters"
-  USE+="\n--file-name='file"
-  USE+="\n--new-name='common.tasks'"
-  USE+="\n--source-path='path/folder/file"
+  local HELPER="The $FUNCNAME method must contain the 3 required parameters"
+  HELPER+="\n--file-name=\"file\""
+  HELPER+="\n--new-name=\"common.tasks\""
+  HELPER+="\n--source-path=\"path/folder/file\""
   if [[  $# != 3 ]]; then
-    _mod_.msg_danger $USE 3
-    _mod_.msg_debug "$@" 3
-    exit 1;
+    _mod_.msg --type danger --msg "$HELPER\n"
+    # shellcheck disable=SC2145
+    _mod_.msg --type danger --msg "Received\n ${@}"
+    exit 1
   fi
 
   while [[ $# -gt 0 ]]; do
@@ -102,139 +250,196 @@ _mod_.replacemod () {
       --new-name=*)     NEW_NAME="${1#*=}";     shift ;;
       --source-path=*)  SOURCE_PATH="${1#*=}";  shift ;;
       *)
-        _mod_.msg_danger $USE
+        _mod_.msg --type danger --msg "$HELPER"
         exit 1
         ;;
     esac
   done
 
   if [[ -z "$FILE_NAME" || -z "$NEW_NAME" || -z "$SOURCE_PATH"  ]]; then
-    _mod_.msg_danger $USE
+    _mod_.msg --type danger --msg "$HELPER"
     exit 1
   fi
 
   PATH_TARGET="$DIRECTORY_TMP/$NEW_NAME"
-  _mod_.msg_debug "New File: $NEW_NAME" 4
-  _mod_.msg_debug "Path $SOURCE_PATH" 4
-  _mod_.msg_debug "Path Tmp: $PATH_TARGET" 4
+  _mod_.debug_msg --type "MODULES" --msg "New file: $NEW_NAME" --level 4
+  _mod_.debug_msg --type "MODULES" --msg "Source: ${SOURCE_PATH##*${EFDE_PATH_INSTALL}}" --level 4
+  _mod_.debug_msg --type "MODULES" --msg "Target: ${PATH_TARGET##*${EFDE_PATH_INSTALL}}" --level 4
 
-  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
-    if echo "$NEW_NAME" | grep -qi ".tasks."; then
-      sed -E "s/_mod_\.([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME}.\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
-    else
-      NEW_NAME_VAR=$(echo "$NEW_NAME" | sed "s/tasks/props/" | tr "." "_")
-      sed -E "s/_mod_([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME_VAR}_\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
-    fi
-
-    if [ ! $? -eq 0 ]; then
-      _mod_.msg_danger "[ERROR] The conversion could not be carried out, report this!" 4
-      _mod_.msg_danger "Source: $SOURCE_PATH" 5
-      _mod_.msg_danger "Target: $PATH_TARGET" 5
-    fi
+  local SED_COMMAND=""
+  if echo "$NEW_NAME" | grep -qi ".tasks."; then
+    #SED_COMMAND="s/_mod_\.([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME}.\1/g"
+    sed -E "s/_mod_\.([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME}.\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
+  else
+    NEW_NAME_VAR=$(echo "$NEW_NAME" | sed "s/tasks/props/" | tr "." "_")
+    #SED_COMMAND="s/_mod_([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME_VAR}_\1/g"
+    sed -E "s/_mod_([a-zA-Z_][a-zA-Z0-9_]*)/${NEW_NAME_VAR}_\1/g" "$SOURCE_PATH" > "$PATH_TARGET"
   fi
 
-  source "$PATH_TARGET"
-
+  #if ! sed -E "$SED_COMMAND" "$SOURCE_PATH" > "$PATH_TARGET"; then
   if [ ! $? -eq 0 ]; then
-    _mod_.msg_danger "[ERROR] The resources were not loaded, report this!" 4
-    _mod_.msg_danger "File: $NEW_NAME" 5
-    _mod_.msg_danger "Path: $PATH_TARGET" 5
-    exit 1
+    _mod_.msg --type danger --msg "[ERROR] The conversion could not be carried out, report this!"
+    _mod_.msg --type danger --msg "Source: $SOURCE_PATH"
+    _mod_.msg --type danger --msg "Target: $PATH_TARGET"
   fi
 
-  # Prepare shortcuts
-  if [[ "$PATH_TARGET" == *".props.shortcuts" ]]; then
-    _mod_.generate_shortcuts_file "${NEW_NAME_VAR}_ITEMS"
+  if ! source "$PATH_TARGET"; then
+    _mod_.msg --type danger --msg "[ERROR] The resources were not loaded, report this!"
+    _mod_.msg --type danger --msg "File: $NEW_NAME"
+    _mod_.msg --type danger --msg "Path: $PATH_TARGET"
+    exit 1
   fi
 }
 
+###########################################################
+# SHORTCUTS
+###########################################################
 _mod_.generate_shortcuts_file() {
-  local VARIABLE_NAME=$1
+  local FILES FILE FILE_NAME VARIABLE_NAME IMPLEMENTION NEW_ROWS=""
   local TARGET_SHORTCUTS="$DIRECTORY_TMP/common.props.shortcuts"
 
-  if [[ ! -f "$TARGET_SHORTCUTS" ]]; then
-    echo -e "#!/usr/bin/env bash\nset -euo pipefail\n" > "$TARGET_SHORTCUTS"
-    echo "EFDE_SHORTCUTS=(" >> "$TARGET_SHORTCUTS"
-  else
-    sed -i '$d' "$TARGET_SHORTCUTS"
+  # Check
+  if ! common.tasks.config.get_efde_mode_debug_shortcuts ; then
+    common.tasks.file.exists "$TARGET_SHORTCUTS" && return 0
   fi
 
-  if [[ "$(declare -p "$VARIABLE_NAME" 2>/dev/null)" =~ "declare -a" ]]; then
+  _mod_.debug_step --type "SHORTCUTS"
 
-    # shellcheck disable=SC1087
-    eval "ARR=(\"\${$VARIABLE_NAME[@]}\")"
-    for LINE in "${ARR[@]}"; do
-      IFS=',' read -r -a VALUE <<< "$LINE"
+  mapfile -t FILES < <(find "${EFDE_CORE_PATH['TMP']}" -type f -name "*.props.shortcuts")
+  for FILE in "${FILES[@]}"; do
+    FILE_NAME=$(basename "$FILE")
+    VARIABLE_NAME="${FILE_NAME//./_}_ITEMS"
+    IMPLEMENTION="${VARIABLE_NAME%%_*}"
 
-      echo "  \"$LINE\"" >> "$TARGET_SHORTCUTS"
-    done
+    _mod_.debug_msg --type "SHORTCUTS" --msg "${IMPLEMENTION^^}" --level 1
+    _mod_.debug_msg --type "SHORTCUTS" --msg "VARIABLE_NAME: $VARIABLE_NAME" --level 2
+    _mod_.debug_msg --type "SHORTCUTS" --msg "FILE: $FILE" --level 2
+    if [[ "$(declare -p "$VARIABLE_NAME" 2>/dev/null)" =~ "declare -a" ]]; then
+      # shellcheck disable=SC1087
+      eval "ARR=(\"\${$VARIABLE_NAME[@]}\")"
+      for LINE in "${ARR[@]}"; do
+        NEW_ROWS+="  \"$LINE\"\n"
+      done
+    fi
+  done
+
+  {
+    echo -e "#!/usr/bin/env bash\nset -euo pipefail\n"
+    echo "EFDE_SHORTCUTS=("
+    echo -e "$NEW_ROWS"
+    echo ")"
+  } > "$TARGET_SHORTCUTS"
+
+  _mod_.debug_msg --type "SHORTCUTS" --msg "RESULT: Shortcuts file updated/created in" --level 1
+  _mod_.debug_msg --type "SHORTCUTS" --msg "FILE: $TARGET_SHORTCUTS" --level 2
+
+  if ! source "$TARGET_SHORTCUTS"; then
+    _mod_.msg --type danger --msg "[ERROR] The resources were not loaded, report this!"
+    _mod_.msg --type danger --msg "File: $NEW_NAME"
+    _mod_.msg --type danger --msg "Path: $PATH_TARGET"
+    exit 1
   fi
-
-  echo ")" >> "$TARGET_SHORTCUTS"
-
-  source "$TARGET_SHORTCUTS"
-
-  _mod_.step "SHORTCUTS"
-  _mod_.msg_debug "Shortcuts file updated/created in $TARGET_SHORTCUTS"
 }
 
 # MMTodo:
 # Improve this feature so that
 #   - Take all characters enclosed in double quotes (\n or \")
 #   - Do not consider spaces between origin and destination ("origin",              "destination")
+###########################################################
+# I18N TRANSLATIONS
+###########################################################
 _mod_.generate_translation(){
-  local PATH_TO_INSPECT="$PATH_CONSOLE"
+  local PATH_TO_INSPECT="${EFDE_CORE_PATH['CONSOLE']}"
   local IS_INIT=true
+  local LANGUAGE_DEFAULT LANGUAGE_CONFIG
 
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
-      --path)
-        PATH_TO_INSPECT="$2"
-        shift 2
-        ;;
-      --isinit)
-        IS_INIT="$2"
-        shift 2
-        ;;
-      *)
-        echo "Invalid option: $1"
-        return 1
-        ;;
+      --path)     PATH_TO_INSPECT="$2";                                 shift 2 ;;
+      --isinit)   IS_INIT="$2";                                         shift 2 ;;
+      *)          _mod_.msg --type danger --msg "Invalid option: $1";   exit 1 ;;
     esac
   done
 
-  local LANGUAGE_DEFAULT=${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']}
-  local LANGUAGE_CONFIG=$(efde.tasks.config.get_var "EFDE_LANGUAGE")
-  
-  if [ "$LANGUAGE_DEFAULT" != "$LANGUAGE_CONFIG" ]; then
-      [[ "$IS_INIT" == "true" ]] && _mod_.step "TRANSLATIONS from $LANGUAGE_DEFAULT to $LANGUAGE_CONFIG"
-      DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
-      for DIRECTORY in $DIRECTORIES; do
-        local PATH_TARGET="$PATH_TO_INSPECT/$DIRECTORY"
-        local PATH_TASKS_EXISTS="$PATH_TARGET/tasks"
+  if ! LANGUAGE_DEFAULT="$(common.tasks.config.get_efde_core_i18n_default)"; then
+    _mod_.msg --type danger --msg "Error: The value for 'EFDE_CORE_CONFIG['I18N_DEFAULT']' is not valid."
+    exit 1
+  fi
 
-        if [ ! -d "$PATH_TASKS_EXISTS" ]; then
-          _mod_.generate_translation --path "$PATH_TARGET" --isinit false
-        else
-          local FILE_i18n="$PATH_TARGET/i18n/$LANGUAGE_CONFIG"
-          _mod_.msg_debug "CHECK DIRECTORY $PATH_TARGET" 1
-          _mod_.msg_debug "TRANSLATIONS FILE $FILE_i18n" 2
-          if common.tasks.file.exists "$FILE_i18n"; then
-            while IFS= read -r line || [ -n "$line" ]; do
-                [ -z "$line" ] && continue
+  if ! LANGUAGE_CONFIG="$(common.tasks.config.get_host_i18n)"; then
+    _mod_.msg --type danger --msg "Error: The value for 'HOST_I18N' is not valid."
+    exit 1
+  fi
 
-                line=$(echo "$line" | sed 's/^"//; s/"$//')
-                text_old=$(echo "$line" | awk -F '","' '{print $1}')
-                text_new=$(echo "$line" | awk -F '","' '{print $2}')
+  if [[ "$LANGUAGE_DEFAULT" != "$LANGUAGE_CONFIG" ]]; then
+    [[ "$IS_INIT" == "true" ]] && _mod_.debug_step --type "I18N"
 
-                if [ -n "$text_old" ] && [ -n "$text_new" ]; then
-                    _mod_.msg_debug "$text_old > $text_new" 3
-                    find "$DIRECTORY_TMP" -type f -name "$DIRECTORY.*" -exec sh -c "sed -i 's#$text_old#$text_new#g' {};" \;
-                fi
-            done < "$FILE_i18n"
-          fi
+    mapfile -t DIRECTORIES < <(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
+    for DIRECTORY in "${DIRECTORIES[@]}"; do
+      local PATH_TARGET="$PATH_TO_INSPECT/$DIRECTORY"
+      local PATH_TASKS_EXISTS="$PATH_TARGET/tasks"
+      if [[ ! -d "$PATH_TASKS_EXISTS" ]]; then
+        _mod_.generate_translation --path "$PATH_TARGET" --isinit false
+      else
+        local FILE_I18N="$PATH_TARGET/i18n/$LANGUAGE_CONFIG"
+        _mod_.debug_msg --type "I18N" --msg "CHECK DIRECTORY $PATH_TARGET" --level 1
+        _mod_.debug_msg --type "I18N" --msg "TRANSLATIONS FILE $FILE_I18N" --level 2
+
+        if common.tasks.file.exists "$FILE_I18N"; then
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            [ -z "$line" ] && continue
+
+            line=${line//\"/}
+            text_old=${line%%,*}
+            text_new=${line##*,}
+
+            if [[ -n "$text_old" && -n "$text_new" ]]; then
+              _mod_.debug_msg --type "I18N" --msg "$text_old > $text_new" --level 3
+              find "$DIRECTORY_TMP" -type f -name "$DIRECTORY.*" -exec sed -i "s#$text_old#$text_new#g" {} +
+            fi
+          done < "$FILE_I18N"
         fi
-      done
+      fi
+    done
   fi
 }
 
+###########################################################
+# Extra
+###########################################################
+_mod_.exists_function() {
+  [ "$(type -t "$1")" = "function" ]
+}
+
+_mod_.msg() {
+  local HELPER="Error: Both --type and --msg must be provided."
+  local TYPE=""
+  local MESSAGE=""
+  local FUNCT=""
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --type)   TYPE="$2";      shift 2 ;;
+      --msg)    shift; MESSAGE="$@";   break ;;
+      *) command printf "\033[1;31mInvalid option: $1\033[0m" 2>/dev/null; exit 1 ;;
+    esac
+  done
+
+  if [[ -z "$TYPE" || -z "$MESSAGE" ]]; then
+    command printf "\033[1;31m$HELPER\033[0m" 2>/dev/null
+    exit 1
+  fi
+
+  local FUNCT="${ESSENTIAL_FUNCTIONS["MSG_${TYPE^^}"]}"
+
+  if _mod_.exists_function "$FUNCT"; then
+    ${FUNCT} "$MESSAGE"
+  else
+    case "$TYPE" in
+      danger)   MSG="\033[1;31m$MESSAGE\033[0m" ;;
+      warning)  MSG="\033[1;33m$MESSAGE\033[0m" ;;
+      *)        MSG="\033[1;31mInvalid message type: $TYPE\033[0m" ;;
+    esac
+    command printf "%b\n" "$MSG" 2>/dev/null
+  fi
+}

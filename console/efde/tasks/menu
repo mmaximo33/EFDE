@@ -17,11 +17,11 @@ set -euo pipefail
   _mod_.config(){
     common.tasks.menu.show \
       --title "$efde_props_menu_TITLE" \
-      --data "${efde_props_menu_CONFIG[@]}"
+      --data "${common_props_config_CONFIG[@]}"
   }
 
   _mod_.config_show(){
-    efde.tasks.config.show_config
+    common.tasks.config.show_config
     _mod_.config
   }
 

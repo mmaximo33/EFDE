@@ -2,7 +2,7 @@
 {
   # shellcheck disable=SC2168
   local IMPLEMENT="Efde"
-    # shellcheck disable=SC2168
+  # shellcheck disable=SC2168
   local PREFIX_TASKS="${IMPLEMENT,,}.tasks"
 
   _mod_ITEMS=(
@@ -12,8 +12,8 @@
     "${IMPLEMENT,,}:uninstall,            $PREFIX_TASKS.main.efde_uninstall,          Uninstall from computer"
     "${IMPLEMENT,,}:tools,                $PREFIX_TASKS.menu.coming_soon,             Tools for developers,   Coming Soon"
     "${IMPLEMENT,,}:config,               $PREFIX_TASKS.menu.config,                  Efde Global Settings"
-    "${IMPLEMENT,,}:config:show,          $PREFIX_TASKS.config.show_config,           Show project EFDE"
-    "${IMPLEMENT,,}:config:set,           $PREFIX_TASKS.config.set_config,            Set config"
+    "${IMPLEMENT,,}:config:show,          common.tasks.config.show_config,            Show project EFDE"
+    "${IMPLEMENT,,}:config:set,           common.tasks.config.set_config,             Set config"
     "${IMPLEMENT,,}:report:issue,         $PREFIX_TASKS.main.report_github,           Report Bug | Improvements | New Features | others"
 
     "project:config:show,                 $PREFIX_TASKS.project.config_show,          Show settings in the project"
