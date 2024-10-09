@@ -6,6 +6,7 @@ set -euo pipefail
 ###########################################################
 
 CONFIG_PATH_FILE="${EFDE_CORE_PATH['FILE_CONFIG']}"
+ESSENTIAL_CONFIG="HOST_SO HOST_I18N HOST_EDITOR_DEFAULT CLI_DEFAULT CLI_SHOW_CLI CLI_SHOW_OUTPUT"
 
 _mod_.show_debug(){
   if _mod_.get_efde_mode_debug_config; then
@@ -154,6 +155,19 @@ _mod_.load_config() {
   for KEY in "${EFDE_CONFIG[@]}"; do
     GLOBAL_EFDE_CONFIG["$KEY"]=$(_mod_.get_var "$KEY")
   done
+
+  local missing_config=false
+  for config in $ESSENTIAL_CONFIG; do
+    if [[ -z "${GLOBAL_EFDE_CONFIG[$config]:-}" ]]; then
+      missing_config=true
+      break
+    fi
+  done
+
+  if $missing_config; then
+    common.tasks.message.warning "[WARNING] Missing essential configuration, creating config..."
+    _mod_.create_config
+  fi
 
   _mod_.show_debug
 }

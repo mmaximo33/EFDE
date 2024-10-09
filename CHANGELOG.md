@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - EFDE:
   - #43 Add custom shortcuts / commands line
+  - #48 Validate that the base configuration is complete
 
 ### Changed
 - EFDE: 
