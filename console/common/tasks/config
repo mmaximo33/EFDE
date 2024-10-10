@@ -6,7 +6,7 @@ set -euo pipefail
 ###########################################################
 
 CONFIG_PATH_FILE="${EFDE_CORE_PATH['FILE_CONFIG']}"
-ESSENTIAL_CONFIG="HOST_SO HOST_I18N HOST_EDITOR_DEFAULT CLI_DEFAULT CLI_SHOW_CLI CLI_SHOW_OUTPUT"
+ESSENTIAL_CONFIG="HOST_SO HOST_I18N HOST_EDITOR_DEFAULT HOST_CLI_MODE"
 
 _mod_.show_debug(){
   if _mod_.get_efde_mode_debug_config; then
@@ -51,7 +51,7 @@ _mod_.set_config(){
   _mod_.set_config_cli
 
   # CORE
-  _mod_.set_var "EFDE_CORE_LAST_UPDATE"       "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
+  #_mod_.set_var "EFDE_CORE_LAST_UPDATE"       "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
   _mod_.set_var "EFDE_CORE_VERSION"           "$(_mod_.set_config_version)"
 
   # Developer
@@ -121,29 +121,7 @@ _mod_.set_config_cli(){
     --isfunction false
 
   RESPONSE=$(common.tasks.menu.get_selected_value)
-  case $RESPONSE in
-    default)
-      _mod_.set_var "CLI_DEFAULT"       "true"
-      _mod_.set_var "CLI_SHOW_CLI"      "true"
-      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
-      ;;
-    silent)
-      _mod_.set_var "CLI_DEFAULT"       "false"
-      _mod_.set_var "CLI_SHOW_CLI"      "false"
-      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
-      ;;
-    training)
-      _mod_.set_var "CLI_DEFAULT"       "false"
-      _mod_.set_var "CLI_SHOW_CLI"      "true"
-      _mod_.set_var "CLI_SHOW_OUTPUT"   "false"
-      ;;
-    auditor)
-      _mod_.set_var "CLI_DEFAULT"       "false"
-      _mod_.set_var "CLI_SHOW_CLI"      "true"
-      _mod_.set_var "CLI_SHOW_OUTPUT"   "true"
-      ;;
-  esac
-
+  _mod_.set_var "HOST_CLI_MODE" "$RESPONSE"
 }
 
 _mod_.set_config_version() {

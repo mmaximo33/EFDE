@@ -21,23 +21,19 @@ EFDE_CORE_VERSION="2.2.0"
 HOST_EDITOR_DEFAULT="nvim"
 HOST_I18N="en_US"
 HOST_SO="Linux"
-
-# CLI 
-CLI_DEFAULT="true"
-CLI_SHOW_CLI="true"
-CLI_SHOW_OUTPUT="false"
+ 
+HOST_CLI_MODE="default"
 
 ```
 
-#### Command line Settings
+#### HOST_CLI_MODE
 
-|              | CLI_DEFAULT                     | CLI_SHOW_CLI            | CLI_SHOW_OUTPUT           |
-|--------------|---------------------------------|-------------------------|---------------------------|
-| **Mode**     | Established by implementation   | Command executed        | Command output            |
-| **Default**  | True                            | n/a                     | n/a                       |
-| **Training** | False                           | True                    | False                     |
-| **Auditor**  | False                           | True                    | True                      |
-| **Silent**   | False                           | False                   | False                     |
+| MODE         | CLI_SHOW_CLI            | CLI_SHOW_OUTPUT           |
+|--------------|-------------------------|---------------------------|
+| **Default**  | n/a                     | n/a                       |
+| **Training** | True                    | False                     |
+| **Auditor**  | True                    | True                      |
+| **Silent**   | False                   | False                     |
 
 
 ### Project config
@@ -68,6 +64,7 @@ Since version 2.2.1 you can find example data in the following directory
   - Third term, the description for your custom shortcut
 - Files Bash: Inside the shortcuts directory, you can add bash files with your custom scripts or create subfolders if necessary
 
-**Clarification: These shortcuts are NOT global to EFDE, they are executed at the project level**
+> [!TIP]  
+> These shortcuts are NOT global, they are available in the directory where EFDE is executed. You can use it in your projects or the project container directory (Example: ~/Domains)
 
 ![efde_shortcuts_custom.png](./media/efde_shortcuts_custom.png)

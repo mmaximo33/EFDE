@@ -126,7 +126,9 @@ If you want to add a new feature you must keep the following rules in mind
 If you want to add shortcuts to your new deployment, just add the file in `console/service/myserv/props/shortcuts`
 The file must contain the following format, where each column represents a piece of data.
 
-**Important**: DO NOT CHANGE VARIABLE NAME `_mod_ITEMS`
+> [!CAUTION]
+> DO NOT CHANGE VARIABLE NAME `_mod_ITEMS`
+ 
 ```bash
 #!/usr/bin/env bash
 {
@@ -145,8 +147,9 @@ The file must contain the following format, where each column represents a piece
     - pt_PT
 - They must follow the following pattern `
 "text_en_us","text_translations"`
-- **Important**: You cannot use characters like `\ \"`
 
+> [!IMPORTANT]
+> You cannot use characters like `\ \"`
 
 ### Boot sequence | Workflow
 

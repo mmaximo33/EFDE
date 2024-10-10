@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - EFDE: 
   - #42 Don't show menu after shortcuts
   - #46 Refactor EFDE_MODE_* validation
+  - #50 Simplify config.env for commands and outputs
 
 ### Fixed
 - EFDE: 
