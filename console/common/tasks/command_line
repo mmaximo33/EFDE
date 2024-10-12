@@ -19,7 +19,7 @@ _mod_.run() {
   shift 2
   local COMMAND_LINE="$@"
 
-  if [[ "${GLOBAL_EFDE_CONFIG['HOST_CLI_MODE']:-}" != "default" ]]; then
+  if [[ "${EFDE_CONFIG_HOST['HOST_CLI_MODE']:-}" != "default" ]]; then
     FORCE_SHOW_CLI=$(_mod_.show_cli)
     FORCE_SHOW_OUTPUT=$(_mod_.show_output)
   fi
@@ -36,7 +36,7 @@ _mod_.run() {
 }
 
 _mod_.show_cli() {
-  case "${GLOBAL_EFDE_CONFIG['HOST_CLI_MODE']:-}" in
+  case "${EFDE_CONFIG_HOST['HOST_CLI_MODE']:-}" in
     silent)                 echo "false"    ;;
     training | auditor)     echo "true"     ;;
     *)                      echo "false"    ;;
@@ -44,7 +44,7 @@ _mod_.show_cli() {
 }
 
 _mod_.show_output() {
-  case "${GLOBAL_EFDE_CONFIG['HOST_CLI_MODE']:-}" in
+  case "${EFDE_CONFIG_HOST['HOST_CLI_MODE']:-}" in
     silent | training)      echo "false"    ;;
     auditor)                echo "true"     ;;
     *)                      echo "false"    ;;

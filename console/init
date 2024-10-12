@@ -11,7 +11,7 @@ set -euo pipefail
 DIRECTORY_TMP="${EFDE_CORE_PATH['TMP']}"
 
 declare -gA EFDE_INIT=(
-  [DEBUG]="${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}"
+  [DEBUG]="${EFDE_CONFIG_CORE['DEBUG']}"
   [TMP]="${EFDE_CORE_PATH['TMP']}"
   [CONSOLE]="${EFDE_CORE_PATH['CONSOLE']}"
   #[INIT_MODULE]="common"
@@ -67,6 +67,7 @@ init.main() {
   init.check_construct
   init.load_modules "${EFDE_INIT['CONSOLE']}"
   common.core.generate_extra_elements
+  common.tasks.config.updates_availables
 }
 
 init.main

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - EFDE:
   - #43 Add custom shortcuts / commands line
   - #48 Validate that the base configuration is complete
+  - #51 Refactor EFDE update and management of CORE and HOST cfg
 
 ### Changed
 - EFDE: 

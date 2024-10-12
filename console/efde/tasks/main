@@ -44,31 +44,59 @@ set -euo pipefail
 #    echo "Repositorio   exitosamente."
 #  }
 
+  _mod_.efde_update_tree(){
+    local SILENT="$1"
+    local MESSAGE="$2"
+    local LEVEL="$3"
+    local IDENT="$4"
+    local TYPE="$5"
+
+    SILENT="${SILENT:-false}"
+    if [[ "$SILENT" == "false" ]]; then
+        common.tasks.message.tree "$MESSAGE" "$LEVEL" "$IDENT" "$TYPE"
+    fi
+  }
 
   _mod_.efde_update() {
-    common.tasks.message.tree "Check update" 1 0 info
-    common.tasks.message.tree "Path: $EFDE_PATH_INSTALL" 2 0 info
+    local SILENT=false
 
-    local UPSTREAM=${1:-'@{u}'}
+    while [[ "$#" -gt 0 ]]; do
+      case $1 in
+        --silent ) SILENT=true ;;
+        * ) break ;;
+      esac
+      shift
+    done
+
+    _mod_.efde_update_tree "$SILENT" "Check update" 1 0 info
+    _mod_.efde_update_tree "$SILENT" "Path: $EFDE_PATH_INSTALL" 2 0 info
+
+    local UPSTREAM="@{u}"
     local LOCAL_BRANCH=$(git -C "$EFDE_PATH_INSTALL" symbolic-ref -q --short HEAD)
     local COMMIT_LOCAL=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 "$LOCAL_BRANCH")
 
     # Configure upstream if not configured
     if ! git -C "$EFDE_PATH_INSTALL" rev-parse --abbrev-ref "$UPSTREAM" &>/dev/null; then
-      common.tasks.message.tree "Configuring upstream for branch '$LOCAL_BRANCH'" 2 0 info
+      _mod_.efde_update_tree "$SILENT" "Configuring upstream for branch '$LOCAL_BRANCH'" 2 0 info
       git -C "$EFDE_PATH_INSTALL" branch --set-upstream-to=origin/"$LOCAL_BRANCH" "$LOCAL_BRANCH"
     fi
 
     local COMMIT_REMOTE=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 "$UPSTREAM")
-    common.tasks.message.tree "Branch: $LOCAL_BRANCH" 2 0 info
-    common.tasks.message.tree "Local  commit: $COMMIT_LOCAL" 2 0 info
-    common.tasks.message.tree "Remote commit: $COMMIT_REMOTE" 2 0 info
+
+    if [[ "$SILENT" == "true" ]]; then
+      # return 0 (true) or 1 (false)
+      [[ "$COMMIT_LOCAL" == "$COMMIT_REMOTE" ]] && return 1 || return 0
+    fi
+
+    _mod_.efde_update_tree "$SILENT" "Branch: $LOCAL_BRANCH" 2 0 info
+    _mod_.efde_update_tree "$SILENT" "Local  commit: $COMMIT_LOCAL" 2 0 info
+    _mod_.efde_update_tree "$SILENT" "Remote commit: $COMMIT_REMOTE" 2 0 info
     if [ "$COMMIT_LOCAL" == "$COMMIT_REMOTE" ]; then
-      common.tasks.message.tree "Result: $(common.tasks.message.msg_color success "Up to date!")" 2 0 info
+      _mod_.efde_update_tree "$SILENT" "Result: $(common.tasks.message.msg_color success "Up to date!")" 2 0 info
     else
-      common.tasks.message.tree "Result: $(common.tasks.message.msg_color warning "There is an update available!")" 2 0 info
+      _mod_.efde_update_tree "$SILENT" "Result: $(common.tasks.message.msg_color warning "There is an update available!")" 2 0 info
       local URL_COMPARE="$URL_REPOSITORY/compare/$COMMIT_LOCAL...$COMMIT_REMOTE"
-      common.tasks.message.tree "Compare URL: $URL_COMPARE" 2 0 warning
+      _mod_.efde_update_tree "$SILENT" "Compare URL: $URL_COMPARE" 2 0 warning
       if common.tasks.prompt.confirm_default_yes "Do you want to download the new version?"; then
         git -C "$EFDE_PATH_INSTALL" pull origin "$LOCAL_BRANCH"
         common.tasks.message.success "Updated!"
@@ -76,7 +104,6 @@ set -euo pipefail
         common.tasks.message.warning "Update canceled."
       fi
     fi
-    _mod_.run_global_efde
   }
 
   _mod_.efde_uninstall() {

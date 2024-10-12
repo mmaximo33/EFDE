@@ -38,7 +38,6 @@ set -euo pipefail
   # EFDE
   _mod_.show_efde(){
     local PREV_TITLE=""
-
     common.tasks.message.title "EFDE | Easy and Fast Developer Environment\nShortcuts"
 
     IFS=$'\n' sorted_shortcuts=($(sort <<<"${EFDE_SHORTCUTS[*]}"))

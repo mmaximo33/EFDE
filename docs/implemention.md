@@ -10,14 +10,10 @@
 Distributing configurations for local deployments between different team members is easy with **EFDE**
 
 ### Global config
-The global **EFDE** configurations can be found in this file `bin/config.env`
+The global **EFDE** configurations can be found in this file `bin/cfg.host`
 
 ```bash
-# Core
-EFDE_CORE_LAST_UPDATE="2024-10-07"
-EFDE_CORE_VERSION="2.2.0"
 
-# Host
 HOST_EDITOR_DEFAULT="nvim"
 HOST_I18N="en_US"
 HOST_SO="Linux"

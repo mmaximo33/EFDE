@@ -13,7 +13,7 @@ set -euo pipefail
     "laravel.tasks.menu.create_environment,    Laravel,                Install for Laravel"
     "symfony.tasks.menu.create_environment,    Symfony,                Install for Symfony (WebApp or Apis)"
     "wordpress.tasks.menu.create_environment,  Wordpress,              Install for Wordpress and Woocommerce"
-    "_______________________________________,  _____________________,  _____________________________________"
+    "$PREFIX_TASKS.menu.coming_soon,           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━, "
     "$PREFIX_TASKS.menu.coming_soon,           Install Magento,        Coming Soon"
     "$PREFIX_TASKS.menu.coming_soon,           Install Woocomerce,     Coming Soon"
     "$PREFIX_TASKS.menu.coming_soon,           Install Prestashop,     Coming Soon"

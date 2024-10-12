@@ -21,7 +21,7 @@ set -euo pipefail
   }
 
   _mod_.config_show(){
-    common.tasks.config.show_config
+    common.tasks.config.show_all
     _mod_.config
   }
 

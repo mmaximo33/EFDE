@@ -8,19 +8,25 @@ set -euo pipefail
 
   # CONFIGURATION
   _mod_CONFIG=(
-    "$PREFIX_TASKS.config.show,         Show,   Show $IMPLEMENT"
-    "$PREFIX_TASKS.config.set_config,   Set,    Set config"
+    "$PREFIX_TASKS.config.show_all,   Show,   Show all $IMPLEMENT"
+    "$PREFIX_TASKS.config.set_all,    Set,    Set all config"
   )
 
   _mod_SET_LANGUAGE=(
-    "en_US,   en_US,    English"
     "es_ES,   es_ES,    Spanish"
+    "en_US,   en_US,    English"
     "pt_PT,   pt_PT,    Portuguese"
   )
 
   _mod_SET_EDITOR=(
     "nano,    nano,     nano"
-    "vim,     vim,      vim"
     "nvim,    nvim,     nvim"
+    "vim,     vim,      vim"
+  )
+
+  _mod_CHECK_UPDATE_EVERY=(
+    "never,         Never,                    You must check manually"
+    "daily,         Daily (Recommended),      Every day"
+    "weekly,        Weekly,                   Every 7 days"
   )
 }

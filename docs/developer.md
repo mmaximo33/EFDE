@@ -49,16 +49,16 @@ git push origin <issue-new-feature> --force-with-lease
 
 #### For full developer
 
-To have all developer features enabled, modify the `bin/config.env` file generated after the first run 
+To have all developer features enabled, modify the `bin/cfg.core` file generated after the first run 
 
 ```sh
 
-EFDE_MODE_DEBUG="false"             # Debug general (It is required for the rest of MODE)
-EFDE_MODE_DEBUG_CONFIG="false"      # Debug load config
-EFDE_MODE_DEBUG_MODULE="false"      # Debug load modules
-EFDE_MODE_DEBUG_SHORTCUTS="false"   # Debug load shortcuts
-EFDE_MODE_DEBUG_I18N="false"        # Debug load translations
-EFDE_MODE_DEBUG_MENU="false"        # Debug load menu
+DEBUG="false"             # Debug general (It is required for the rest of MODE)
+DEBUG_CONFIG="false"      # Debug load config
+DEBUG_MODULE="false"      # Debug load modules
+DEBUG_SHORTCUTS="false"   # Debug load shortcuts
+DEBUG_I18N="false"        # Debug load translations
+DEBUG_MENU="false"        # Debug load menu
 
 ```
 <details>
@@ -155,7 +155,7 @@ The file must contain the following format, where each column represents a piece
 
 #### Basic 
 - Load essential elements
-- Load `bin/config.env` configuration
+- Load `bin/cfg.core` and `bin/cfg.host` configuration
 - Load modules
 - Build shortcuts
 - Apply translations
@@ -179,8 +179,8 @@ Taking into account the installation carried out previously.
     - Finds all files in `../props/shortcuts` locations and merges them into `~/Domains/bin/.tmp/common.props.shortcuts` to improve speed on future runs
   - Apply translations
     - Translations apply only if
-      - The language set `bin/config.env HOST_I18N` is different from the default `en_US`
-      - If the variable EFDE_MODE_DEBUG is true in `bin/config.env`
+      - The language set `bin/cfg.host HOST_I18N` is different from the default `en_US`
+      - If the variable MODE_DEBUG is true in `bin/cfg.host`
     - It goes through all the files looking for text matches and replacing them with the established ones, when finished it restarts EFDE 
 
 

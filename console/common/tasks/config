@@ -5,114 +5,230 @@ set -euo pipefail
 # Try to avoid calling functions outside this file to avoid adding on essential load modules
 ###########################################################
 
-CONFIG_PATH_FILE="${EFDE_CORE_PATH['FILE_CONFIG']}"
-ESSENTIAL_CONFIG="HOST_SO HOST_I18N HOST_EDITOR_DEFAULT HOST_CLI_MODE"
-
-_mod_.show_debug(){
-  if _mod_.get_efde_mode_debug_config; then
-    common.tasks.message.debug_manager_title "CONFIG"
-    sorted_keys=($(printf "%s\n" "${!GLOBAL_EFDE_CONFIG[@]}" | sort))
-
-    for KEY in "${sorted_keys[@]}"; do
-        common.tasks.message.tree "$KEY: ${GLOBAL_EFDE_CONFIG[$KEY]}" 1 0 debug
-    done
-  fi
-}
+CONFIG_PATH_CORE="${EFDE_CORE_PATH['FILE_CONFIG_CORE']}"
+CONFIG_PATH_HOST="${EFDE_CORE_PATH['FILE_CONFIG_HOST']}"
 
 _mod_.set_run_cli_efde(){
   GLOBAL_RUN_EFDE=$(basename "$0")
 }
 
-_mod_.check_config() {
+###########################################################
+# CONFIGs
+###########################################################
+# Check exists
+#   - True
+#     - load
+#   - False
+#     - create
+#       - set_all
+#         - config
+#         - show
+#       - i18n_check
+
+_mod_.check() {
   _mod_.set_run_cli_efde
-  if ! common.tasks.file.exists "$CONFIG_PATH_FILE"; then
-    _mod_.create_config
+  if ! common.tasks.file.exists "$CONFIG_PATH_HOST"; then
+    _mod_.create
   fi
-  _mod_.load_config
+  _mod_.load
 }
 
-_mod_.create_config() {
+_mod_.create() {
   common.tasks.message.info "Your first time with EFDE?"
   common.tasks.message.info "We will create the basic configurations"
-  _mod_.set_config
+  _mod_.set_all
+  _mod_.i18n_check
+}
 
-  if [ "${EFDE_CORE_CONFIG['I18N_DEFAULT']}" != "$(common.tasks.config.get_var "HOST_I18N")" ]; then
+_mod_.load() {
+  local FILES=("$CONFIG_PATH_CORE" "$CONFIG_PATH_HOST")
+  local CONFIG_CORE="${EFDE_CONFIG_CORE['KEYS_REQUIRED']}"
+  local CONFIG_HOST="${EFDE_CONFIG_HOST['KEYS_REQUIRED']}"
+
+  for file in "${FILES[@]}"; do
+    local TYPE="$(basename "${file}" | sed 's/^cfg\.//')"
+    local REQUIRED_KEYS=()
+    eval "read -a REQUIRED_KEYS <<< \"\${CONFIG_${TYPE^^}}\""
+
+    mapfile -t EFDE_CONFIG < <(grep -o '^[^=]\+' "$file" | sort)
+
+    # Check
+    for key in "${REQUIRED_KEYS[@]}"; do
+      if [[ ! " ${EFDE_CONFIG[*]} " =~ " $key " ]]; then
+        common.tasks.message.danger "[Error] Required variables \n- Variables: $(eval echo \"\${CONFIG_${TYPE^^}}\") \n- File: $file \n- Check:"
+        cat "$file"
+        exit 1
+      fi
+    done
+
+    # Load
+    local FUNC_GET="_mod_.get_${TYPE}_config"
+    local VAR="EFDE_CONFIG_${TYPE^^}"
+    for KEY in "${EFDE_CONFIG[@]}"; do
+      VALUE=$("$FUNC_GET" "$KEY")
+      eval "${VAR}[$KEY]=\"$VALUE\""
+    done
+  done
+  _mod_.show_config_debug
+}
+
+_mod_.set_all(){
+
+  # CORE
+  _mod_.set_core_version
+  _mod_.set_core_update_frequency
+  _mod_.set_core_update_last
+  _mod_.set_core_default
+
+  # Set HOST
+  _mod_.set_host_i18n
+  _mod_.set_host_editor
+  _mod_.set_host_cli
+  _mod_.set_host_so
+
+  _mod_.confirm
+}
+
+_mod_.confirm(){
+  _mod_.sort_var_in_file
+  common.tasks.message.success "This is your EFDE configuration"
+  _mod_.show_all
+  if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "\nReset settings") ; then
+    _mod_.set_all
+  fi
+}
+
+_mod_.show_all() {
+  local FILES=("$CONFIG_PATH_CORE" "$CONFIG_PATH_HOST")
+
+  for path_file_config in "${FILES[@]}"; do
+    common.tasks.message.warning "\nIt is stored in the following file \n> $path_file_config"
+    while IFS= read -r LINE || [[ -n "$LINE" ]]; do
+      common.tasks.message.info "$LINE"
+    done < "$path_file_config"
+  done
+}
+
+_mod_.i18n_check(){
+  if [ "$(_mod_.get_core_i18n_default)" != "$(_mod_.get_host_i18n)" ]; then
     common.tasks.message.warning "\n\nApplying translations, wait a moment..."
+    sleep 1
     common.core.generate_translation
     common.tasks.message.success "\nThe translation configuration has been applied, we need to restart EFDE"
     common.tasks.message.success "Run on your console \n> $GLOBAL_RUN_EFDE"
     exit # Reload for translations
   fi
 }
-
-_mod_.set_config(){
-  _mod_.set_config_language
-  _mod_.set_config_editor
-  _mod_.set_config_cli
-
-  # CORE
-  #_mod_.set_var "EFDE_CORE_LAST_UPDATE"       "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
-  _mod_.set_var "EFDE_CORE_VERSION"           "$(_mod_.set_config_version)"
-
-  # Developer
-  _mod_.set_var "EFDE_MODE_DEBUG"             "false"
-  _mod_.set_var "EFDE_MODE_DEBUG_MODULE"      "false"
-  _mod_.set_var "EFDE_MODE_DEBUG_SHORTCUTS"   "false"
-  _mod_.set_var "EFDE_MODE_DEBUG_CONFIG"      "false"
-  _mod_.set_var "EFDE_MODE_DEBUG_I18N"        "false"
-  _mod_.set_var "EFDE_MODE_DEBUG_MENU"        "false"
-
-  # Host
-  _mod_.set_var "HOST_SO"                     "$(common.tasks.os.get_operating_system)"
-
-  _mod_.confirm_config
+###########################################################
+# SET | GET
+###########################################################
+# CONFIG_CORE
+_mod_.get_core_config(){
+  local KEY="$1"
+  echo $(common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_CORE")
 }
 
-_mod_.confirm_config(){
-    _mod_.sort_var_in_file
-    common.tasks.message.success "This is your EFDE configuration"
-    common.tasks.message.info "It is stored in the following file \n> $CONFIG_PATH_FILE \n"
-
-    _mod_.show
-    if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "\nReset settings") ; then
-      _mod_.set_config
-    fi
+_mod_.set_core_config(){
+  local KEY="$1"
+  local VALUE="$2"
+  common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$CONFIG_PATH_CORE"
 }
 
-_mod_.show() {
-  while IFS= read -r LINE || [[ -n "$LINE" ]]; do
-      common.tasks.message.info "$LINE"
-  done < "$CONFIG_PATH_FILE"
+_mod_.set_core_version() {
+  _mod_.set_core_config "CORE_VERSION" "$(common.tasks.git.efde_get_current_tag)"
 }
 
-_mod_.set_config_language(){
+_mod_.set_core_update_frequency(){
   common.tasks.menu.show \
-    --title "Default language?" \
+    --title "How often do check for updates?" \
+    --data "${common_props_config_CHECK_UPDATE_EVERY[@]}" \
+    --isfunction false
+  RESPONSE=$(common.tasks.menu.get_selected_value)
+  _mod_.set_core_config "UPDATE_CHECK_FREQUENCY" "$RESPONSE"
+}
+
+_mod_.set_core_update_last() {
+  _mod_.set_core_config "UPDATE_CHECK_LAST" "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
+}
+
+_mod_.get_core_update_available(){
+  echo $(_mod_.get_host_config "UPDATE_CHECK_AVAILABLE")
+}
+
+_mod_.set_core_update_available(){
+  _mod_.set_core_config "UPDATE_CHECK_AVAILABLE" "$1"
+}
+
+_mod_.set_core_default(){
+  _mod_.set_core_config "DEBUG"                           "false"
+  _mod_.set_core_config "DEBUG_MODULE"                    "false"
+  _mod_.set_core_config "DEBUG_SHORTCUTS"                 "false"
+  _mod_.set_core_config "DEBUG_CONFIG"                    "false"
+  _mod_.set_core_config "DEBUG_I18N"                      "false"
+  _mod_.set_core_config "DEBUG_MENU"                      "false"
+  _mod_.set_core_config "UPDATE_CHECK_AVAILABLE"          "false"
+}
+
+_mod_.get_core_i18n_default(){
+  local language="${EFDE_CORE_CONFIG['I18N_DEFAULT']}"
+  if _mod_.is_language_supported "$language"; then
+    echo "$language"
+  else
+    common.tasks.message.danger "[Error] The value for 'EFDE_CORE_CONFIG[I18N_DEFAULT]' is not valid";
+    exit 1
+  fi
+}
+
+# CONFIG_HOST
+_mod_.get_host_config(){
+  local KEY="$1"
+  echo $(common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_HOST")
+}
+
+_mod_.set_host_config(){
+  local KEY="$1"
+  local VALUE="$2"
+  common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$CONFIG_PATH_HOST"
+}
+
+_mod_.get_host_i18n(){
+  local language="$(_mod_.get_host_config "HOST_I18N")"
+  if _mod_.is_language_supported "$language"; then
+    echo "$language"
+  else
+    common.tasks.message.danger "[Error] The value for 'HOST_I18N' is not valid";
+    exit 1
+  fi
+}
+
+_mod_.set_host_i18n(){
+  common.tasks.menu.show \
+    --title "Select default LANGUAGE" \
     --data "${common_props_config_SET_LANGUAGE[@]}" \
     --isfunction false
 
   RESPONSE=$(common.tasks.menu.get_selected_value)
-  _mod_.set_var "HOST_I18N" "$RESPONSE"
+  _mod_.set_host_config "HOST_I18N" "$RESPONSE"
 }
 
-_mod_.set_config_editor(){
+_mod_.set_host_editor(){
   common.tasks.menu.show \
-    --title "select EDITOR default" \
+    --title "Select default EDITOR" \
     --data "${common_props_config_SET_EDITOR[@]}" \
     --isfunction false
 
   RESPONSE=$(common.tasks.menu.get_selected_value)
-  _mod_.set_var "HOST_EDITOR_DEFAULT" "$RESPONSE"
+  _mod_.set_host_config "HOST_EDITOR_DEFAULT" "$RESPONSE"
 }
 
-_mod_.set_config_cli(){
+_mod_.set_host_cli(){
   local MSG=""
   local RESPONSE=false
   local TYPE_SETTINGS=(
+    "silent,     Silent,                   Do not show executed commands or output"
     "default,    Default (Recommended),    Established by implementation"
     "training,   Training,                 Show executed commands, no output"
     "auditor,    Auditor,                  Show executed commands and output"
-    "silent,     Silent,                   Do not show executed commands or output"
   )
 
   common.tasks.menu.show \
@@ -121,48 +237,17 @@ _mod_.set_config_cli(){
     --isfunction false
 
   RESPONSE=$(common.tasks.menu.get_selected_value)
-  _mod_.set_var "HOST_CLI_MODE" "$RESPONSE"
+  _mod_.set_host_config "HOST_CLI_MODE" "$RESPONSE"
 }
 
-_mod_.set_config_version() {
-  echo $(common.tasks.git.efde_get_current_tag)
+_mod_.set_host_so(){
+  _mod_.set_host_config "HOST_SO" "$(common.tasks.os.get_operating_system)"
 }
 
-_mod_.load_config() {
-  mapfile -t EFDE_CONFIG < <(grep -o '^[^=]\+' "$CONFIG_PATH_FILE")
-  for KEY in "${EFDE_CONFIG[@]}"; do
-    GLOBAL_EFDE_CONFIG["$KEY"]=$(_mod_.get_var "$KEY")
-  done
-
-  local missing_config=false
-  for config in $ESSENTIAL_CONFIG; do
-    if [[ -z "${GLOBAL_EFDE_CONFIG[$config]:-}" ]]; then
-      missing_config=true
-      break
-    fi
-  done
-
-  if $missing_config; then
-    common.tasks.message.warning "[WARNING] Missing essential configuration, creating config..."
-    _mod_.create_config
-  fi
-
-  _mod_.show_debug
-}
-
-_mod_.get_var(){
-  local KEY="$1"
-  echo $(common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_FILE")
-}
-
-_mod_.set_var(){
-  local KEY="$1"
-  local VALUE="$2"
-  common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$CONFIG_PATH_FILE"
-}
-
+# HELPERS
 _mod_.sort_var_in_file(){
-  sort -o "$CONFIG_PATH_FILE" "$CONFIG_PATH_FILE"
+  sort -o "$CONFIG_PATH_CORE" "$CONFIG_PATH_CORE"
+  sort -o "$CONFIG_PATH_HOST" "$CONFIG_PATH_HOST"
 }
 
 _mod_.is_language_supported() {
@@ -177,33 +262,66 @@ _mod_.is_language_supported() {
   return 1
 }
 
-_mod_.get_efde_core_i18n_default(){
-  local language="${EFDE_CORE_CONFIG['I18N_DEFAULT']}"
-  if _mod_.is_language_supported "$language"; then
-    echo "$language"
-  else
-    common.tasks.message.danger "Error: The value for 'EFDE_CORE_CONFIG['I18N_DEFAULT']' is not valid";
-    return 1
-  fi
-}
+_mod_.updates_availables() {
+  local RUN_UPDATE="false"
+  local CHECK_LAST="${EFDE_CONFIG_CORE['UPDATE_CHECK_LAST']}"
+  local UPDATE_FREQUENCY="${EFDE_CONFIG_CORE['UPDATE_CHECK_FREQUENCY']}"
+  local QUESTION=$(common.tasks.message.msg_color warning "There is a new version available. \nDo you want to update")
 
-_mod_.get_host_i18n(){
-  local language="$(common.tasks.config.get_var "HOST_I18N")"
-  if _mod_.is_language_supported "$language"; then
-    echo "$language"
-  else
-    common.tasks.message.danger "Error: The value for 'HOST_I18N' is not valid";
-    return 1
+  local TODAY=$(date +%Y-%m-%d)
+  local DAYS_DIFF=$(( ( $(date -d "$TODAY" +%s) - $(date -d "$CHECK_LAST" +%s) ) / 86400 ))
+
+  case "$UPDATE_FREQUENCY" in
+    daily)    [[ "$DAYS_DIFF" -ge 1 ]] && RUN_UPDATE="true" ;;
+    weekly)   [[ "$DAYS_DIFF" -ge 7 ]] && RUN_UPDATE="true" ;;
+    never)    RUN_UPDATE="true";;
+    *)        RUN_UPDATE="true";;
+  esac
+
+  if [[ "$RUN_UPDATE" == "true" ]]; then
+    if efde.tasks.main.efde_update --silent; then
+      _mod_.set_core_update_last
+      _mod_.set_core_update_available "true"
+
+      if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
+        _mod_.set_core_update_available "false"
+        efde.tasks.main.efde_update
+      fi
+    fi
   fi
 }
 
 ###########################################################
-# MODE DEVELOP / DEBUG [MODULE | CONFIG | | I18N | MENU ]
+# MODE DEBUG [MODULE | CONFIG | | I18N | MENU ]
 ###########################################################
+_mod_.show_config_debug(){
+  if _mod_.get_efde_mode_debug_config; then
+    common.tasks.message.debug_manager_title "CONFIG"
+    local CONFIGS=("EFDE_CONFIG_CORE" "EFDE_CONFIG_HOST")
+
+    for config in "${CONFIGS[@]}"; do
+      common.tasks.message.tree "$config" 1 0 debug
+
+      if [[ "$(declare -p $config 2>/dev/null)" =~ "declare -A" ]]; then
+        eval "keys=(\"\${!${config}[@]}\")"
+        IFS=$'\n' sorted_keys=($(sort <<<"${keys[*]}"))
+        unset IFS
+
+        for KEY in "${sorted_keys[@]}"; do
+          eval "value=\${${config}[\$KEY]}"
+          common.tasks.message.tree "$KEY: $value" 2 0 debug
+        done
+      else
+        common.tasks.message.danger "[Error] The array $config is not defined or is not associative."
+      fi
+    done
+  fi
+}
+
 _mod_.get_efde_mode_debug(){
   # return 0 (true) or 1 (false)
   # GENERAL AFTER THE CONSTRUCTION OF MODULES
-  if [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" == "true" ]]; then
+  if [[ "${EFDE_CONFIG_CORE['DEBUG']}" == "true" ]]; then
     return 0
   fi
   return 1
@@ -212,7 +330,7 @@ _mod_.get_efde_mode_debug(){
 _mod_.get_efde_mode_debug_modules() {
   # return 0 (true) or 1 (false)
   if _mod_.get_efde_mode_debug && \
-    [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG_MODULE']:-${ESSENTIAL_MODULES['DEBUG']}}" == "true" ]]; then
+    [[ "${EFDE_CONFIG_CORE['DEBUG_MODULE']:-${ESSENTIAL_MODULES['DEBUG']}}" == "true" ]]; then
     return 0
   fi
   return 1
@@ -220,7 +338,7 @@ _mod_.get_efde_mode_debug_modules() {
 
 _mod_.get_efde_mode_debug_shortcuts(){
   # Return 0 (true) or 1 (false)
-  if _mod_.get_efde_mode_debug && [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG_SHORTCUTS']}" == "true" ]]; then
+  if _mod_.get_efde_mode_debug && [[ "${EFDE_CONFIG_CORE['DEBUG_SHORTCUTS']}" == "true" ]]; then
     return 0
   fi
   return 1
@@ -228,7 +346,7 @@ _mod_.get_efde_mode_debug_shortcuts(){
 
 _mod_.get_efde_mode_debug_config(){
   # Return 0 (true) or 1 (false)
-  if _mod_.get_efde_mode_debug && [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG_CONFIG']}" == "true" ]]; then
+  if _mod_.get_efde_mode_debug && [[ "${EFDE_CONFIG_CORE['DEBUG_CONFIG']}" == "true" ]]; then
     return 0
   fi
   return 1
@@ -236,7 +354,7 @@ _mod_.get_efde_mode_debug_config(){
 
 _mod_.get_efde_mode_debug_i18n(){
   # Return 0 (true) or 1 (false)
-  if _mod_.get_efde_mode_debug && [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG_I18N']}" == "true" ]]; then
+  if _mod_.get_efde_mode_debug && [[ "${EFDE_CONFIG_CORE['DEBUG_I18N']}" == "true" ]]; then
     return 0
   fi
   return 1
@@ -244,7 +362,7 @@ _mod_.get_efde_mode_debug_i18n(){
 
 _mod_.get_efde_mode_debug_menu(){
   # Return 0 (true) or 1 (false)
-  if _mod_.get_efde_mode_debug && [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG_MENU']}" == "true" ]]; then
+  if _mod_.get_efde_mode_debug && [[ "${EFDE_CONFIG_CORE['DEBUG_MENU']}" == "true" ]]; then
     return 0
   fi
   return 1

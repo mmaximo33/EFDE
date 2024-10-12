@@ -1,5 +1,8 @@
 # EFDE | Easy and Fast Development Environment [![follow](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@Efde.official)
 
+### If you like the project, give us a little star ⭐. It really helps us a lot. Thank you! 💪
+
+
 ![efde type](https://img.shields.io/badge/project-Open_Source-green.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ![efde version](https://img.shields.io/badge/status-Active-green.svg)
@@ -151,13 +154,13 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 
 ### Shortcuts
 
-Since version 2.2.1, CUSTOM shortcuts are available per project. You can see the list by running `efde custom`
-
-![efde_shortcuts_custom.png](./docs/media/efde_shortcuts_custom.png)
-
 Since version 2.1.0, shortcuts are available. You can see the list by running `efde efde:shortcuts`
 
 ![efde shortcuts](./docs/media/efde_shortcuts.gif)
+
+Since version 2.2.1, CUSTOM shortcuts are available per project. You can see the list by running `efde custom`
+
+![efde_shortcuts_custom.png](./docs/media/efde_shortcuts_custom.png)
 
 ## Mission
 

@@ -139,7 +139,7 @@ _mod_.essential_to_run_load() {
   done
 
   # GET ALL CONFIG
-  common.tasks.config.check_config
+  common.tasks.config.check
 }
 
 _mod_.essential_to_run_msg() {
@@ -300,7 +300,15 @@ _mod_.generate_shortcuts_file() {
 
   # Check
   if ! common.tasks.config.get_efde_mode_debug_shortcuts ; then
-    common.tasks.file.exists "$TARGET_SHORTCUTS" && return 0
+    if common.tasks.file.exists "$TARGET_SHORTCUTS" ; then
+        if ! source "$TARGET_SHORTCUTS"; then
+          _mod_.msg --type danger --msg "[ERROR] The resources were not loaded, report this!"
+          _mod_.msg --type danger --msg "File: $NEW_NAME"
+          _mod_.msg --type danger --msg "Path: $PATH_TARGET"
+          exit 1
+        fi
+        return 0
+    fi
   fi
 
   _mod_.debug_step --type "SHORTCUTS"
@@ -341,6 +349,14 @@ _mod_.generate_shortcuts_file() {
   fi
 }
 
+_mod_.load_shortcuts_file() {
+  if ! source "$TARGET_SHORTCUTS"; then
+    _mod_.msg --type danger --msg "[ERROR] The resources were not loaded, report this!"
+    _mod_.msg --type danger --msg "File: $NEW_NAME"
+    _mod_.msg --type danger --msg "Path: $PATH_TARGET"
+    exit 1
+  fi
+}
 # MMTodo:
 # Improve this feature so that
 #   - Take all characters enclosed in double quotes (\n or \")
@@ -361,7 +377,7 @@ _mod_.generate_translation(){
     esac
   done
 
-  if ! LANGUAGE_DEFAULT="$(common.tasks.config.get_efde_core_i18n_default)"; then
+  if ! LANGUAGE_DEFAULT="$(common.tasks.config.get_core_i18n_default)"; then
     _mod_.msg --type danger --msg "Error: The value for 'EFDE_CORE_CONFIG['I18N_DEFAULT']' is not valid."
     exit 1
   fi

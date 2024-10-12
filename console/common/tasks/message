@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+#https://en.wikipedia.org/wiki/Box-drawing_characters
 
 _mod_.echo() {
   # shellcheck disable=SC2068
@@ -57,13 +58,27 @@ _mod_.debug(){
 }
 
 _mod_.title(){
-  local FUNCTION=""
+  local FUNCTION SEPARATOR SUFFIX URL HIPERLINK
   if common.tasks.config.get_efde_mode_debug; then
     FUNCTION="_mod_.debug"
   else
     FUNCTION="_mod_.info"
   fi
-  ${FUNCTION} "$(printf '%.s═' {1..50})"
+
+  SEPARATOR="$(printf '%.s━' {1..50})"
+  URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/tag/${EFDE_CONFIG_CORE['CORE_VERSION']:-0.0.0}"
+  SUFFIX="[EFDE v${EFDE_CONFIG_CORE['CORE_VERSION']:-0.0.0}]"
+  HIPERLINK="🯄"
+
+  if [[ "${EFDE_CONFIG_CORE['UPDATE_CHECK_AVAILABLE']:-EFDE_CORE_CONFIG['UPDATE_AVAILABLE']}" == "true" ]]; then
+    URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/latest"
+    SUFFIX=$(_mod_.echo success "[Check NEW version]")
+    HIPERLINK="$(_mod_.echo warning $HIPERLINK)"
+  fi
+
+  HYPERLINK="\e]8;;$URL\a$HIPERLINK\e]8;;\a"
+  ${FUNCTION} "$SEPARATOR $SUFFIX$HYPERLINK"
+
   _mod_.info "$@\n"
 }
 

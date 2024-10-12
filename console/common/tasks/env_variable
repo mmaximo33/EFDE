@@ -54,13 +54,13 @@ _mod_.get_variable() {
             value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/')
             echo -n "$value"
         else
-            common.tasks.message.danger  "[Error]: Variable not found: \n- FILE: $file \n- KEY: $key" >&2
+            common.tasks.message.danger  "[Error]: Variable not found: \n- Parent: ${FUNCNAME[1]} \n- FILE: $file \n- KEY: $key" >&2
         fi
     else
         #echo $(common.tasks.module.debug_function_moment) >&2
-        common.tasks.message.debug "[Error]: File $file does not exist " >&2
-        common.tasks.message.debug "- Function: $FUNCNAME" >&2
-        common.tasks.message.debug "- CallFunction: $FUNCNAME" >&2
+        common.tasks.message.danger "[Error]: File $file does not exist " >&2
+        common.tasks.message.danger "- Function: $FUNCNAME" >&2
+        common.tasks.message.danger "- CallFunction: $FUNCNAME" >&2
         return 0
     fi
 }
