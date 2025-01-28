@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+{
+  # shellcheck disable=SC2168
+  local IMPLEMENT="Mysql"
+  # shellcheck disable=SC2168
+  local PREFIX_MAIN="${IMPLEMENT,,}.tasks.main"
+
+  _mod_ITEMS=(
+    "${IMPLEMENT,,}:env:show,          $PREFIX_MAIN.env_show,            Show variables,               Show values in ./.env file"
+    "${IMPLEMENT,,}:db:query,          $PREFIX_MAIN.run_custom_query,           Run custom query,             Run custom query on your database"
+    "${IMPLEMENT,,}:db:export,         $PREFIX_MAIN.database_export,     Export database,              Export Database in ./dumps"
+    "${IMPLEMENT,,}:db:import,         $PREFIX_MAIN.database_import,     Import database,              Import Database from ./dumps"
+    "${IMPLEMENT,,}:db:permissions,    $PREFIX_MAIN.permissions,         Apply privileges,             Apply DATABASE:USER privileges"
+    "${IMPLEMENT,,}:container,         $PREFIX_MAIN.container_entry,     Entry container,"
+    "${IMPLEMENT,,}:run:script,        docker.tasks.menu.command,        Run command line,             Run command in database container"
+  )
+}

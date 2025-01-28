@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+{
+  # shellcheck disable=SC2168
+  local IMPLEMENT="Laravel"
+    # shellcheck disable=SC2168
+  local PREFIX_TASKS="${IMPLEMENT,,}.tasks"
+
+  _mod_ITEMS=(
+    "${IMPLEMENT,,}:project:config,         efde.tasks.project.config_show,                   Show settings in the project"
+    "${IMPLEMENT,,}:artisan,                $PREFIX_TASKS.main.console_run_command,           $IMPLEMENT Artisan"
+    "${IMPLEMENT,,}:permissions:fix,        $PREFIX_TASKS.main.permissions_fix,               Fix permissions"
+    "${IMPLEMENT,,}:install,                $PREFIX_TASKS.menu.create_environment,            Select type project (New or Existing)"
+    "${IMPLEMENT,,}:install:new,            $PREFIX_TASKS.install.new_environment,            Create new project"
+    "${IMPLEMENT,,}:install:clone,          $PREFIX_TASKS.install.clone_environment,          Clone existing project"
+    "${IMPLEMENT,,}:doc:compatibility,      $PREFIX_TASKS.main.see_compatibility_versions,    See versions compatibility"
+  )
+}

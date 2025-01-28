@@ -12,3 +12,5 @@
 "The '$choice' option is not in the list.","A opção '$choice' não está na lista."
 "But we found some that may match the desired action:","Mas encontramos algumas que podem corresponder à ação desejada:"
 "The shortcut is not registered:","O atalho não está registrado:"
+"Error: Function '$FUNCTION_NAME' does not exist.","Erro: a função '$FUNCTION_NAME' não existe."
+"Error: Se espera un solo argumento (string) que no puede estar vacío.","Erro: Um único argumento (string) é esperado e não pode estar vazio."

@@ -3,27 +3,25 @@ set -euo pipefail
 
 _mod_.run() {
   if [ "$#" -lt 3 ]; then
-    local USE=""
-    USE+="Error: At least three parameters are required:\n"
-    USE+=" - FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE\n"
-    USE+="\n parameters:\n ${@}\n"
-    USE+="\n Example:\n"
-    USE+=" - $FUNCNAME FORCE_SHOW_CLI=true FORCE_SHOW_OUTPUT=true COMMAND_LINE\n"
-    USE+=" - $FUNCNAME 1 0 'cd folder'"
-    common.tasks.message.danger "$USE"
+    local HELPER=""
+    HELPER+="Error: At least three parameters are required:\n"
+    HELPER+=" - FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE\n"
+    HELPER+="\n parameters:\n ${@}\n"
+    HELPER+="\n Example:\n"
+    HELPER+=" - $FUNCNAME FORCE_SHOW_CLI=true FORCE_SHOW_OUTPUT=true COMMAND_LINE\n"
+    HELPER+=" - $FUNCNAME 1 0 'cd folder'"
+    common.tasks.message.danger "$HELPER"
     return 1
   fi
 
-  local FORCE_SHOW_CLI FORCE_SHOW_OUTPUT COMMAND_LINE
-
-  FORCE_SHOW_CLI=$1
-  FORCE_SHOW_OUTPUT=$2
+  local FORCE_SHOW_CLI=$1
+  local FORCE_SHOW_OUTPUT=$2
   shift 2
-  COMMAND_LINE="$@"
+  local COMMAND_LINE="$@"
 
-  if [ "${GLOBAL_EFDE_CONFIG['CLI_DEFAULT']}" = "false" ]; then
-    FORCE_SHOW_CLI=${GLOBAL_EFDE_CONFIG['CLI_SHOW_CLI']}
-    FORCE_SHOW_OUTPUT=${GLOBAL_EFDE_CONFIG['CLI_SHOW_OUTPUT']}
+  if [[ "${EFDE_CONFIG_HOST['HOST_CLI_MODE']:-}" != "default" ]]; then
+    FORCE_SHOW_CLI=$(_mod_.show_cli)
+    FORCE_SHOW_OUTPUT=$(_mod_.show_output)
   fi
 
   if [ "${FORCE_SHOW_CLI}" = "true" ]; then
@@ -37,4 +35,18 @@ _mod_.run() {
   fi
 }
 
-#  COMMAND_LINE="docker compose exec database mysql -uefdeuser -pefdepassword --database=efdedb -hdatabase -e\"select * from pepe;\""
+_mod_.show_cli() {
+  case "${EFDE_CONFIG_HOST['HOST_CLI_MODE']:-}" in
+    silent)                 echo "false"    ;;
+    training | auditor)     echo "true"     ;;
+    *)                      echo "false"    ;;
+  esac
+}
+
+_mod_.show_output() {
+  case "${EFDE_CONFIG_HOST['HOST_CLI_MODE']:-}" in
+    silent | training)      echo "false"    ;;
+    auditor)                echo "true"     ;;
+    *)                      echo "false"    ;;
+  esac
+}

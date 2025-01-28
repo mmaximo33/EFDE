@@ -3,24 +3,32 @@ set -euo pipefail
 {
   _mod_.main(){
     common.tasks.os.console_clear
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_MAIN[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${efde_props_menu_MAIN[@]}"
   }
 
   _mod_.efde(){
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_EFDE[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${efde_props_menu_EFDE[@]}"
   }
 
   _mod_.config(){
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_CONFIG[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${common_props_config_CONFIG[@]}"
   }
 
   _mod_.config_show(){
-    efde.tasks.config.show_config
+    common.tasks.config.show_all
     _mod_.config
   }
 
   _mod_.tools(){
-    common.tasks.menu.show "$efde_props_menu_TITLE" "${efde_props_menu_TOOLS[@]}"
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${efde_props_menu_TOOLS[@]}"
   }
 
   _mod_.coming_soon(){
@@ -28,7 +36,7 @@ set -euo pipefail
     _mod_.main
   }
 
-  _mod_.shortcuts(){
+  _mod_.shortcuts_show(){
     common.tasks.shortcuts.show
   }
 }

@@ -10,22 +10,57 @@ else
   GLOBAL_DOCKER_COMPOSE_COMMAND="docker-compose"
 fi
 
-_mod_.dp_command_run(){
-  local COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} $@"
-  common.tasks.command_line.run true false "${COMMAND_RUN}"
+_mod_.dp_command_run() {
+  local INPUT="true"
+  local OUTPUT="false"
+  local COMMAND=""
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --input|-i)
+        INPUT="$2"
+        shift 2
+        ;;
+      --output|-o)
+        OUTPUT="$2"
+        shift 2
+        ;;
+      --cli|-c)
+        COMMAND="$2"
+        shift 2
+        ;;
+      *)
+        common.tasks.message.danger "Unrecognized option: $1" >&2
+        return 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$COMMAND" ]]; then
+    common.tasks.message.danger "Error: No command was provided." >&2
+    return 1
+  fi
+
+  common.tasks.command_line.run "${INPUT}" "${OUTPUT}" "${GLOBAL_DOCKER_COMPOSE_COMMAND}" "${COMMAND}"
 }
+
+
 
 _mod_.dp_build(){
   _mod_.dp_all_stop
-  _mod_.dp_command_run "up -d --build"
+  _mod_.dp_command_run --cli "up -d --build"
 }
 
 _mod_.dp_start(){
-  _mod_.dp_command_run "start"
+  _mod_.dp_command_run --cli "start"
 }
 
 _mod_.dp_stop(){
-  _mod_.dp_command_run "stop"
+  _mod_.dp_command_run --cli "stop"
+}
+
+_mod_.dp_restart(){
+  _mod_.dp_command_run --cli "restart"
 }
 
 _mod_.dp_all_stop(){
@@ -49,16 +84,16 @@ _mod_.apache_stop(){
 
 _mod_.dp_down(){
   local QUESTION=$(common.tasks.message.msg_color danger "Do you want to remove services from the project?")
-  _mod_.dp_show_container simple
+  _mod_.dp_show_container
   if common.tasks.prompt.confirm_default_no "$QUESTION" ; then
-    _mod_.dp_command_run "down"
+    _mod_.dp_command_run --cli "down"
   fi
 }
 
 _mod_.dp_logs(){
   local -A MSG
   local COMMAND_RUN VALUES SEARCH
-  COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} logs -f"
+  COMMAND_RUN="logs -f"
   VALUES=""
   MSG=(
     [MAIN]=$(common.tasks.message.msg_color warning 'Enter value to search or press ENTER for show all:')
@@ -84,25 +119,38 @@ _mod_.dp_logs(){
   if [[ -n "$VALUES" ]]; then
       COMMAND_RUN="${COMMAND_RUN} | egrep --color=always -E \"$VALUES\""
   fi
-  common.tasks.command_line.run true true "${COMMAND_RUN}"
+  _mod_.dp_command_run -i true -o true -c "${COMMAND_RUN}"
 }
 
+_mod_.dp_show_container() {
+  local COMMAND="ps -a --format \"table {{.Service}}\t{{.Name}}\t{{.Ports}}\t{{.Status}}\t{{.Image}}\""
+  local quit=false
 
-
-_mod_.dp_show_container(){
-  local COMMAND="ps -a"
-  if [[ $# -gt 0 && "$1" == "simple" ]]; then
-    COMMAND="ps -a --format \"table {{.Name}}\t{{.Image}}\t{{.Service}}\t{{.Status}}\""
+  if [[ "$#" -gt 0 ]]; then
+    case "$1" in
+      --quit|-q)
+        quit=true
+        ;;
+      *)
+        common.tasks.message.danger "Unrecognized option: $1" >&2
+        return 1
+        ;;
+    esac
   fi
-  common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} $COMMAND"
 
+  _mod_.dp_command_run -i true -o true -c "$COMMAND"
+
+  if [[ "$quit" == true ]]; then
+    return 1
+  fi
 }
+
 
 #_mod_.container_select() {
 #  local MSG SERVICE
-#  _mod_.dp_show_container simple
-#
-#  local MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+#  _mod_.dp_show_container
+#q
+#  local MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
 #  local SERVICE
 #  SERVICE=$(common.tasks.prompt.request_input "$MSG")
 #
@@ -111,16 +159,15 @@ _mod_.dp_show_container(){
 #    SERVICE=$(common.tasks.prompt.request_input "$MSG")
 #  done
 #
-#  _mod_.dp_command_run "ps --filter name=$SERVICE"
+#  _mod_.dp_command_run --cli "ps --filter name=$SERVICE"
 #  echo "$SERVICE"
 #}
-
 
 _mod_.container_entry(){
   local COMMAND_RUN VALUES MSG SERVICE
 
-  _mod_.dp_show_container simple
-  MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+  _mod_.dp_show_container
+  MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
   SERVICE=$(common.tasks.prompt.request_input "$MSG")
 
   MSG=$(common.tasks.message.msg_color warning 'You want to open a new instance? RUN=Y or EXEC=N')
@@ -129,15 +176,15 @@ _mod_.container_entry(){
   else
     COMMAND_RUN="exec"
   fi
-  common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} $COMMAND_RUN $SERVICE bash"
+  _mod_.dp_command_run -i true -o true -c "$COMMAND_RUN $SERVICE bash"
 }
 
 _mod_.container_run_command() {
   local COMMAND_RUN COMMAND_CUSTOM MSG SERVICE
 
-  _mod_.dp_show_container simple
+  _mod_.dp_show_container
 
-  MSG=$(common.tasks.message.msg_color warning 'Enter service name:')
+  MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
   SERVICE=$(common.tasks.prompt.request_input "$MSG")
 
   MSG=$(common.tasks.message.msg_color warning 'You want to open a new instance? RUN=Y or EXEC=N')
@@ -151,7 +198,7 @@ _mod_.container_run_command() {
     MSG=$(common.tasks.message.msg_color warning 'What command do you want to run?:')
     COMMAND_CUSTOM=$(common.tasks.prompt.request_input "$MSG")
 
-    common.tasks.command_line.run true true "$GLOBAL_DOCKER_COMPOSE_COMMAND $COMMAND_RUN $SERVICE $COMMAND_CUSTOM"
+    _mod_.dp_command_run -i true -o true -c "$COMMAND_RUN $SERVICE $COMMAND_CUSTOM"
 
     MSG=$(common.tasks.message.msg_color warning 'Do you want to run another command?')
     if common.tasks.prompt.confirm_default_yes "$MSG"; then
@@ -160,5 +207,10 @@ _mod_.container_run_command() {
       break
     fi
   done
+}
+
+_mod_.recipe_see(){
+  cat docker-compose.yml
+  _mod_.main
 }
 

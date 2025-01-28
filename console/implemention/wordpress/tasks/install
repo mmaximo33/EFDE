@@ -3,10 +3,10 @@ set -euo pipefail
 
 _mod_.choose_php_versions(){
   local PHP_VERSION=""
-  # while for call function see versions
-  while [ "$PHP_VERSION" == "" ] || common.tasks.module.exists_function "$PHP_VERSION" ; do
+
+  while [ "$PHP_VERSION" == "" ]; do
     wordpress.tasks.menu.create_environment_version
-    PHP_VERSION=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+    PHP_VERSION=$(common.tasks.menu.get_selected_value)
   done
 
   GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="wordpress"
@@ -66,7 +66,7 @@ _mod_.clone_environment(){
 _mod_.clone_repository(){
   sleep 3
   common.tasks.command_line.run true false "sudo chown -R $UID:www-data ./app"
-  docker.tasks.main.dp_command_run exec app_fpm find /var/www/html/ -mindepth 1 -delete
+  docker.tasks.main.dp_command_run --cli "exec app_fpm find /var/www/html/ -mindepth 1 -delete"
 
   common.tasks.git.request_url_and_clone_repository
 
@@ -74,7 +74,7 @@ _mod_.clone_repository(){
 
   # shellcheck disable=SC2072
   if [[ "${GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']}" > "8.1" ]]; then
-      [ ! -e ./app/wp-config-docker.php ] && docker.tasks.main.dp_command_run "exec app_fpm cp /usr/src/wordpress/wp-config-docker.php /var/www/html/"
+      [ ! -e ./app/wp-config-docker.php ] && docker.tasks.main.dp_command_run --cli "exec app_fpm cp /usr/src/wordpress/wp-config-docker.php /var/www/html/"
       cp -f ./app/wp-config-docker.php ./app/wp-config.php
   fi
 }

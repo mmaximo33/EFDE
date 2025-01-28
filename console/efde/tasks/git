@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-_mod_.get_current_tag(){
-  cd $EFDE_PATH_INSTALL
-  echo $(git describe --tags --abbrev=0)
-}

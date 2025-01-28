@@ -8,7 +8,7 @@ _mod_.see_compatibility_versions(){
 
 _mod_.run_command_app_cli(){
   # shellcheck disable=SC2145
-  docker.tasks.main.dp_command_run "run --rm app_cli ${@}"
+  docker.tasks.main.dp_command_run --cli "run --rm app_cli ${@}"
 }
 
 _mod_.permissions_fix(){
@@ -16,9 +16,12 @@ _mod_.permissions_fix(){
   ! common.tasks.directory.exists "$PATH_APP" && common.tasks.directory.create_recursive "$PATH_APP"
   sleep 3 # Important: Probably when the permissions are applied, the construction of the directories is not finished
   common.tasks.message.info "Permissions see https://developer.wordpress.org/advanced-administration/server/file-permissions/"
-  common.tasks.command_line.run true false "sudo chown -R $UID:www-data $PATH_APP"
+  common.tasks.command_line.run true false "sudo usermod -aG www-data $USER"
+  common.tasks.command_line.run true false "sudo chown -R $USER:www-data $PATH_APP"
   common.tasks.command_line.run true false "find $PATH_APP -type d -exec chmod 755 {} \;"
   common.tasks.command_line.run true false "find $PATH_APP -type f -exec chmod 644 {} \;"
+  common.tasks.command_line.run true false "chmod -R 775 $PATH_APP/wp-content"
+
 }
 
 _mod_.console_run_command(){
@@ -59,7 +62,7 @@ _mod_.console_run_command(){
       fi
     fi
 
-    common.tasks.command_line.run true true "${GLOBAL_DOCKER_COMPOSE_COMMAND} run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
+    docker.tasks.main.dp_command_run -i true -o true -c "run --rm app_cli $COMMAND_RUN $COMMAND_CUSTOM"
     common.tasks.prompt.confirm_default_yes "${MSG['OTHER']}" || break
     VALUES=""
   done

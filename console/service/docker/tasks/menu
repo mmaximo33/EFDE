@@ -2,7 +2,9 @@
 set -euo pipefail
 
 _mod_.main(){
-  common.tasks.menu.show "$docker_props_menu_TITLE" "${docker_props_menu_MAIN[@]}"
+  common.tasks.menu.show \
+    --title "$docker_props_menu_TITLE" \
+    --data "${docker_props_menu_MAIN[@]}"
 }
 
 _mod_.build(){
@@ -11,12 +13,17 @@ _mod_.build(){
 }
 
 _mod_.show(){
-  docker.tasks.main.dp_show_container simple
+  docker.tasks.main.dp_show_container --quit true
   _mod_.main
 }
 
 _mod_.start(){
   docker.tasks.main.dp_start
+  _mod_.main
+}
+
+_mod_.restart(){
+  docker.tasks.main.dp_restart
   _mod_.main
 }
 
@@ -54,6 +61,6 @@ _mod_.command(){
 }
 
 _mod_.recipe_see(){
-  cat docker-compose.yml
+  docker.tasks.main.recipe_see
   _mod_.main
 }

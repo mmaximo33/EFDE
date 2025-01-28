@@ -1,4 +1,6 @@
 .idea
 bin/.tmp
-bin/config.env
+bin/cfg.core
+bin/cfg.host
 bin/efde.sh
+bin/install.sh

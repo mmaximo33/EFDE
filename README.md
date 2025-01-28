@@ -1,11 +1,14 @@
 # EFDE | Easy and Fast Development Environment [![follow](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@Efde.official)
 
+### If you like the project, give us a little star ⭐. It really helps us a lot. Thank you! 💪
+
+
 ![efde type](https://img.shields.io/badge/project-Open_Source-green.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ![efde version](https://img.shields.io/badge/status-Active-green.svg)
 ![efde_lastcommin](https://img.shields.io/github/last-commit/mmaximo33/efde.svg)
 ![efde_release](https://img.shields.io/github/release/mmaximo33/efde.svg)
-![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/2.1.0.svg)
+![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/2.2.0.svg)
 ![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/1.2.0.svg)
 
 ![issue-open](https://img.shields.io/github/issues/mmaximo33/efde.svg)
@@ -13,7 +16,7 @@
 ![pull-open](https://img.shields.io/github/issues-pr/mmaximo33/efde.svg)
 ![pull-close](https://img.shields.io/github/issues-pr-closed/mmaximo33/efde.svg)
 
-![efde version](https://img.shields.io/badge/language-grey.svg) ![en_US](https://img.shields.io/badge/en.US-blue.svg) ![es_ES](https://img.shields.io/badge/es.ES-blue.svg) ![pt_PT](https://img.shields.io/badge/pt.PT-blue.svg)
+![efde translations](https://img.shields.io/badge/language-grey.svg) ![en_US](https://img.shields.io/badge/en.US-blue.svg) ![es_ES](https://img.shields.io/badge/es.ES-blue.svg) ![pt_PT](https://img.shields.io/badge/pt.PT-blue.svg)
 
 ## Index
 
@@ -103,6 +106,7 @@ ln -sfT $PWD/bin/efde.sh ~/bin/efde
 ```sh
 Coming soon
 ```
+
 </details>
 
 <details>
@@ -111,6 +115,7 @@ Coming soon
 ```sh
 Coming soon
 ```
+
 </details>
 
 #### For script 
@@ -153,6 +158,10 @@ Since version 2.1.0, shortcuts are available. You can see the list by running `e
 
 ![efde shortcuts](./docs/media/efde_shortcuts.gif)
 
+Since version 2.2.1, CUSTOM shortcuts are available per project. You can see the list by running `efde custom`
+
+![efde_shortcuts_custom.png](./docs/media/efde_shortcuts_custom.png)
+
 ## Mission
 
 EFDE arises motivated by giving something back to this beautiful community of programmers, computer scientists or curious about technology.
@@ -176,6 +185,77 @@ It is NOT something super innovative, but surely more than one will find it inte
 
 ## Documentation
 
+### Contributing
+
+There is still a lot to do with this small project if you are invited to join.
+Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
+
+## Sponsor
+If you like this library and want to give some recognition, it is now possible to **become a [Github sponsor](https://www.github.com/sponsors/xavierfoucrier)** and support this project by sponsoring BarbaJS maintainer on Github. Even if it's a small contribution, you participate in the effort of making **open source projects maintained for anyone**, and developers to be rewarded for their work/time.
+
+## Contribute
+If you want to report a bug or request a new feature/improvement, please **read the project [contributors guidelines](.github/CONTRIBUTING.md) before**.
+
+Thanks for taking time to contribute to Barba :tada: :+1:
+
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://www.linkedin.com/in/marucci-maximo/">
+          <img src="https://avatars.githubusercontent.com/u/12983255?v=4?s=100" width="100px;" alt="Marucci Maximo"/><br/>
+          <sub><b>mmaximo33</b></sub><br/>
+          <sub><b>Marucci Maximo</b></sub>
+        </a><br/>
+        <a href="#ideas-mmaximo33" title="Ideas, Planning, & Feedback">🤔</a> 
+        <a href="https://github.com/mmaximo33/EFDE/commits?author=mmaximo33" title="Code">💻</a> 
+        <a href="https://github.com/mmaximo33/EFDE/issues?q=author%3Ammaximo33+label%3A%2203+Type%3A+Documentation+%3Abooks%3A%22" title="Documentation">📖</a> 
+        <a href="https://github.com/mmaximo33/EFDE/issues?q=author%3Ammaximo33+label%3A%2203+Type%3A+Discussion+%3Aspeaker%3A%22" title="Answering Questions">💬</a> 
+        <a href="https://github.com/mmaximo33/EFDE/issues?q=author%3Ammaximo33+label%3A%2203+Type%3A+Bug+%3Abug%3A%22" title="Bug reports">🐛</a> 
+        <a href="https://github.com/mmaximo33/EFDE/commits?author=mmaximo33" title="Tests">⚠️</a> 
+        <a href="https://github.com/mmaximo33/EFDE/pulls?q=is%3Apr+reviewed-by%mmaximo33" title="Reviewed Pull Requests">👀</a>
+      </td>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://www.linkedin.com/in/marucci-maximo/">
+          <img src="./docs/media/joinus.png" width="100px;" alt="Join Us"/><br/>
+          <sub><b></b></sub><br/>
+          <sub><b>Join us</b></sub>
+        </a><br/>
+        <a href="#ideas-joinus" title="Ideas, Planning, & Feedback">🤔</a> 
+        <a href="#code-joinus" title="Code">💻</a> 
+        <a href="#docs-joinus" title="Documentation">📖</a> 
+        <a href="#questions-joinus" title="Answering Questions">💬</a> 
+        <a href="#bugs-joinus" title="Bug reports">🐛</a> 
+        <a href="#qa-joinus" title="Tests">⚠️</a> 
+        <a href="#pr-joinus" title="Reviewed Pull Requests">👀</a>
+      </td>
+    </tr>
+
+[//]: # (      6 per row )
+[//]: # (      <td align="center" valign="top" width="14.28%">)
+[//]: # (      </td>)
+[//]: # (      <td align="center" valign="top" width="14.28%">)
+[//]: # (      </td>)
+[//]: # (      <td align="center" valign="top" width="14.28%">)
+[//]: # (      </td>)
+[//]: # (      <td align="center" valign="top" width="14.28%">)
+[//]: # (      </td>)
+
+  </table>
+<tbody>
+
+## Collaborate with us
+
+<a href="https://jb.gg/OpenSourceSupport" target="_blank">
+  <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height="125" alt="Logotipo de JetBrains (principal) logo.">
+</a>
+
 ### Code of conduct
 
 The collaborators of this project strongly believe in a respectful community.
@@ -186,17 +266,6 @@ For this reason we operate under the following [CODE OF CONDUCT](./CODE_OF_CONDU
 Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time.
 [GOVERNANCE](./GOVERNANCE.md) will be re-evaluated as the project evolves.
 
-### Contributing
-
-There is still a lot to do with this small project if you are invited to join.
-Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
-
 ### License
 
 The MIT License (MIT). Please see [LICENSE](./LICENSE.md).
-
-## Collaborate with us
-
-<a href="https://jb.gg/OpenSourceSupport" target="_blank">
-  <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height="125" alt="Logotipo de JetBrains (principal) logo.">
-</a>

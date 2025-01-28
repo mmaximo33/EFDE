@@ -14,6 +14,10 @@ declare -gA GLOBAL_IMPLEMENTION_EFDE_FOLDER=(
 ################################
 # CURRENT PROJECT
 #-------------------------------
+_mod_.get_current_path_efde(){
+  echo "$(pwd)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}"
+}
+
 _mod_.get_current_path_env_file(){
   echo "$(pwd)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
 }
@@ -74,7 +78,7 @@ _mod.set_all_env(){
 }
 
 _mod_.copy_environment(){
-  local ORIGIN="$PATH_CONSOLE/implemention/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']}/environment"
+  local ORIGIN="${EFDE_CORE_PATH['CONSOLE']}/implemention/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']}/environment"
   local TARGET="$(_mod_.get_new_path_project)"
   shopt -s dotglob
   cp -r "$ORIGIN"/* "$TARGET"
@@ -82,15 +86,60 @@ _mod_.copy_environment(){
 }
 
 _mod_.project_name(){
-  local value=$(common.tasks.prompt.request_input "$(common.tasks.message.warning "Enter the project name\nProject name:") ")
+  local -A MSG
+  local value
 
-  if ! [[ "$value" =~ ^[[:alnum:][:space:]]+$ ]]; then
-    common.tasks.message.danger "The entered value can only contain letters or numbers."
-    common.tasks.message.info "Cancel to [ctrl + c]"
-    _mod_.project_name
-  fi
+  MSG=(
+    [MAIN]=""
+    [START]=$(common.tasks.message.warning "Enter the project name\nProject name:")
+    [ERROR]=$(common.tasks.message.danger "The entered value can only contain letters, numbers, dots, hyphens, and underscores (no spaces allowed).")
+    [EXIT]=$(common.tasks.message.info "Cancel with [ctrl + c]")
+  )
+  MSG['MAIN']=${MSG['START']}
+  while true; do
+    value=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
+    if [[ "$value" =~ ^[[:alnum:]._-]+$ ]]; then
+      break
+    else
+      MSG['MAIN']="${MSG['ERROR']}\n${MSG['EXIT']}\n${MSG['START']}"
+    fi
+  done
 
-  echo "$(common.tasks.string.convert_string_to_camelcase "$value")"
+  echo "$(common.tasks.string.convert_string_to_lowercase "$value")"
+}
+
+_mod_.create_shortcuts_example(){
+  local PATH_FOLDER_SHORTCUTS="$(_mod_.get_new_path_implemention)/shortcuts"
+  local PATH_FILE_LIST="$PATH_FOLDER_SHORTCUTS/list"
+  common.tasks.directory.create_recursive "$PATH_FOLDER_SHORTCUTS/folder"
+
+  file_content='#!/usr/bin/env bash
+  {
+    CUSTOM_SHORTCUTS=(
+  #   "action,          path/file,                Description action"
+  #   "folder:file,     folder/folder/file,       Description action"
+      "info,            info,                     Info custom shortcuts"
+      "folder:test,     folder/info,              Run folder/info"
+    )
+  }
+  '
+  echo "$file_content" > $PATH_FILE_LIST
+
+
+  file_content='#!/usr/bin/env bash
+echo "";echo "> Example custom scripts";
+echo "";echo "> Current path"
+pwd
+echo "";echo "> Check custom shortcuts $(pwd)/.efde/shortcuts"
+ls -lha .efde/shortcuts
+echo "";echo "> Check LIST"
+cat .efde/shortcuts/list
+echo "";echo "> Check this SCRIPT"
+cat .efde/shortcuts/info
+'
+
+  echo "$file_content" > "$PATH_FOLDER_SHORTCUTS/info"
+  echo "$file_content" > "$PATH_FOLDER_SHORTCUTS/folder/info"
 }
 
 _mod_.setup_environment(){
@@ -100,6 +149,7 @@ _mod_.setup_environment(){
   _mod_.create_folder
   _mod_.copy_environment
   _mod.set_all_env
+  _mod_.create_shortcuts_example
 }
 
 

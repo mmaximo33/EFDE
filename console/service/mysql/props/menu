@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 {
   # shellcheck disable=SC2168
-  PATH_MENU="mysql.tasks.menu"
+  local IMPLEMENT="mysql"
+    # shellcheck disable=SC2168
+  local PREFIX_MENU="${IMPLEMENT,,}.tasks.menu"
 
   _mod_TITLE="MySQL\nSelect an option:"
 
   _mod_MAIN=(
-    "mysql:env,               $PATH_MENU.env_show,            Show variables,               Show values in ./.env file"
-    "mysql:db:query,          $PATH_MENU.query_run,           Run custom query,             Run custom query on your database"
-    "mysql:db:export,         $PATH_MENU.database_export,     Export database,              Export Database in ./dumps"
-    "mysql:db:import,         $PATH_MENU.database_import,     Import database,              Import Database from ./dumps"
-    "mysql:db:permissions,    $PATH_MENU.permissions,         Apply privileges,             Apply DATABASE:USER privileges"
-    "mysql:container,         $PATH_MENU.container_entry,     Entry container,"
-    "mysql:run:script,        docker.tasks.menu.command,      Run command line,             Run command in database container"
+    "$PREFIX_MENU.env_show,            Show variables,               Show values in ./.env file"
+    "$PREFIX_MENU.query_run,           Run custom query,             Run custom query on your database"
+    "$PREFIX_MENU.database_export,     Export database,              Export Database in ./dumps"
+    "$PREFIX_MENU.database_import,     Import database,              Import Database from ./dumps"
+    "$PREFIX_MENU.permissions,         Apply privileges,             Apply DATABASE:USER privileges"
+    "$PREFIX_MENU.container_entry,     Entry container,"
+    "docker.tasks.menu.command,        Run command line,             Run command in database container"
   )
 }

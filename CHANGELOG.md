@@ -5,7 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.0] 2024-xx-xx
+## [2.3.0] 2025-01-28
+
+### Added
+- EFDE:
+  - #43 Add custom shortcuts / commands line
+  - #48 Validate that the base configuration is complete
+  - #51 Refactor EFDE update and management of CORE and HOST cfg
+
+### Changed
+- EFDE:
+  - #17 Installation - Version management 
+  - #42 Don't show menu after shortcuts
+  - #46 Refactor EFDE_MODE_* validation
+  - #50 Simplify config.env for commands and outputs
+
+### Fixed
+- EFDE:
+  - #39 error project name folder creation
+  - #41 Correct use of the docker-compose command in implemention
+  - #44 Adjust indentation in the menu
+  - #45 Fix menu return
+  - #47 Improve translation debugging
+
+## [2.2.0] 2024-05-12
 
 ### Added
 - EFDE: #32 Translation system (en_US es_ES pt_PT)
@@ -20,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - #36 Function info menu not aligned (Debug Mode)
 - Symfony: #33 fix application directory permissions application
 - MySQL: #3 General fixes for database import and export
-
+ 
 ## [2.1.0] 2024-03-04
 
 ### Added

@@ -1,69 +1,178 @@
 #!/usr/bin/env bash
 set -euo pipefail
+{
+  PATH_IMPLEMENTION_CUSTOM_SHORTCUTS="shortcuts"
+  PATH_IMPLEMENTION_CUSTOM_SHORTCUTS_LIST="$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS/list"
 
-_mod_.target() {
-  local PARAM="$1"
+  # GENERAL
+  _mod_.show(){
+    _mod_.show_efde
+    _mod_.show_custom
+  }
 
-  for LINE in "${EFDE_SHORTCUTS[@]}"; do
-    IFS=',' read -r -a VALUES <<< "$LINE"
-    if [[ "${VALUES[0]}" == "$PARAM" ]]; then
-      FUNCTION_RUN="${VALUES[1]}"
-      ${FUNCTION_RUN}
-      return 0
-    fi
-  done
-  common.tasks.message.info "The shortcut is not registered: $(common.tasks.message.danger ${PARAM^^})"
-  _mod_.find "$PARAM"
-  return 1
-}
+  _mod_.target() {
+    local PARAM="$@"
 
-_mod_.find(){
-  local PARAM="$1"
-  common.tasks.message.info "But we found some that may match the desired action:\n"
-
-  local PARTS=(${PARAM//:/ })
-  for ((i = 0; i < ${#PARTS[@]}; i++)); do
-    PATTERN+="${PARTS[i]}"
-    if ((i < ${#PARTS[@]} - 1)); then
-      PATTERN+="|"
-    fi
-  done
-  ${GLOBAL_RUN_EFDE} efde:shortcuts | egrep --color=always "${PATTERN}"
-}
-
-_mod_.show(){
-  local PREV_TITLE=""
-  local MODE="info"
-
-  [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" || "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && MODE="debug"
-  common.tasks.message.echo $MODE "$(printf '%.s═' {1..45})"
-  common.tasks.message.info "EFDE | Easy and Fast Developer Environment\nShortcuts"
-
-  IFS=$'\n' sorted_shortcuts=($(sort <<<"${EFDE_SHORTCUTS[*]}"))
-
-  for LINE in "${sorted_shortcuts[@]}"; do
-    IFS=',' read -r -a VALUES <<< "$LINE"
-
-    CURRENT_TITLE="${VALUES[0]%%:*}"
-    if [ "$PREV_TITLE" != "$CURRENT_TITLE" ]; then
-      common.tasks.message.warning "\n$CURRENT_TITLE:"
-      PREV_TITLE="$CURRENT_TITLE"
-    fi
-
-    local SHORTCUT=$(common.tasks.message.success $(_mod_.trim ${VALUES[0]}))
-    local DESCRPTION=$(common.tasks.message.success $(_mod_.trim ${VALUES[3]:-${VALUES[2]}}))
-    if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
-      local FUNCTION=$(common.tasks.message.echo debug $(_mod_.trim ${VALUES[1]}))
-      printf "  %-45s %-55s\n" "$SHORTCUT" "$FUNCTION"
+    if [[ "$PARAM" == custom:* ]]; then
+      _mod_.target_custom $PARAM
     else
-      printf "  %-45s %-55s\n" "$SHORTCUT" "$DESCRPTION"
+      _mod_.target_efde $PARAM
     fi
-  done
-}
+  }
 
+  _mod_.find(){
+    local PARAM="$1"
+    common.tasks.message.info "But we found some that may match the desired action:\n"
 
-_mod_.trim() {
+    local PARTS=(${PARAM//:/ })
+    for ((i = 0; i < ${#PARTS[@]}; i++)); do
+      PATTERN+="${PARTS[i]}"
+      if ((i < ${#PARTS[@]} - 1)); then
+        PATTERN+="|"
+      fi
+    done
+
+    ${GLOBAL_RUN_EFDE} efde:shortcuts | egrep --color=always "${PATTERN}"
+  }
+
+  # EFDE
+  _mod_.show_efde(){
+    local PREV_TITLE=""
+    common.tasks.message.title "EFDE | Easy and Fast Developer Environment\nShortcuts"
+
+    IFS=$'\n' sorted_shortcuts=($(sort <<<"${EFDE_SHORTCUTS[*]}"))
+
+    for LINE in "${sorted_shortcuts[@]}"; do
+      IFS=',' read -r -a VALUES <<< "$LINE"
+
+      CURRENT_TITLE="${VALUES[0]%%:*}"
+      if [ "$PREV_TITLE" != "$CURRENT_TITLE" ]; then
+        common.tasks.message.warning "$CURRENT_TITLE:"
+        PREV_TITLE="$CURRENT_TITLE"
+      fi
+
+      local SHORTCUT=$(common.tasks.message.success $(_mod_.trim ${VALUES[0]}))
+      local DESCRPTION=$(common.tasks.message.echo $(_mod_.trim ${VALUES[3]:-${VALUES[2]}}))
+      if common.tasks.config.get_efde_mode_debug; then
+        local FUNCTION=$(common.tasks.message.echo debug $(_mod_.trim ${VALUES[1]}))
+        printf "  %-45s %-55s\n" "$SHORTCUT" "$FUNCTION"
+      else
+        printf "  %-45s %-55s\n" "$SHORTCUT" "$DESCRPTION"
+      fi
+    done
+  }
+
+  _mod_.target_efde(){
+    local PARAM="$@"
+
+    for LINE in "${EFDE_SHORTCUTS[@]}"; do
+      IFS=',' read -r -a VALUES <<< "$LINE"
+      if [[ "${VALUES[0]}" == "$PARAM" ]]; then
+        FUNCTION_RUN=$(_mod_.trim "${VALUES[1]}")
+        ${FUNCTION_RUN}
+        return 0
+      fi
+    done
+    common.tasks.message.warning "The shortcut is not registered: $(common.tasks.message.danger \'${PARAM^^}\')"
+    _mod_.find "$PARAM"
+    exit 1
+  }
+
+  # CUSTOM
+  _mod_.load_custom_shortcuts() {
+    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implemention.get_current_path_efde)/$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS_LIST"
+    if [[ -f "$PATH_ABSOLUTE_SHORTCUTS" ]]; then
+      source "$PATH_ABSOLUTE_SHORTCUTS"
+
+      if [[ -z "${CUSTOM_SHORTCUTS+x}" ]]; then
+        common.tasks.message.warning "The CUSTOM_SHORTCUTS variable is not defined in the file: $PATH_ABSOLUTE_SHORTCUTS"
+        exit 1
+      fi
+    else
+      common.tasks.message.warning "The shortcuts file was not found in the path: $PATH_ABSOLUTE_SHORTCUTS"
+      exit 1
+    fi
+  }
+
+  _mod_.show_custom() {
+    local PREV_TITLE=""
+    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implemention.get_current_path_efde)/$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS_LIST"
+    local PATH_RELATIVE=$(echo "$PATH_ABSOLUTE_SHORTCUTS" | awk -F'/' '{print $(NF-3) "/" $(NF-2) "/" $(NF-1) "/" $NF}')
+    local CURRENT_TITLE="custom"
+
+    _mod_.load_custom_shortcuts
+
+    common.tasks.message.info "\nCustom shortcuts in $PATH_RELATIVE"
+
+    IFS=$'\n' sorted_items=($(printf "%s\n" "${CUSTOM_SHORTCUTS[@]}" | sort))
+
+    for LINE in "${sorted_items[@]}"; do
+      IFS=',' read -r -a VALUES <<< "$LINE"
+
+      if [[ ${#VALUES[@]} -lt 3 ]]; then
+        common.tasks.message.danger "Malformed or incomplete line (The line must contain a minimum of 3 elements)\n$LINE"
+        continue
+      fi
+
+      if [ "$PREV_TITLE" != "$CURRENT_TITLE" ]; then
+        common.tasks.message.warning "$CURRENT_TITLE:"
+        PREV_TITLE="$CURRENT_TITLE"
+      fi
+
+      local ITEM=$(common.tasks.message.success "$CURRENT_TITLE:$(_mod_.trim "${VALUES[0]}")")
+      local DESCRIPTION=$(common.tasks.message.echo $(_mod_.trim "${VALUES[2]}"))
+
+      if common.tasks.config.get_efde_mode_debug; then
+        local PATH_FILE=$(common.tasks.message.echo debug $(_mod_.trim "${VALUES[1]}"))
+        printf "  %-45s %-55s\n" "$ITEM" "$PATH_FILE"
+      else
+        printf "  %-45s %-55s\n" "$ITEM" "$DESCRIPTION"
+      fi
+    done
+  }
+
+  _mod_.target_custom() {
+    local action="$1"
+    local found=false
+    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implemention.get_current_path_efde)/$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS"
+
+    _mod_.load_custom_shortcuts
+
+    if [[ "$action" == custom:* ]]; then
+      action="${action#custom:}"
+    fi
+
+    for LINE in "${CUSTOM_SHORTCUTS[@]}"; do
+      IFS=',' read -r -a VALUES <<< "$LINE"
+
+      if [[ "${VALUES[0]}" == "$action" ]]; then
+        local FILE_RUN=$(_mod_.trim "${VALUES[1]}")
+
+        FILE_RUN_PATH="$PATH_ABSOLUTE_SHORTCUTS/$FILE_RUN"
+        if common.tasks.file.exists "$FILE_RUN_PATH"; then
+          common.tasks.message.info "\nCustom shortcuts"
+          common.tasks.message.success "Run script $FILE_RUN_PATH"
+          common.tasks.message.warning "Wait..."
+          sleep 1
+          bash "$FILE_RUN_PATH"
+          found=true
+        else
+          common.tasks.message.danger "The specified file does not exist: $FILE_RUN_PATH"
+          return 1
+        fi
+      fi
+    done
+
+    if [[ "$found" == false ]]; then
+      common.tasks.message.danger "Action not found $action in CUSTOM_SHORTCUTS."
+      return 1
+    fi
+  }
+
+  # EXTRA
+  _mod_.trim() {
     local var="$*"
-    var="$(echo -e "${var}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"  # Eliminar espacios al principio y al final
+    var="$(echo -e "${var}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
     echo -n "$var"
+  }
 }

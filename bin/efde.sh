@@ -1,13 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-declare -gA GLOBAL_EFDE_CONFIG=(
-  [LANGUAGE_DEFAULT]="en_US"
-  [EFDE_MODE_DEBUG]=false          # Debug Messages
-  [EFDE_MODE_DEVELOP]=false        # MMTodo: Prepared for create tmps
+declare -gA EFDE_CORE_CONFIG=(
+  [PROJECT_NAME]="efde"
+  [REPOSITORY]="https://github.com/mmaximo33/EFDE"
+  [I18N_DEFAULT]="en_US"
+  [FILE_CONFIG_HOST]="cfg.host"
+  [FILE_CONFIG_CORE]="cfg.core"
+  [UPDATE_AVAILABLE]="false"
 )
 
-resolve_absolute_dir() {
+declare -gA EFDE_CORE_PATH=(['INSTALL']="", [CONSOLE]="", [BIN]="", [TMP]="", [FILE_CONFIG_HOST]="", [FILE_CONFIG_CORE]="")
+
+declare -gA EFDE_CONFIG_CORE=(
+  [KEYS_REQUIRED]="DEBUG DEBUG_MODULE DEBUG_CONFIG DEBUG_SHORTCUTS DEBUG_I18N DEBUG_MENU"
+  [KEYS_OPTIONAL]="UPDATE_CHECK UPDATE_CHECK_LAST UPDATE_CHECK_AVAILABLE"
+) # Sets in cfg.core
+
+declare -gA EFDE_CONFIG_HOST=(
+  [KEYS_REQUIRED]="HOST_SO HOST_I18N HOST_EDITOR_DEFAULT HOST_CLI_MODE"
+  [KEYS_OPTIONAL]=""
+) # Sets in cfg.core
+
+efdeinit.resolve_absolute_dir() {
   local ABSOLUTE_BIN_PATH
   case "$OSTYPE" in
     linux-gnu) #Linux
@@ -21,15 +36,37 @@ resolve_absolute_dir() {
   echo "${ABSOLUTE_BIN_PATH}"
 }
 
-init_dirs()
+efdeinit.init_dirs()
 {
-    EFDE_PATH_INSTALL="$(resolve_absolute_dir)"
-    export PATH_CONSOLE="${EFDE_PATH_INSTALL}/console"
-    export PATH_BIN="${EFDE_PATH_INSTALL}/bin"
-    source "$PATH_CONSOLE/init"
+  EFDE_PATH_INSTALL="$(efdeinit.resolve_absolute_dir)"
+  EFDE_CORE_PATH['INSTALL']="$EFDE_PATH_INSTALL"
+  EFDE_CORE_PATH['BIN']="${EFDE_PATH_INSTALL}/bin"
+  EFDE_CORE_PATH['TMP']="${EFDE_PATH_INSTALL}/bin/.tmp"
+  EFDE_CORE_PATH['CONSOLE']="${EFDE_PATH_INSTALL}/console"
+  EFDE_CORE_PATH['FILE_CONFIG_HOST']="${EFDE_CORE_PATH['BIN']}/${EFDE_CORE_CONFIG['FILE_CONFIG_HOST']}"
+  EFDE_CORE_PATH['FILE_CONFIG_CORE']="${EFDE_CORE_PATH['BIN']}/${EFDE_CORE_CONFIG['FILE_CONFIG_CORE']}"
+
+  efdeinit.init_configs
+  source "${EFDE_CORE_PATH['CONSOLE']}/init"
 }
 
-menu_implementation(){
+efdeinit.init_configs() {
+  local config_file="${EFDE_CORE_PATH['FILE_CONFIG_CORE']}"
+  local REQUIRED_KEYS=()
+  eval "read -a REQUIRED_KEYS <<< \"\${EFDE_CONFIG_CORE['KEYS_REQUIRED']}\""
+  if [[ ! -f "$config_file" ]]; then
+    for key in "${REQUIRED_KEYS[@]}"; do
+      EFDE_CONFIG_CORE[$key]="false"
+    done
+  else
+    for key in "${REQUIRED_KEYS[@]}"; do
+      local value="$(grep -E "^${key}=" "$config_file" | cut -d'=' -f2 | sed 's/^"//;s/"$//')"
+      EFDE_CONFIG_CORE[$key]="${value:-false}"
+    done
+  fi
+}
+
+efdeinit.menu_implementation(){
   local PATH_ENV=$(efde.tasks.implemention.get_current_path_env_file)
   local IMPLEMENTION=$(common.tasks.env_variable.get_variable "EFDE_PROJECT_IMPLEMENTION" "$PATH_ENV")
 
@@ -39,37 +76,18 @@ menu_implementation(){
   fi
 }
 
-generate_extra_elements(){
-  efde.tasks.config.check_config
-  common.core.generate_shortcuts_file
-
-  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]; then
-    if [ ${GLOBAL_EFDE_CONFIG['LANGUAGE_DEFAULT']} != "$(efde.tasks.config.get_var "EFDE_LANGUAGE")" ]; then
-      common.core.generate_transactions
-    fi
-  fi
+efdeinit.menu(){
+  efde.tasks.implemention.has_folder_implementation && \
+  efdeinit.menu_implementation || efde.tasks.menu.main
 }
 
-menu(){
-  if ! efde.tasks.implemention.has_folder_implementation ; then
-    efde.tasks.menu.main
-  fi
-
-  menu_implementation
-}
-
-shortcuts(){
+efdeinit.shortcuts(){
   common.tasks.shortcuts.target "$@"
 }
 
-main() {
-  init_dirs # IMPORTANT
-  generate_extra_elements
-  if [ $# -gt 0 ]; then
-    shortcuts "$@"
-  else
-    menu
-  fi
+efdeinit.main() {
+  efdeinit.init_dirs # IMPORTANT
+  [ $# -gt 0 ] && efdeinit.shortcuts "$@" || efdeinit.menu
 }
 
-main "$@"
+efdeinit.main "$@"

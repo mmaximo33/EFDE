@@ -2,11 +2,13 @@
 set -euo pipefail
 
 _mod_.main(){
-  common.tasks.menu.show "$mysql_props_menu_TITLE" "${mysql_props_menu_MAIN[@]}"
+  common.tasks.menu.show \
+    --title "$mysql_props_menu_TITLE" \
+    --data "${mysql_props_menu_MAIN[@]}"
 }
 
 _mod_.env_show(){
-  cat "$(efde.tasks.implemention.get_current_path_env_file)" | grep -E "MYSQL|PMA"
+  mysql.tasks.main.env_show
   if common.tasks.prompt.confirm_default_yes $(common.tasks.message.msg_color warning "Back to menu?"); then
     common.tasks.os.console_clear
     _mod_.main

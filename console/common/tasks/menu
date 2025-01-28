@@ -1,127 +1,360 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-declare -gA GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE #VARIABLE GLOBAL - HIGH SOLUTION ;)
+declare -ga GLOBAL_MENU_CORE_DATA=()
 
+declare -gA GLOBAL_MENU_CORE=(
+  ['title']=""
+  ['isfunction']=false
+  ['history']=""
+  ['identation']=25
+)
+
+declare -gA GLOBAL_MENU_CURRENT_OPTION=(
+  ['title']="init"
+  ['description']="init"
+  ['function']="init"
+  ['choice']="init"
+)
+
+
+##########################
+## Debug menu
+##########################
 _mod_.msg_debug() {
-  if [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ]]; then
-    common.core.msg_debug "#######################################################################"
-    common.core.msg_debug "# MENU "
-    common.core.msg_debug "GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE:" 1
-    common.core.msg_debug "title: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']}" 2
-    common.core.msg_debug "description: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']}" 2
-    common.core.msg_debug "functions:" 2
-    common.core.msg_debug "new: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}" 3
-    common.core.msg_debug "old: ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}" 3 1
-    common.core.msg_debug "-----------------------------------------------------------------------"
+  if common.tasks.config.get_efde_mode_debug_menu; then
+    common.tasks.message.debug_manager_title "MENU"
+    common.tasks.message.debug_manager_tree "GLOBAL_MENU_CORE_DATA:" 1
+    for key in "${!GLOBAL_MENU_CORE_DATA[@]}"; do
+      common.tasks.message.debug_manager_tree "${key^^}: ${GLOBAL_MENU_CORE_DATA[$key]}" 2
+    done
+
+    common.tasks.message.debug_manager_tree "GLOBAL_MENU_CORE:" 1
+    for key in "${!GLOBAL_MENU_CORE[@]}"; do
+      common.tasks.message.debug_manager_tree "${key^^}: ${GLOBAL_MENU_CORE[$key]}" 2
+    done
+
+    common.tasks.message.debug_manager_tree "GLOBAL_MENU_CURRENT_OPTION:" 1
+    for key in "${!GLOBAL_MENU_CURRENT_OPTION[@]}"; do
+      common.tasks.message.debug_manager_tree "${key^^}: ${GLOBAL_MENU_CURRENT_OPTION[$key]}" 2
+    done
   fi
 }
 
-_mod_.print_options(){
-  local MODE="info"
-  local QUESTION="$1"
-  shift
-  local OPTIONS=("$@")
+##########################
+## GET | SET
+##########################
+_mod_.get_core_data(){
+  printf "%s\n" "${GLOBAL_MENU_CORE_DATA[@]}"
+}
 
-  [[ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" || "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ]] && MODE="debug"
+_mod_.set_core_data(){
+  GLOBAL_MENU_CORE_DATA=("$@")
+}
 
-  common.tasks.message.echo $MODE "$(printf '%.s═' {1..45})"
-  common.tasks.message.info "$QUESTION\n"
+_mod_.get_core_identation(){
+  echo "${GLOBAL_MENU_CORE['identation']}"
+}
 
-  for i in "${!OPTIONS[@]}"; do
-    OPTION=${OPTIONS[i]}
-    IFS=',' read -r -a VALUES <<< "$OPTION"
+_mod_.get_core_isfunction(){
+  # return 0 (true) or 1 (false)
+  [[ "${GLOBAL_MENU_CORE['isfunction']}" == "true" ]] || return 1
+}
 
-    if [[ ${#VALUES[@]} -ge 3 ]]; then
-      local TITULO=$(echo ${VALUES[2]})
-      local DESCRIPTION=$(echo ${VALUES[3]:-${VALUES[2]}})
-      if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] ; then
-        VALUES[1]=$(echo "${VALUES[1]}" | sed 's/ //g')
-        local DESCRIPTION=$(common.tasks.message.echo debug "${VALUES[1]}")
-      fi
+_mod_.set_core_isfunction(){
+  _mod_.set_validate "$@" && GLOBAL_MENU_CORE['isfunction']=$@
+}
 
-      printf "%-0s. %-25s %s\n" "$i" "$TITULO" "$DESCRIPTION"
-    else
-      common.tasks.message.warning "\nInvalid menu option: Requieres minimum: \'shortcut, function, name\' \n- For: $OPTION"
-    fi
+_mod_.get_core_title(){
+  echo "${GLOBAL_MENU_CORE['title']}"
+}
+
+_mod_.set_core_title(){
+  _mod_.set_validate "$@" && GLOBAL_MENU_CORE['title']="$@"
+}
+
+_mod_.get_core_history(){
+  echo "${GLOBAL_MENU_CORE['history']}"
+}
+
+_mod_.set_core_history(){
+  GLOBAL_MENU_CORE['history']=$1
+}
+
+_mod_.get_option_function(){
+  echo "${GLOBAL_MENU_CURRENT_OPTION['function']}"
+}
+
+_mod_.set_option_function(){
+  _mod_.set_validate "$@" && GLOBAL_MENU_CURRENT_OPTION['function']="$@"
+}
+
+_mod_.get_option_title(){
+  echo "${GLOBAL_MENU_CURRENT_OPTION['title']}"
+}
+
+_mod_.set_option_title(){
+  _mod_.set_validate "$@" && GLOBAL_MENU_CURRENT_OPTION['title']="$@"
+}
+
+_mod_.get_option_description(){
+  echo "${GLOBAL_MENU_CURRENT_OPTION['description']}"
+}
+
+_mod_.set_option_description(){
+  _mod_.set_validate "$@" && GLOBAL_MENU_CURRENT_OPTION['description']="$@"
+}
+
+_mod_.get_option_choice(){
+  echo "${GLOBAL_MENU_CURRENT_OPTION['choice']}"
+}
+
+_mod_.set_option_choice(){
+  _mod_.set_validate "$@" && GLOBAL_MENU_CURRENT_OPTION['choice']="$@"
+}
+
+_mod_.set_validate(){
+  if [[ "$#" -ne 1 || -z "$1" ]]; then
+    common.tasks.message.danger "Error: A SINGLE argument (string) is expected and cannot be empty."
+    return 1
+  fi
+}
+
+##########################
+## MENU
+##########################
+_mod_.show(){
+  _mod_.validate_params "$@"
+  _mod_.history_add
+  _mod_.print_options
+  _mod_.choice_options
+}
+
+_mod_.validate_params(){
+  local HELPER="Usage: ${FUNCNAME[1]} --title \"newtitle\" --data \'\${menu_data[@]} --isfunction false
+
+Options:
+  --title Title to display.
+  --data Array of data (passed as an array).
+  --isfunction (Optional) true/false, default: true."
+
+  _mod_.set_core_isfunction true
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --title)
+        _mod_.set_core_title "$2"
+        shift 2
+        ;;
+      --data)
+        shift
+        local DATA_TMP=()
+        while [[ "$#" -gt 0 && "$1" != --* ]]; do
+            DATA_TMP+=("$1")
+            shift
+        done
+        _mod_.set_core_data "${DATA_TMP[@]}"
+        ;;
+      --isfunction)
+        _mod_.set_core_isfunction "$2"
+        shift 2
+        ;;
+      *)
+        common.tasks.message.danger "Unknown option: $1"
+        common.tasks.message.warning "$HELPER"
+        return 1
+        ;;
+    esac
   done
 }
 
-_mod_.choice_options(){
-  local QUESTION="$1"
-  shift
-  local OPTIONS=("$@")
+_mod_.print_options(){
+    local IDENTATION_DEFAULT=$(_mod_.get_core_identation)
+    local QUESTION="$(_mod_.get_core_title)"
+    local OPTIONS=()
+    while IFS= read -r line; do
+        OPTIONS+=("$line")
+    done < <(_mod_.get_core_data)
 
-  common.tasks.message.info "\nPress R to return | Q to quit | I for info"
-  choice=$(common.tasks.prompt.request_input "$(common.tasks.message.success "Enter the option number:")")
+    common.tasks.message.title "$QUESTION"
 
-  if [[ $choice =~ ^[0-9]+$ && $choice -ge 0 && $choice -le $(( ${#OPTIONS[@]} -1 )) ]]; then
-    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['choice']=$choice
+    for i in "${!OPTIONS[@]}"; do
+        OPTION=${OPTIONS[i]}
+        if [[ -z "$OPTION" ]]; then
+            common.tasks.message.warning "Empty option found, skipping."
+            continue
+        fi
 
-    _mod_.chosen_option "${OPTIONS[$choice]}"
-    common.tasks.os.console_clear
-    local RUN_FUNCTION=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+        IFS=',' read -r -a VALUES <<< "$OPTION"
 
-    if common.tasks.module.exists_function "$RUN_FUNCTION" ;then
-      _mod_.msg_debug
-      ${RUN_FUNCTION}
-    fi
-  else
-    [[ "$choice" == "q" ]] && exit 0
-    # MMToDo: Bug in return functions
-    #[[ "$choice" == "r" ]] && { common.tasks.os.console_clear; ${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']}; return; }
-    [[ "$choice" == "r" ]] && { common.tasks.message.danger "We detected a BUG, we are working to correct the return";  }
-    common.tasks.os.console_clear
-    common.tasks.message.danger "The '$choice' option is not in the list."
-    _mod_.show "$QUESTION" "${OPTIONS[@]}"
-  fi
+        if [[ ${#VALUES[@]} -ge 2 ]]; then
+            local TITULO=$(echo ${VALUES[1]} | sed 's/^ *//;s/ *$//')
+            local DESCRIPTION=$(echo ${VALUES[2]:-${VALUES[1]}} | sed 's/^ *//;s/ *$//')
+            if common.tasks.config.get_efde_mode_debug; then
+                VALUES[0]=$(echo "${VALUES[0]}" | sed 's/ //g')
+                local DESCRIPTION=$(common.tasks.message.echo debug "${VALUES[0]}")
+            fi
 
+            IDENTATION=$(( i > 9 ? IDENTATION_DEFAULT - 1 : IDENTATION_DEFAULT ))
+
+            printf "%-0s. %-${IDENTATION}s %s\n" "$i" "$TITULO" "$DESCRIPTION"
+        else
+            common.tasks.message.warning "\nInvalid menu option: Requires minimum: 'function, name' \n- For: $OPTION"
+        fi
+    done
+}
+
+_mod_.choice_options() {
+  local QUESTION=$(_mod_.get_core_title)
+
+  local OPTIONS=()
+  while IFS= read -r line; do
+      OPTIONS+=("$line")
+  done < <(_mod_.get_core_data)
+
+  common.tasks.message.info "\n$(printf \
+    "Press [I]nfo |%s [Q]uit" \
+    "$(_mod_.history_check_return && echo ' [R]eturn |' || echo '')")\n"
+
+  choice=$(common.tasks.prompt.request_input "$(common.tasks.message.warning "Enter the option number:")")
+
+  case "$choice" in
+    q|quit|Q|QUIT|Quit)
+      common.tasks.os.console_clear
+      exit ;;
+    r|return|R|RETURN|Return)
+      _mod_.history_go_to_last_item
+      return ;;
+    i|info|I|INFO|Info)
+      efde.tasks.main.more_info
+      return ;;
+    *)
+      if [[ $choice =~ ^[0-9]+$ && $choice -ge 0 && $choice -lt ${#OPTIONS[@]} ]]; then
+        _mod_.chosen_option $choice
+        if _mod_.get_core_isfunction; then
+          local RUN_FUNCTION="$(_mod_.get_option_function)"
+          _mod_.check_function_exists $RUN_FUNCTION
+        fi
+      else
+        common.tasks.os.console_clear
+        common.tasks.message.danger "The '$choice' option is not in the list."
+        _mod_.show \
+          --title "$QUESTION" \
+          --data "${OPTIONS[@]}" \
+          --isfunction "$(_mod_.get_core_isfunction && echo true || echo false)"
+      fi
+      ;;
+  esac
 }
 
 _mod_.chosen_option(){
-  local MENU_ARRAY="$1"
+  local CHOICE="$1"
+  local MENU_ARRAY=()
   local VALUES
 
-  IFS=',' read -r -a VALUES <<< "$MENU_ARRAY"
+  _mod_.set_option_choice $CHOICE
+  while IFS= read -r line; do
+      MENU_ARRAY+=("$line")
+  done < <(_mod_.get_core_data)
+
+
+  IFS=',' read -r -a VALUES <<< "${MENU_ARRAY[$CHOICE]}"
   if [[ ${#VALUES[@]} -ge 2 ]]; then
+    _mod_.set_option_function "$(echo ${VALUES[0]})"
+    _mod_.set_option_title "${VALUES[1]#"${VALUES[1]%%[![:space:]]*}"}"
 
-    # Return function menu
-    # MMTodo: Review
-    # Solo se puede hacer un solo return,
-    # Solucion acumular historico de functions, durante el ciclo de vida de la ejecucion
-    if [[ ! -n "${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']+isset}" ]]; then
-      GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']=""
-    else
-      GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function_old']="${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}"
-    fi
-
-    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']=$(echo ${VALUES[1]})
-    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['title']="${VALUES[2]}"
-    GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['description']="${VALUES[3]:-${VALUES[2]}}"
-
+    local DESCRIPTION_TMP="${VALUES[2]:-${VALUES[1]}}"
+    _mod_.set_option_description "${DESCRIPTION_TMP#"${DESCRIPTION_TMP%%[![:space:]]*}"}"
   else
     common.tasks.message.danger "Error: Incorrect input format"
     exit 1
   fi
 }
 
-# USAGE
-# my_array=(
-#   'sortucut,  Title 0,  Description 0'
-#   'code,                            Title 0,  Description 0'
-#   'function_name,                   Title 1,  Description 1'
-#   'common.tasks.module.function,    Title 2,  Description 2'
-# )
-#
-# common.tasks.menu.show "¿Question?" "${my_array[@]}"
-#
-# common.tasks.message.echo $SHOW_MENU_RESPONSE
-_mod_.show(){
-  _mod_.print_options "$@"
-  _mod_.choice_options "$@"
+_mod_.check_function_exists() {
+  local FUNCTION_NAME="$1"
+  if common.tasks.module.exists_function "$FUNCTION_NAME"; then
+    common.tasks.os.console_clear
+    ${FUNCTION_NAME}
+  fi
 }
 
+##########################
+## History Manager
+##########################
+_mod_.history_get_array() {
+    if [[ -z "$(_mod_.get_core_history)" ]]; then
+        echo "null"
+        return
+    fi
 
+    IFS=',' read -r -a HISTORY_ARRAY <<< "$(_mod_.get_core_history)"
+    echo "${HISTORY_ARRAY[@]}"
+}
 
+_mod_.history_add(){
+  local FUNCTION_NEW=$(echo "$(caller 1)" | awk '{print $2}')
+  local FUNCTION_LAST=$(_mod_.history_get_last)
+  local HISTORY="$(_mod_.get_core_history)"
 
+  if [[ "$FUNCTION_NEW" != "$FUNCTION_LAST" ]]; then
+    if [[ -n "$HISTORY" ]]; then
+      HISTORY+=",${FUNCTION_NEW}"
+    else
+      HISTORY="${FUNCTION_NEW}"
+      _mod_.set_option_function "${FUNCTION_NEW}"
+    fi
+    _mod_.set_core_history "$HISTORY"
+  fi
+  _mod_.msg_debug
+}
 
+_mod_.history_get_last() {
+  local HISTORY_ARRAY=($(_mod_.history_get_array))
+
+  if [[ -z "$(_mod_.get_core_history)" ]]; then
+    echo "null"
+    return
+  fi
+
+  echo "${HISTORY_ARRAY[-1]}"
+}
+
+_mod_.history_remove_last() {
+  local HISTORY_ARRAY=($(_mod_.history_get_array))
+  local HISTORY_NEW
+  if [[ ${#HISTORY_ARRAY[@]} -gt 0 ]]; then
+    unset "HISTORY_ARRAY[-1]"
+  fi
+
+  HISTORY_NEW=$(IFS=','; echo "${HISTORY_ARRAY[*]}")
+  _mod_.set_core_history "$HISTORY_NEW"
+}
+
+_mod_.history_check_return(){
+  local HISTORY_ARRAY=($(_mod_.history_get_array))
+
+  if (( ${#HISTORY_ARRAY[@]} > 1 )); then
+    return 0
+  else
+    return 1
+  fi
+}
+
+_mod_.history_go_to_last_item(){
+  local FUNCTION_NAME
+  if _mod_.history_check_return; then
+    _mod_.history_remove_last
+    FUNCTION_NAME=$(_mod_.history_get_last)
+    _mod_.history_remove_last
+  else
+    FUNCTION_NAME=$(_mod_.history_get_last)
+  fi
+
+  common.tasks.os.console_clear
+  _mod_.check_function_exists "$FUNCTION_NAME"
+}
+
+_mod_.get_selected_value(){
+  echo "$(_mod_.get_option_function)"
+}

@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  # Manager versions
+  # Min version for manager
+  _mod_.version_min(){
+    echo "2.2.0"
+  }
+
+  _mod_.version_point_current() {
+    local POINT_CURRENT
+    POINT_CURRENT=$(git -C "$EFDE_PATH_INSTALL" tag --points-at HEAD)
+
+    if [[ -z "$POINT_CURRENT" ]]; then
+        POINT_CURRENT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --abbrev-ref HEAD)
+    fi
+    echo "$POINT_CURRENT"
+  }
+
+  _mod_.manage_version() {
+    local TAGS_LIST VERSIONS POINT_CURRENT POINT_SELECT
+
+    POINT_CURRENT=$(_mod_.version_point_current)
+    TAGS_LIST=$(git -C "$EFDE_PATH_INSTALL" tag --sort=-v:refname)
+
+    VERSIONS=("$(printf "%s, %s%s, %s" \
+       "develop" \
+       "develop" \
+       "$( [[ "develop" == "$POINT_CURRENT" ]] && echo " (current)" || echo "" )" \
+       "develop")")
+    while IFS= read -r tag; do
+
+      [[ "$tag" < $(_mod_.version_min ) ]] && continue
+
+      VERSIONS+=("$(printf "%s, %s%s, %s" \
+        "$tag" \
+        "$tag" \
+        "$( [[ "$tag" == "$POINT_CURRENT" ]] && echo " (current)" || echo "" )" \
+        "$tag")")
+
+    done <<< "$TAGS_LIST"
+
+    common.tasks.menu.show \
+      --title "$efde_props_menu_TITLE" \
+      --data "${VERSIONS[@]}" \
+      --isfunction false
+    POINT_SELECT=$(common.tasks.menu.get_selected_value)
+
+    local QUESTION=$(common.tasks.message.msg_color warning "You want to move to the version $(common.tasks.message.msg_color success "$POINT_SELECT")?")
+    if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
+      if git -C "$EFDE_PATH_INSTALL" rev-parse "refs/tags/$POINT_SELECT" >/dev/null 2>&1; then
+        git -C "$EFDE_PATH_INSTALL" checkout "tags/$POINT_SELECT"   # Switch TAG
+      else
+        git -C "$EFDE_PATH_INSTALL" switch "$POINT_SELECT"          # Switch Branch
+      fi
+
+      common.tasks.message.success "\nMoving to $POINT_SELECT"
+      common.tasks.directory.remove force "${EFDE_CORE_PATH['TMP']}"
+      common.tasks.message.success "\nRebooting to take changes"
+      common.tasks.message.warning "Wait..."
+      sleep 2
+      efde.tasks.main.run_global_efde
+    else
+      common.tasks.message.danger "Version change cancelled.\nIt is currently in [$POINT_CURRENT]"
+    fi
+  }
+
+  # Updates
+  _mod_.update_tree(){
+    local SILENT="$1"
+    local MESSAGE="$2"
+    local LEVEL="$3"
+    local IDENT="$4"
+    local TYPE="$5"
+    SILENT="${SILENT:-false}"
+    if [[ "$SILENT" == "false" ]]; then
+      common.tasks.message.tree "$MESSAGE" "$LEVEL" "$IDENT" "$TYPE"
+    fi
+  }
+
+  _mod_.update() {
+    local SILENT=false
+    local MSG CURRENT_TAG REMOTE_TAGS NEW_TAG LOCAL_COMMIT REMOTE_COMMIT
+
+    while [[ "$#" -gt 0 ]]; do
+      case $1 in
+        --silent ) SILENT=true ;;
+        * ) break ;;
+      esac
+      shift
+    done
+
+    # CHECK TAGS
+    _mod_.update_tree "$SILENT" "Checking updates." 1 0 info
+    local CURRENT_TAG=$(git -C "$EFDE_PATH_INSTALL" describe --tags --abbrev=0)
+    local REMOTE_TAGS=$(git -C "$EFDE_PATH_INSTALL" ls-remote --tags origin)
+    local NEW_TAG=$(echo "$REMOTE_TAGS" | grep -v '\^{}' | awk -F'/' '{print $3}' | sort -V | tail -n1)
+
+    if [[ "$CURRENT_TAG" < "$NEW_TAG" ]]; then
+      MSG=$(common.tasks.message.msg_color warning "New tag detected: $NEW_TAG.")
+      _mod_.update_tree "$SILENT" "TAGs: $MSG" 2 0 info
+      CHECK_TAGS=0 # true
+    else
+      MSG=$(common.tasks.message.msg_color success "It is updated with the tags (last v$NEW_TAG).")
+      _mod_.update_tree "$SILENT" "TAGs: $MSG" 2 0 info
+      CHECK_TAGS=1 # false
+    fi
+
+    if [[ "$SILENT" == "true" ]]; then
+      return $CHECK_TAGS
+    fi
+
+    # CHECK DEVELOP
+    if ! git -C "$EFDE_PATH_INSTALL" show-ref --verify --quiet refs/heads/develop; then
+      MSG=$(common.tasks.message.msg_color danger "'develop' does not exist. No updates checked.")
+      _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+      CHECK_DEVELOP=0 # Return 0 to indicate no action taken
+    fi
+
+    local LOCAL_COMMIT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 develop)
+    local REMOTE_COMMIT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 origin/develop)
+    if [[ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]]; then
+      MSG=$(common.tasks.message.msg_color warning "Updates available for branch 'develop'.")
+      _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+      CHECK_DEVELOP=0 # true
+    else
+      MSG=$(common.tasks.message.msg_color success "'develop' does not exist. No updates checked.")
+      _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+      CHECK_DEVELOP=1 # false
+    fi
+
+    if [[ "$CHECK_DEVELOP" -eq 0 || "$CHECK_TAGS" -eq 0 ]]; then
+      sleep 1
+      local QUESTION=$(common.tasks.message.msg_color warning "\nDo we update ${EFDE_CORE_CONFIG['PROJECT_NAME']} now?")
+      if common.tasks.prompt.confirm_default_yes "$QUESTION"; then
+        git -C "$EFDE_PATH_INSTALL" fetch --tags
+        _mod_.update_tree "$SILENT" "Fetched new tags!" 1 0 success
+
+        git -C "$EFDE_PATH_INSTALL" pull origin develop
+        _mod_.update_tree "$SILENT" "Updated branch develop" 1 0 success
+
+        git -C "$EFDE_PATH_INSTALL" switch -c main "$NEW_TAG"
+        _mod_.update_tree "$SILENT" "Move to tag $NEW_TAG" 1 0 success
+
+        common.tasks.config.set_core_update_available "false"
+        return 0
+      else
+        common.tasks.message.danger "Update canceled."
+        return 1
+      fi
+    fi
+  }
+
+  # Uninstalls
+  _mod_.uninstall() {
+    common.tasks.message.info "You are about to eliminate one of the best tools for application development in local environments"
+    if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "Are you sure you want to do it?"); then
+      local CONFIRM="Delete ${EFDE_CORE_CONFIG['PROJECT_NAME']}"
+      local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
+      local QUESTION=$(common.tasks.message.msg_color warning "If you are completely sure, write '$CONFIRM_COLOR'")
+      local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
+      if [[ "$RESPONSE" == "$CONFIRM" ]]; then
+        common.tasks.file.remove "$(type -P "$GLOBAL_RUN_EFDE")"
+        common.tasks.directory.remove force "$EFDE_PATH_INSTALL"
+        common.tasks.message.success "${EFDE_CORE_CONFIG['PROJECT_NAME']} was successfully uninstalled from your computer"
+        common.tasks.message.warning "We hope to work together again"
+        _mod_.more_info
+      else
+        common.tasks.message.danger "Confirmation failed. Aborting ${EFDE_CORE_CONFIG['PROJECT_NAME']} deletion."
+      fi
+    fi
+  }
+}

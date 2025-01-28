@@ -17,10 +17,9 @@ _mod_.choose_php_versions(){
   local VERSION_PHP
   local VERSION_SYMFONY=""
 
-  # while for call function see versions
-  while [ "$VERSION_SYMFONY" == "" ] || common.tasks.module.exists_function "$VERSION_SYMFONY" ; do
+  while [ "$VERSION_SYMFONY" == "" ]; do
     symfony.tasks.menu.create_environment_version
-    VERSION_SYMFONY=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
+    VERSION_SYMFONY=$(common.tasks.menu.get_selected_value)
   done
 
   VERSION_PHP=$( [ "$VERSION_SYMFONY" == "5" ] && echo "7.4" || echo "8.2" )

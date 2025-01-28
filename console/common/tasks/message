@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+#https://en.wikipedia.org/wiki/Box-drawing_characters
 
 _mod_.echo() {
   # shellcheck disable=SC2068
@@ -14,7 +15,7 @@ _mod_.msg_color(){
       info)     shift;  MSG="${B_CYAN}$@${COLOR_RESET}";;
       warning)  shift;  MSG="${B_YELLOW}$@${COLOR_RESET}";;
       danger)   shift;  MSG="${B_RED}$@${COLOR_RESET}";;
-      debug)    shift;  MSG="${B_PURPLE}${@}${COLOR_RESET}";;
+      debug)    shift;  MSG="${B_PURPLE}$@${COLOR_RESET}";;
       *)                MSG="$@";;
     esac
 
@@ -53,9 +54,33 @@ _mod_.danger(){
 }
 
 _mod_.debug(){
-  if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEBUG']}" = "true" ] ; then
-    _mod_.echo debug "$@"
+  common.tasks.config.get_efde_mode_debug && _mod_.echo debug "$@"
+}
+
+_mod_.title(){
+  local FUNCTION SEPARATOR POINT SUFFIX URL HIPERLINK
+  if common.tasks.config.get_efde_mode_debug; then
+    FUNCTION="_mod_.debug"
+  else
+    FUNCTION="_mod_.info"
   fi
+
+  SEPARATOR="$(printf '%.s━' {1..50})"
+  POINT=$(efde.tasks.lifecycle.version_point_current)
+  URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/tag/${POINT:-0.0.0}"
+  SUFFIX="EFDE [${POINT:-0.0.0}]"
+  HIPERLINK="🯄"
+
+  if [[ "${EFDE_CONFIG_CORE['UPDATE_CHECK_AVAILABLE']:-EFDE_CORE_CONFIG['UPDATE_AVAILABLE']}" == "true" ]]; then
+    URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/latest"
+    SUFFIX=$(_mod_.echo success "[Check NEW version]")
+    HIPERLINK="$(_mod_.echo warning $HIPERLINK)"
+  fi
+
+  HYPERLINK="\e]8;;$URL\a$HIPERLINK\e]8;;\a"
+  ${FUNCTION} "$SEPARATOR $SUFFIX $HYPERLINK"
+
+  _mod_.info "$@\n"
 }
 
 # USE
@@ -93,6 +118,25 @@ _mod_.tree(){
 }
 
 _mod_.tree_print(){
-    # shellcheck disable=SC2145
-    command printf "$@\n" 2>/dev/null
+  # shellcheck disable=SC2145
+  command printf "$@\n" 2>/dev/null
+}
+
+
+_mod_.debug_manager_title(){
+  if common.tasks.config.get_efde_mode_debug; then
+    _mod_.debug "$(printf '%.s#' {1..75})"
+    _mod_.debug "# LOAD $1"
+    _mod_.debug "$(printf '%.s-' {1..75})"
+  fi
+}
+
+_mod_.debug_manager_tree(){
+  if common.tasks.config.get_efde_mode_debug; then
+    local level="${2:-0}"
+    local end="${3:-0}"
+    common.tasks.message.tree \
+      "$(printf '%s' "$1" | sed 's/\\n/\\\\n/g')" \
+      "$level" "$end" debug
+  fi
 }
