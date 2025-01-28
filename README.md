@@ -183,20 +183,18 @@ You are invited to join, use or even contribute to the growth of EFDE to give ba
 
 It is NOT something super innovative, but surely more than one will find it interesting.
 
-## Documentation
-
-### Contributing
+## Contributing
 
 There is still a lot to do with this small project if you are invited to join.
 Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
 
 ## Sponsor
-If you like this library and want to give some recognition, it is now possible to **become a [Github sponsor](https://www.github.com/sponsors/xavierfoucrier)** and support this project by sponsoring BarbaJS maintainer on Github. Even if it's a small contribution, you participate in the effort of making **open source projects maintained for anyone**, and developers to be rewarded for their work/time.
+If you like this project and want to give some recognition, it is now possible to **become a [Github sponsor](https://www.github.com/sponsors/mmaximo33)** and support this project by sponsoring **[mmaximo33](https://www.github.com/sponsors/mmaximo33)** maintainer on Github. Even if it's a small contribution, you participate in the effort of making **open source projects maintained for anyone**, and developers to be rewarded for their work/time.
 
 ## Contribute
-If you want to report a bug or request a new feature/improvement, please **read the project [contributors guidelines](.github/CONTRIBUTING.md) before**.
+If you want to report a bug or request a new feature/improvement, please **read the project [contributors guidelines](./CONTRIBUTING.md) before**.
 
-Thanks for taking time to contribute to Barba :tada: :+1:
+Thanks for taking time to contribute. 🎉 👍
 
 ## Contributors
 
@@ -250,12 +248,13 @@ Thanks for taking time to contribute to Barba :tada: :+1:
   </table>
 <tbody>
 
-## Collaborate with us
+### Collaborate with us
 
 <a href="https://jb.gg/OpenSourceSupport" target="_blank">
   <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height="125" alt="Logotipo de JetBrains (principal) logo.">
 </a>
 
+## Documentation
 ### Code of conduct
 
 The collaborators of this project strongly believe in a respectful community.
@@ -263,7 +262,7 @@ For this reason we operate under the following [CODE OF CONDUCT](./CODE_OF_CONDU
 
 ### Maintainers
 
-Currently, the sole maintainer is [@mmaximo33](https://github.com/mmaximo33) - more maintainers are quite welcome, and we hope to add folks to the team over time.
+Currently, the sole maintainer is **[@mmaximo33](https://github.com/mmaximo33)** - more maintainers are quite welcome, and we hope to add folks to the team over time.
 [GOVERNANCE](./GOVERNANCE.md) will be re-evaluated as the project evolves.
 
 ### License

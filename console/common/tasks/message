@@ -66,19 +66,20 @@ _mod_.title(){
   fi
 
   SEPARATOR="$(printf '%.s━' {1..50})"
-  POINT=$(efde.tasks.lifecycle.version_point_current)
-  URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/tag/${POINT:-0.0.0}"
-  SUFFIX="EFDE [${POINT:-0.0.0}]"
-  HIPERLINK="🯄"
-
-  if [[ "${EFDE_CONFIG_CORE['UPDATE_CHECK_AVAILABLE']:-EFDE_CORE_CONFIG['UPDATE_AVAILABLE']}" == "true" ]]; then
-    URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/latest"
-    SUFFIX=$(_mod_.echo success "[Check NEW version]")
-    HIPERLINK="$(_mod_.echo warning $HIPERLINK)"
+  if common.core.exists_function "efde.tasks.lifecycle.version_point_current"; then
+    POINT=$(efde.tasks.lifecycle.version_point_current)
+    URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/tag/${POINT:-0.0.0}"
+    SUFFIX="EFDE [${POINT:-0.0.0}]"
+    HIPERLINK="🯄"
+    HYPERLINK="\e]8;;$URL\a$HIPERLINK\e]8;;\a"
+    if [[ "${EFDE_CONFIG_CORE['UPDATE_CHECK_AVAILABLE']:-EFDE_CORE_CONFIG['UPDATE_AVAILABLE']}" == "true" ]]; then
+      URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/latest"
+      SUFFIX=$(_mod_.echo success "[Check NEW version]")
+      HIPERLINK="$(_mod_.echo warning $HIPERLINK)"
+    fi
   fi
 
-  HYPERLINK="\e]8;;$URL\a$HIPERLINK\e]8;;\a"
-  ${FUNCTION} "$SEPARATOR $SUFFIX $HYPERLINK"
+  ${FUNCTION} "$SEPARATOR ${SUFFIX:-} ${HYPERLINK:-}"
 
   _mod_.info "$@\n"
 }
