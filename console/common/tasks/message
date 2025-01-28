@@ -15,7 +15,7 @@ _mod_.msg_color(){
       info)     shift;  MSG="${B_CYAN}$@${COLOR_RESET}";;
       warning)  shift;  MSG="${B_YELLOW}$@${COLOR_RESET}";;
       danger)   shift;  MSG="${B_RED}$@${COLOR_RESET}";;
-      debug)    shift;  MSG="${B_PURPLE}${@}${COLOR_RESET}";;
+      debug)    shift;  MSG="${B_PURPLE}$@${COLOR_RESET}";;
       *)                MSG="$@";;
     esac
 
@@ -58,7 +58,7 @@ _mod_.debug(){
 }
 
 _mod_.title(){
-  local FUNCTION SEPARATOR SUFFIX URL HIPERLINK
+  local FUNCTION SEPARATOR POINT SUFFIX URL HIPERLINK
   if common.tasks.config.get_efde_mode_debug; then
     FUNCTION="_mod_.debug"
   else
@@ -66,8 +66,9 @@ _mod_.title(){
   fi
 
   SEPARATOR="$(printf '%.s━' {1..50})"
-  URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/tag/${EFDE_CONFIG_CORE['CORE_VERSION']:-0.0.0}"
-  SUFFIX="[EFDE v${EFDE_CONFIG_CORE['CORE_VERSION']:-0.0.0}]"
+  POINT=$(efde.tasks.lifecycle.version_point_current)
+  URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/tag/${POINT:-0.0.0}"
+  SUFFIX="EFDE [${POINT:-0.0.0}]"
   HIPERLINK="🯄"
 
   if [[ "${EFDE_CONFIG_CORE['UPDATE_CHECK_AVAILABLE']:-EFDE_CORE_CONFIG['UPDATE_AVAILABLE']}" == "true" ]]; then
@@ -77,7 +78,7 @@ _mod_.title(){
   fi
 
   HYPERLINK="\e]8;;$URL\a$HIPERLINK\e]8;;\a"
-  ${FUNCTION} "$SEPARATOR $SUFFIX$HYPERLINK"
+  ${FUNCTION} "$SEPARATOR $SUFFIX $HYPERLINK"
 
   _mod_.info "$@\n"
 }

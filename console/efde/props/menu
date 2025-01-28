@@ -2,14 +2,14 @@
 set -euo pipefail
 {
   # shellcheck disable=SC2168
-  local IMPLEMENT="Efde"
+  local IMPLEMENT="${EFDE_CORE_CONFIG['PROJECT_NAME']}"
   # shellcheck disable=SC2168
   local PREFIX_TASKS="${IMPLEMENT,,}.tasks"
 
-  _mod_TITLE="EFDE | Easy and Fast Developer Environment\nSelect an option:"
+  _mod_TITLE="${IMPLEMENT^^} | Easy and Fast Developer Environment\nSelect an option:"
 
   _mod_MAIN=(
-    "$PREFIX_TASKS.menu.efde,                  $IMPLEMENT config,      Settings and configurations"
+    "$PREFIX_TASKS.menu.efde,                  ${IMPLEMENT^^} config,  Settings and configurations"
     "laravel.tasks.menu.create_environment,    Laravel,                Install for Laravel"
     "symfony.tasks.menu.create_environment,    Symfony,                Install for Symfony (WebApp or Apis)"
     "wordpress.tasks.menu.create_environment,  Wordpress,              Install for Wordpress and Woocommerce"
@@ -22,12 +22,13 @@ set -euo pipefail
   )
 
   _mod_EFDE=(
-    "$PREFIX_TASKS.main.more_info,         More info,              Show project $IMPLEMENT"
-    "$PREFIX_TASKS.menu.config,            Global configs,         $IMPLEMENT Global Settings"
-    "$PREFIX_TASKS.menu.shortcuts_show,    Show shortcuts,         Show shortcuts"
-    "$PREFIX_TASKS.main.report_github,     Report on github ,      Report Bug | Improvements | New Features | others"
-    "$PREFIX_TASKS.main.efde_update,       Update,                 Check update and downloads"
-    "$PREFIX_TASKS.main.efde_uninstall,    Uninstall,              Uninstall from computer"
+    "$PREFIX_TASKS.main.more_info,            More info,              Show project ${IMPLEMENT^^}"
+    "$PREFIX_TASKS.menu.config,               Global configs,         ${IMPLEMENT^^} Global Settings"
+    "$PREFIX_TASKS.menu.shortcuts_show,       Show shortcuts,         Show shortcuts"
+    "$PREFIX_TASKS.main.report_github,        Report on github,       Report Bug | Improvements | New Features | others"
+    "$PREFIX_TASKS.lifecycle.manage_version,  Manage Version,         Change ${IMPLEMENT^^} version"
+    "$PREFIX_TASKS.lifecycle.update,          Update,                 Check update and downloads"
+    "$PREFIX_TASKS.lifecycle.uninstall,       Uninstall,              Uninstall from computer"
   )
 
   # TOOLS

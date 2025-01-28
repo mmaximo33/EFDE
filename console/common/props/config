@@ -8,7 +8,7 @@ set -euo pipefail
 
   # CONFIGURATION
   _mod_CONFIG=(
-    "$PREFIX_TASKS.config.show_all,   Show,   Show all $IMPLEMENT"
+    "$PREFIX_TASKS.config.show_all,   Show,   Show all ${IMPLEMENT^^}"
     "$PREFIX_TASKS.config.set_all,    Set,    Set all config"
   )
 

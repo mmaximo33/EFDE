@@ -2,6 +2,7 @@
 set -euo pipefail
 
 declare -gA EFDE_CORE_CONFIG=(
+  [PROJECT_NAME]="efde"
   [REPOSITORY]="https://github.com/mmaximo33/EFDE"
   [I18N_DEFAULT]="en_US"
   [FILE_CONFIG_HOST]="cfg.host"

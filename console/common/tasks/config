@@ -75,7 +75,6 @@ _mod_.load() {
 _mod_.set_all(){
 
   # CORE
-  _mod_.set_core_version
   _mod_.set_core_update_frequency
   _mod_.set_core_update_last
   _mod_.set_core_default
@@ -134,10 +133,6 @@ _mod_.set_core_config(){
   common.tasks.env_variable.set_variable "$KEY" "$VALUE" "$CONFIG_PATH_CORE"
 }
 
-_mod_.set_core_version() {
-  _mod_.set_core_config "CORE_VERSION" "$(common.tasks.git.efde_get_current_tag)"
-}
-
 _mod_.set_core_update_frequency(){
   common.tasks.menu.show \
     --title "How often do check for updates?" \
@@ -152,7 +147,7 @@ _mod_.set_core_update_last() {
 }
 
 _mod_.get_core_update_available(){
-  echo $(_mod_.get_host_config "UPDATE_CHECK_AVAILABLE")
+  echo $(_mod_.get_core_config "UPDATE_CHECK_AVAILABLE")
 }
 
 _mod_.set_core_update_available(){
@@ -274,18 +269,18 @@ _mod_.updates_availables() {
   case "$UPDATE_FREQUENCY" in
     daily)    [[ "$DAYS_DIFF" -ge 1 ]] && RUN_UPDATE="true" ;;
     weekly)   [[ "$DAYS_DIFF" -ge 7 ]] && RUN_UPDATE="true" ;;
-    never)    RUN_UPDATE="true";;
+    never)    RUN_UPDATE="false";;
     *)        RUN_UPDATE="true";;
   esac
 
   if [[ "$RUN_UPDATE" == "true" ]]; then
-    if efde.tasks.main.efde_update --silent; then
-      _mod_.set_core_update_last
+    _mod_.set_core_update_last
+    if efde.tasks.lifecycle.update --silent; then
       _mod_.set_core_update_available "true"
 
       if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
         _mod_.set_core_update_available "false"
-        efde.tasks.main.efde_update
+        efde.tasks.lifecycle.update
       fi
     fi
   fi

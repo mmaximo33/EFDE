@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.0] 2024-xx-xx
+## [2.3.0] 2025-01-28
 
 ### Added
 - EFDE:
@@ -14,13 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - #51 Refactor EFDE update and management of CORE and HOST cfg
 
 ### Changed
-- EFDE: 
+- EFDE:
+  - #17 Installation - Version management 
   - #42 Don't show menu after shortcuts
   - #46 Refactor EFDE_MODE_* validation
   - #50 Simplify config.env for commands and outputs
 
 ### Fixed
-- EFDE: 
+- EFDE:
   - #39 error project name folder creation
   - #41 Correct use of the docker-compose command in implemention
   - #44 Adjust indentation in the menu
