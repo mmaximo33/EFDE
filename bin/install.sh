@@ -315,6 +315,11 @@ Install'
       exit 1
     fi
 
+    if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
+      export PATH="$HOME/bin:$PATH"
+      hash -r
+    fi
+
     efde_tree "$(efde_msg success "[DONE]")" 3 1
   }
 
