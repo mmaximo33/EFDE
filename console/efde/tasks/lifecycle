@@ -49,9 +49,11 @@ set -euo pipefail
     local QUESTION=$(common.tasks.message.msg_color warning "You want to move to the version $(common.tasks.message.msg_color success "$POINT_SELECT")?")
     if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
       if git -C "$EFDE_PATH_INSTALL" rev-parse "refs/tags/$POINT_SELECT" >/dev/null 2>&1; then
-        git -C "$EFDE_PATH_INSTALL" checkout "tags/$POINT_SELECT"   # Switch TAG
+        # Switch TAG
+        git -C "$EFDE_PATH_INSTALL" checkout "tags/$POINT_SELECT" >/dev/null 2>&1
       else
-        git -C "$EFDE_PATH_INSTALL" switch "$POINT_SELECT"          # Switch Branch
+        # Switch Branch
+        git -C "$EFDE_PATH_INSTALL" switch "$POINT_SELECT" >/dev/null 2>&1
       fi
 
       common.tasks.message.success "\nMoving to $POINT_SELECT"
