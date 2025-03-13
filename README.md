@@ -1,8 +1,5 @@
 # EFDE | Easy and Fast Development Environment [![follow](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@Efde.official)
 
-### If you like the project, give us a little star ⭐. It really helps us a lot. Thank you! 💪
-
-
 ![efde type](https://img.shields.io/badge/project-Open_Source-green.svg) ![efde version](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ![efde version](https://img.shields.io/badge/status-Active-green.svg)
@@ -18,10 +15,12 @@
 
 ![efde translations](https://img.shields.io/badge/language-grey.svg) ![en_US](https://img.shields.io/badge/en.US-blue.svg) ![es_ES](https://img.shields.io/badge/es.ES-blue.svg) ![pt_PT](https://img.shields.io/badge/pt.PT-blue.svg)
 
+### If you like the project, give us a little star ⭐.
+#### It really helps us a lot. Thank you! 💪
 ## Index
 
 - [Intro](#intro)
-- [Installing or Updating or Uninstall](#install--update)
+- [Installing, Manager Versions, Updating & Uninstall](#install--update)
 - [Usage](#usage)
 - [Mission](#mission)
 - [Documentation](#documentation)
@@ -82,6 +81,13 @@ Anyway, if you want to know more, you can see the following list with the offici
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/engine/install/ubuntu/)
 [![Docker Compose](https://img.shields.io/badge/Docker_Compose-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/install/other/)
 
+<details>
+<summary>See installation of required tools</summary>
+
+![efde_process_install.png](./docs/media/efde_process_install.png)
+
+</details>
+
 ### Install
 #### Manual 
 For manual installation you must
@@ -132,8 +138,8 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 
 ![Efde process install](./docs/media/efde_process_install.gif)
 
-### Update & Uninstall
-![efde process update or uninstall](./docs/media/efde_process_update_uninstall.gif)
+### Manager Version, Update & Uninstall
+![efde process versiosn update uninstall](./docs/media/efde_process_version_update_uninstall.gif)
 
 ## Usage
 
@@ -143,12 +149,14 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 - Go to the directory where you create your projects (example: `~/Domains`)
 - Run `efde`  in your command console
 
-### Created with EFDE
+### Created project with EFDE
 
-- In case you are in a project created with **EFDE**. Example: `~/Domains/newproject`
+- In case you are in a project created with **EFDE**. Example: `~/Domains/demo`
 - The menu for that implementation will be displayed (Symfony, Laravel, Magento, Wordpress, WooComerce, Prestashop, React, Angular, Vue, Others)
 
 ![efde symfony install](./console/implemention/symfony/docs/media/install.gif)
+
+### Use in project 
 
 ![efde symfony use](./console/implemention/symfony/docs/media/use.gif)
 
@@ -156,11 +164,17 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 
 Since version 2.1.0, shortcuts are available. You can see the list by running `efde efde:shortcuts`
 
-![efde shortcuts](./docs/media/efde_shortcuts.gif)
+![efde shortcuts](./docs/media/efde_shortcut.gif)
 
+#### Projects shortcuts
 Since version 2.2.1, CUSTOM shortcuts are available per project. You can see the list by running `efde custom`
 
+<details>
+<summary>Custom Shortcuts</summary>
+
 ![efde_shortcuts_custom.png](./docs/media/efde_shortcuts_custom.png)
+
+</details>
 
 ## Mission
 

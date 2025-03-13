@@ -5,15 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] 2025-03-13
+
+### Fixed
+
+- EFDE
+  - #53 Force symbolic link update after installation
+  - #54 Fail update, uninstall, manager version
+  - Update documentations
+
 ## [2.3.0] 2025-01-28
 
 ### Added
+
 - EFDE:
   - #43 Add custom shortcuts / commands line
   - #48 Validate that the base configuration is complete
   - #51 Refactor EFDE update and management of CORE and HOST cfg
 
 ### Changed
+
 - EFDE:
   - #17 Installation - Version management 
   - #42 Don't show menu after shortcuts
@@ -21,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - #50 Simplify config.env for commands and outputs
 
 ### Fixed
+
 - EFDE:
   - #39 error project name folder creation
   - #41 Correct use of the docker-compose command in implemention
@@ -31,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.2.0] 2024-05-12
 
 ### Added
+
 - EFDE: #32 Translation system (en_US es_ES pt_PT)
 - Laravel: #5 Add new implemention
 - Wordpress: #31 Add new implemention
