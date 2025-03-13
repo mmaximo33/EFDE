@@ -159,7 +159,7 @@ set -euo pipefail
     if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "Are you sure you want to do it?"); then
       local CONFIRM="Delete ${EFDE_CORE_CONFIG['PROJECT_NAME']}"
       local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
-      local QUESTION=$(common.tasks.message.msg_color warning "If you are completely sure, write '$CONFIRM_COLOR'")
+      local QUESTION=$(common.tasks.message.msg_color warning "If you are completely sure, write '$CONFIRM_COLOR':")
       local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
       if [[ "$RESPONSE" == "$CONFIRM" ]]; then
         common.tasks.file.remove "$(type -P "$GLOBAL_RUN_EFDE")"
@@ -171,5 +171,10 @@ set -euo pipefail
         common.tasks.message.danger "Confirmation failed. Aborting ${EFDE_CORE_CONFIG['PROJECT_NAME']} deletion."
       fi
     fi
+  }
+
+  _mod_.more_info(){
+    url="${EFDE_CORE_CONFIG['REPOSITORY']}?tab=readme-ov-file#easy-and-fast-development-environment-efde-"
+    common.tasks.command_line.run false false "xdg-open $url"
   }
 }
