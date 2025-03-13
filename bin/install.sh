@@ -393,7 +393,7 @@ Install'
     mkdir -p "${INSTALL_DIR}"
     if command git clone --branch ${INSTALL['GIT_BRANCH']} "$(efde_source)" "$INSTALL_DIR" 2>/dev/null; then
       cd "$INSTALL_DIR"
-      command git fetch origin develop 2>/dev/null
+      command git fetch origin develop:develop 2>/dev/null
       if [[ ! "${INSTALL['GIT_BRANCH']}" == "main" ]]; then
         efde_tree "$(efde_msg debug "[DEBUG]") TESTING BRANCH $(git rev-parse --abbrev-ref HEAD 2>&1)" 4 1
       else

@@ -79,76 +79,76 @@ set -euo pipefail
   }
 
   _mod_.update() {
-    local SILENT=false
-    local MSG CURRENT_TAG REMOTE_TAGS NEW_TAG LOCAL_COMMIT REMOTE_COMMIT
+      local SILENT=false
+      local MSG CURRENT_TAG REMOTE_TAGS NEW_TAG LOCAL_COMMIT REMOTE_COMMIT CHECK_TAGS CHECK_DEVELOP
 
-    while [[ "$#" -gt 0 ]]; do
-      case $1 in
-        --silent ) SILENT=true ;;
-        * ) break ;;
-      esac
-      shift
-    done
+      while [[ "$#" -gt 0 ]]; do
+        case $1 in
+          --silent ) SILENT=true ;;
+          * ) break ;;
+        esac
+        shift
+      done
 
-    # CHECK TAGS
-    _mod_.update_tree "$SILENT" "Checking updates." 1 0 info
-    local CURRENT_TAG=$(git -C "$EFDE_PATH_INSTALL" describe --tags --abbrev=0)
-    local REMOTE_TAGS=$(git -C "$EFDE_PATH_INSTALL" ls-remote --tags origin)
-    local NEW_TAG=$(echo "$REMOTE_TAGS" | grep -v '\^{}' | awk -F'/' '{print $3}' | sort -V | tail -n1)
+      # CHECK TAGS
+      _mod_.update_tree "$SILENT" "Checking updates." 1 0 info
+      local CURRENT_TAG=$(git -C "$EFDE_PATH_INSTALL" tag --sort=-v:refname | head -n1)
+      local REMOTE_TAGS=$(git -C "$EFDE_PATH_INSTALL" ls-remote --tags origin | awk -F'/' '{print $3}' | grep -v '\^{}' | sort -V)
+      local NEW_TAG=$(echo "$REMOTE_TAGS" | tail -n1)
 
-    if [[ "$CURRENT_TAG" < "$NEW_TAG" ]]; then
-      MSG=$(common.tasks.message.msg_color warning "New tag detected: $NEW_TAG.")
-      _mod_.update_tree "$SILENT" "TAGs: $MSG" 2 0 info
-      CHECK_TAGS=0 # true
-    else
-      MSG=$(common.tasks.message.msg_color success "It is updated with the tags (last v$NEW_TAG).")
-      _mod_.update_tree "$SILENT" "TAGs: $MSG" 2 0 info
-      CHECK_TAGS=1 # false
-    fi
-
-    if [[ "$SILENT" == "true" ]]; then
-      return $CHECK_TAGS
-    fi
-
-    # CHECK DEVELOP
-    if ! git -C "$EFDE_PATH_INSTALL" show-ref --verify --quiet refs/heads/develop; then
-      MSG=$(common.tasks.message.msg_color danger "'develop' does not exist. No updates checked.")
-      _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
-      CHECK_DEVELOP=0 # Return 0 to indicate no action taken
-    fi
-
-    local LOCAL_COMMIT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 develop)
-    local REMOTE_COMMIT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 origin/develop)
-    if [[ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]]; then
-      MSG=$(common.tasks.message.msg_color warning "Updates available for branch 'develop'.")
-      _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
-      CHECK_DEVELOP=0 # true
-    else
-      MSG=$(common.tasks.message.msg_color success "'develop' does not exist. No updates checked.")
-      _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
-      CHECK_DEVELOP=1 # false
-    fi
-
-    if [[ "$CHECK_DEVELOP" -eq 0 || "$CHECK_TAGS" -eq 0 ]]; then
-      sleep 1
-      local QUESTION=$(common.tasks.message.msg_color warning "\nDo we update ${EFDE_CORE_CONFIG['PROJECT_NAME']} now?")
-      if common.tasks.prompt.confirm_default_yes "$QUESTION"; then
-        git -C "$EFDE_PATH_INSTALL" fetch --tags
-        _mod_.update_tree "$SILENT" "Fetched new tags!" 1 0 success
-
-        git -C "$EFDE_PATH_INSTALL" pull origin develop
-        _mod_.update_tree "$SILENT" "Updated branch develop" 1 0 success
-
-        git -C "$EFDE_PATH_INSTALL" switch -c main "$NEW_TAG"
-        _mod_.update_tree "$SILENT" "Move to tag $NEW_TAG" 1 0 success
-
-        common.tasks.config.set_core_update_available "false"
-        return 0
+      if [[ "$CURRENT_TAG" != "$NEW_TAG" ]]; then
+        MSG=$(common.tasks.message.msg_color warning "New tag detected: $NEW_TAG.")
+        _mod_.update_tree "$SILENT" "TAGs: $MSG" 2 0 info
+        CHECK_TAGS=0 # true
       else
-        common.tasks.message.danger "Update canceled."
-        return 1
+        MSG=$(common.tasks.message.msg_color success "It is updated with the tags (last v$NEW_TAG).")
+        _mod_.update_tree "$SILENT" "TAGs: $MSG" 2 0 info
+        CHECK_TAGS=1 # false
       fi
-    fi
+
+      if [[ "$SILENT" == "true" ]]; then
+        return $CHECK_TAGS
+      fi
+
+      # CHECK DEVELOP BRANCH
+      if git -C "$EFDE_PATH_INSTALL" rev-parse --verify develop >/dev/null 2>&1; then
+        LOCAL_COMMIT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 develop)
+        REMOTE_COMMIT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 origin/develop)
+        if [[ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]]; then
+          MSG=$(common.tasks.message.msg_color warning "Updates available for branch 'develop'.")
+          _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+          CHECK_DEVELOP=0 # true
+        else
+          MSG=$(common.tasks.message.msg_color success "Branch 'develop' is up to date.")
+          _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+          CHECK_DEVELOP=1 # false
+        fi
+      else
+        MSG=$(common.tasks.message.msg_color danger "'develop' does not exist. No updates checked.")
+        _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+        CHECK_DEVELOP=0 # false
+      fi
+
+      if [[ "$CHECK_DEVELOP" -eq 0 || "$CHECK_TAGS" -eq 0 ]]; then
+        sleep 1
+        local QUESTION=$(common.tasks.message.msg_color warning "\nDo you want to update ${EFDE_CORE_CONFIG['PROJECT_NAME']} now?")
+        if common.tasks.prompt.confirm_default_yes "$QUESTION"; then
+          git -C "$EFDE_PATH_INSTALL" fetch --tags
+          _mod_.update_tree "$SILENT" "Fetched new tags!" 1 0 success
+
+          git -C "$EFDE_PATH_INSTALL" pull origin develop:develop
+          _mod_.update_tree "$SILENT" "Updated branch develop" 1 0 success
+
+          git -C "$EFDE_PATH_INSTALL" checkout -B main "$NEW_TAG"
+          _mod_.update_tree "$SILENT" "Switched to tag $NEW_TAG" 1 0 success
+
+          common.tasks.config.set_core_update_available "false"
+          return 0
+        else
+          common.tasks.message.danger "Update canceled."
+          return 1
+        fi
+      fi
   }
 
   # Uninstalls
