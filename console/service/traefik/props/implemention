@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  declare -gA _mod_MAIN=(
+    [DOMAIN_TRAEFIK]=$(common.tasks.env_variable.get_variable "EFDE_TRAEFIK_DOMAIN" "$PATH_CONSOLE_SERVICE/traefik/environment/.env")
+  )
+}

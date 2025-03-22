@@ -30,8 +30,8 @@ set -euo pipefail
 
   # TOOLS
   _mod_TOOLS=(
-    "tools:portainer,   portainerfunction,      Portainer.io,     https://portainer.io/,"
-    "tools:domains,     tools.tasks.domains,    Local domains,    /etc/hosts,"
+    "tools:domains,     localdomains.tasks.menu.main,    Local domains,    /etc/hosts,"
+    "tools:portainer,   $PATH_MENU.menu.coming_soon,     Portainer.io,     https://portainer.io/,"
   )
 
   # CONFIGURATION

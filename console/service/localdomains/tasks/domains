@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# add_domains_efde "traefik.efde" "portainer.efde"
+_mod_.add_domains_efde() {
+  local HOSTS_FILE=${localdomains_props_implemention_MAIN['LINUX_PATH_FILE']}
+  local DOMAINS="$@"
+  local -A MSG=(
+    [INFO]="The local domain already exists"
+    [SUCCESS]="The local domain was added"
+  )
+
+  if ! grep -q "# start EFDE domains" "$HOSTS_FILE"; then
+    echo -e "\n# start EFDE domains\n# end EFDE domains" | sudo tee -a "$HOSTS_FILE"
+  fi
+
+  for DOMAIN in $DOMAINS; do
+    if grep -q "$DOMAIN" "$HOSTS_FILE"; then
+      common.tasks.message.info ${MSG['INFO']}
+    else
+      sudo sed -i "/# start EFDE domains/a 127.0.0.1 $DOMAIN" "$HOSTS_FILE"
+      common.tasks.message.success ${MSG['SUCCESS']}
+    fi
+  done
+}
+
+_mod_.domain_add(){
+  local HOSTS_FILE=${localdomains_props_implemention_MAIN['LINUX_PATH_FILE']}
+
+  while true; do
+    local DOMAIN=$(common.tasks.prompt.request_input $(common.tasks.message.msg_color warning "Enter the new domain:"))
+    local -A MSG=(
+      [DANGER]="You must enter a domain."
+      [INFO]="The domain $DOMAIN already exists in $HOSTS_FILE."
+      [SUCCESS]="Domain $DOMAIN successfully added."
+    )
+
+    if [[ -z "$DOMAIN" ]]; then
+      common.tasks.message.danger ${MSG['DANGER']}
+      continue
+    fi
+
+    if ! _mod_.validate_domain "$DOMAIN"; then
+      continue
+    fi
+
+    if grep -q "127.0.0.1 $DOMAIN" "$HOSTS_FILE"; then
+      common.tasks.message.info ${MSG['INFO']}
+      return
+    fi
+
+    echo "127.0.0.1 $DOMAIN" | sudo tee -a "$HOSTS_FILE"
+    common.tasks.message.success ${MSG['SUCCESS']}
+    return
+  done
+}
+
+_mod_.domain_remove(){
+  local HOSTS_FILE=${localdomains_props_implemention_MAIN['LINUX_PATH_FILE']}
+
+  while true; do
+    local DOMAIN=$(common.tasks.prompt.request_input $(common.tasks.message.msg_color warning "Enter the domain to remove:"))
+    local -A MSG=(
+      [DANGER]="You must enter a domain."
+      [WARNING]="The domain $DOMAIN does not exist in $HOSTS_FILE."
+      [SUCCESS]="Domain $DOMAIN successfully deleted."
+    )
+
+    if [[ -z "$DOMAIN" ]]; then
+      common.tasks.message.danger ${MSG['DANGER']}
+      continue
+    fi
+
+    if ! _mod_.validate_domain "$DOMAIN"; then
+      continue
+    fi
+
+    if ! grep -q "127.0.0.1 $DOMAIN" "$HOSTS_FILE"; then
+      common.tasks.message.warning ${MSG['WARNING']}
+      return
+    fi
+
+    sudo sed -i "/127.0.0.1 $DOMAIN/d" "$HOSTS_FILE"
+    common.tasks.message.success ${MSG['SUCCESS']}
+    return
+  done
+}
+
+_mod_.validate_domain() {
+  local DOMAIN=$1
+  local DOMAIN_REGEX="^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
+
+  if [[ $DOMAIN =~ $DOMAIN_REGEX ]]; then
+    return 0
+  else
+    common.tasks.message.danger "'$DOMAIN' is not valid."
+    return 1
+  fi
+}
+

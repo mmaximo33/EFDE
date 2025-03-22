@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.show_efde(){
+  sed -n '/# start EFDE domains/,/# end EFDE domains/p' ${localdomains_props_implemention_MAIN['LINUX_PATH_FILE']}
+}
+
+_mod_.show_all(){
+  cat "${localdomains_props_implemention_MAIN['LINUX_PATH_FILE']}"
+}
+
+_mod_.domain_add(){
+   localdomains.tasks.domains.domain_add
+}
+
+_mod_.domain_remove(){
+  localdomains.tasks.domains.domain_remove
+}

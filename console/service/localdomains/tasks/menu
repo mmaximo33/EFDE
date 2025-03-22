@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+_mod_.main(){
+  common.tasks.menu.show "$docker_props_menu_TITLE" "${localdomains_props_menu_MAIN[@]}"
+}
+
+_mod_.show_efde(){
+  _mod_.main.show_efde
+  _mod_.main
+}
+
+_mod_.show_all(){
+  _mod_.main.show_all
+  _mod_.main
+}
+
+_mod_.domain_add(){
+  _mod.domains.domain_add
+  _mod_.main
+}
+
+_mod_.domain_remove(){
+  _mod.domains.domain_remove
+  _mod_.main
+}

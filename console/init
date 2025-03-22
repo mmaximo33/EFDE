@@ -11,10 +11,10 @@ create_folder_tmp(){
 
 create_construct(){
   # Load basic module
-  MODULE_NAME="common"
-  IMPORT_FILE="core"
-  PATH_SOURCE="$PATH_CONSOLE/$MODULE_NAME/$IMPORT_FILE"
-  PATH_TARGET="$DIRECTORY_TMP/$MODULE_NAME.$IMPORT_FILE"
+  local MODULE_NAME="common"
+  local IMPORT_FILE="core"
+  local PATH_SOURCE="$PATH_CONSOLE/$MODULE_NAME/$IMPORT_FILE"
+  local PATH_TARGET="$DIRECTORY_TMP/$MODULE_NAME.$IMPORT_FILE"
 
   if [ "${GLOBAL_EFDE_CONFIG['EFDE_MODE_DEVELOP']}" = "true" ] || [ ! -f "$PATH_TARGET" ]; then
       sed "/sed/! s/_mod_/$MODULE_NAME.$IMPORT_FILE/g" "$PATH_SOURCE" > "$PATH_TARGET"
@@ -26,7 +26,7 @@ create_construct(){
 
 load_modules(){
   local PATH_TO_INSPECT="$@"
-  DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
+  local DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
   for DIRECTORY in $DIRECTORIES; do
     [ "$DIRECTORY" = "common" ] && continue
 

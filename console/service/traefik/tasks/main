@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  # shellcheck disable=SC2168
+  PATH_SERVICE="$PATH_CONSOLE/service/traefik"
+
+  _mod_.get_envrionment_variable(){
+    local PATH_ENV="$PATH_SERVICE/environment/.env"
+
+    echo "$(common.tasks.env_variable.get_variable "$1" "$PATH_ENV")"
+  }
+
+  _mod_.get_environment_container_name(){
+    echo "$(_mod_.get_envrionment_variable "EFDE_CONTAINER_NAME")"
+  }
+
+  _mod_.get_environment_container_network(){
+    echo "$(_mod_.get_envrionment_variable "EFDE_NETWORK_NAME")"
+  }
+
+  _mod_.create_local_domain(){
+    localdomains.tasks.domains.add_domains_efde "${traefik_props_implemention_MAIN['DOMAIN_TRAEFIK']}"
+  }
+
+  _mod_.check_running(){
+    local CONTAINER_NAME="$(_mod_.get_environment_container_name)"
+    local NETWORK_NAME="$(_mod_.get_environment_container_network)"
+    local DOCKER_RUN="docker.tasks.main.d_command_run"
+
+    _mod_.create_local_domain
+
+    # Check network created
+    if [ ! "$(docker network ls | grep $NETWORK_NAME)" ]; then
+        docker network create $NETWORK_NAME
+    fi
+
+    if [ ! "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+        if [ "$(docker ps -aq -f status=exited -f name=$CONTAINER_NAME)" ]; then
+            # Container exists but is stopped, so start it
+            docker start $CONTAINER_NAME
+        else
+            # Container does not exist, so create and start it
+            docker.tasks.main.dp_command_run -f "$PATH_SERVICE/environment/docker-compose.yml" up -d
+        fi
+    fi
+  }
+}

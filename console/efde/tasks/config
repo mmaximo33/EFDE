@@ -41,6 +41,7 @@ _mod_.set_config(){
   _mod_.set_var "EFDE_LAST_UPDATE"            "$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")"
   _mod_.set_var "EFDE_MODE_DEBUG"             "false"
   _mod_.set_var "EFDE_MODE_DEVELOP"           "false"
+  _mod_.set_var "EFDE_GITIGNORE_DEFAULT"      ".idea\n.vscode\n.docker/database\ndumps"
   _mod_.confirm_config
 }
 

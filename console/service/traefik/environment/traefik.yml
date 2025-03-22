@@ -1,0 +1,36 @@
+api:
+  insecure: true
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+#global:
+#  checkNewVersion: true
+#  sendAnonymousUsage: true
+#entryPoints:
+#  web:
+#    address: ':80'
+#    http:
+#      redirections:
+#        entryPoint:
+#          to: web-secure
+#          scheme: https
+#  web-secure:
+#    address: ':443'
+#    http:
+#      tls:
+#        certResolver: lets-encrypt
+#  traefik:
+#    address: ':8082'
+#log:
+#  level: DEBUG
+#  filePath: /etc/traefik/logs/traefik.log
+#accessLog:
+#  filePath: /etc/traefik/logs/access.log

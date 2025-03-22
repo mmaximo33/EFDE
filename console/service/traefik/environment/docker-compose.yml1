@@ -1,0 +1,44 @@
+version: '3.8'
+#services:
+#  ${EFDE_SERVICE_NAME}:
+
+services:
+  efde_service_traefik:
+    image: traefik:latest
+    container_name: ${EFDE_CONTAINER_NAME}
+    env_file: .env
+    restart: always
+    ports: ["80:80"]
+    #ports: ["80:80", "443:443", "8080:8080"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/traefik.yml
+      - ./acme.json:/etc/traefik/acme.json
+#    command:
+#      - "--api.insecure=true" # Habilita el dashboard
+#      - "--api.dashboard=true"
+#      - "--providers.docker=true"
+#      - "--entrypoints.web.address=:80"
+#      - "--entrypoints.websecure.address=:443"
+#      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+#      - "--certificatesresolvers.myresolver.acme.email=my-projects@example.com"
+#      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+#      #- "--log.level=DEBUG"
+#      # HTTP to HTTPS Redirect
+#      - traefik.http.routers.(`${EFDE_SERVICE_NAME}`).entrypoints=web
+#      - traefik.http.routers.(`${EFDE_SERVICE_NAME}`).rule=HostRegexp(`host:.+`)
+#      # HTTPS
+#      - traefik.http.routers.(`${EFDE_SERVICE_NAME}`).entrypoints=web-secure
+#      - traefik.http.routers.(`${EFDE_SERVICE_NAME}`).rule=Host(`${EFDE_DOMAIN_NAME}`)
+    networks:
+      efde-network:
+
+networks:
+  efde-network:
+    name: ${EFDE_NETWORK_NAME}
+    driver: bridge
+    ipam:
+      driver: default
+    external: true
+
+#docker network inspect efde-traefik-network

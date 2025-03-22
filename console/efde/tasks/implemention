@@ -1,116 +1,304 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+#Example
 declare -gA GLOBAL_SETUP_IMPLEMENTION=(
-  [EFDE_PROJECT_NAME]=""
-  [EFDE_PROJECT_CREATE_AT]=""
+  [EFDE_PROJECT_VERSION]="comming soon"
+  [EFDE_PROJECT_CREATE_AT]="yyyy-mm-dd"
+  [EFDE_PROJECT_NAME]="example"
+  [EFDE_PROJECT_DOMAIN]="efde.domain.com"
   [EFDE_PROJECT_IMPLEMENTION]=""
+  [TMP_PATH_NEW_PROJECT]=""
+  [TMP_PATH_EFDE_FOLDER]="${efde_props_implemention_MAIN['EFDE_FOLDER']}"
+  [TMP_PATH_EFDE_FILE_ENV]="${efde_props_implemention_MAIN['EFDE_FILE_ENV']}"
 )
-declare -gA GLOBAL_IMPLEMENTION_EFDE_FOLDER=(
-  [FOLDER]=".efde"
-  [FILE_ENV]=".env"
-)
+
+_mod_.clear_global_variables(){
+  # Set required
+  GLOBAL_SETUP_IMPLEMENTION=(
+    [TMP_PATH_NEW_PROJECT]=""
+    [TMP_PATH_EFDE_FOLDER]="${efde_props_implemention_MAIN['EFDE_FOLDER']}"
+    [TMP_PATH_EFDE_FILE_ENV]="${efde_props_implemention_MAIN['EFDE_FILE_ENV']}"
+  )
+}
+
+################################
+# GENERAL
+#-------------------------------
+_mod_.get_current_path_env_file(){
+  # shellcheck disable=SC2005
+  # shellcheck disable=SC2046
+  echo $(printf "%s/%s/%s" \
+    "$(pwd)" \
+    "${efde_props_implemention_MAIN['EFDE_FOLDER']}" \
+    "${efde_props_implemention_MAIN['EFDE_FILE_ENV']}"
+  )
+}
 
 ################################
 # CURRENT PROJECT
 #-------------------------------
-_mod_.get_current_path_env_file(){
-  echo "$(pwd)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
+_mod_.has_folder_implementation(){
+  common.tasks.file.exists "$(_mod_.get_current_path_env_file)"
 }
+
 
 ################################
 # NEW OR CLONE PROJECT
 #-------------------------------
-_mod_.clear_global_variables(){
-  GLOBAL_SETUP_IMPLEMENTION=()
-}
-
 _mod_.get_new_path_project(){
-  echo "$(pwd)/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']}"
+  if [[ -n "${GLOBAL_SETUP_IMPLEMENTION['TMP_PATH_NEW_PROJECT']}" ]]; then
+    echo "${GLOBAL_SETUP_IMPLEMENTION['TMP_PATH_NEW_PROJECT']}"
+  else
+    echo "$(pwd)/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']}"
+  fi
 }
 
-_mod_.get_new_path_implemention(){
-  echo "$(_mod_.get_new_path_project)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}"
+_mod_.get_efde_folder(){
+  echo "$(_mod_.get_new_path_project)/${GLOBAL_SETUP_IMPLEMENTION['TMP_PATH_EFDE_FOLDER']}"
 }
 
-_mod_.get_new_path_env_file(){
-  echo "$(_mod_.get_new_path_implemention)/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
-}
-
-_mod_.has_folder_implementation(){
-  common.tasks.directory.exists "$(_mod_.get_new_path_implemention)"
+_mod_.get_efde_file_env(){
+  echo "$(_mod_.get_efde_folder)/${GLOBAL_SETUP_IMPLEMENTION['TMP_PATH_EFDE_FILE_ENV']}"
 }
 
 _mod_.create_symbolic_link_env(){
-  local ORIGIN="${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FOLDER']}/${GLOBAL_IMPLEMENTION_EFDE_FOLDER['FILE_ENV']}"
+  local ORIGIN="$(_mod_.get_efde_file_env)"
   local TARGET="$(_mod_.get_new_path_project)/.env"
   ln -sfT "$ORIGIN" "$TARGET"
 }
 
 _mod_.create_folder(){
   local FOLDER_PROJECT="$(_mod_.get_new_path_project)"
-  local FOLDER_IMPLEMENTION="$(_mod_.get_new_path_implemention)"
+  local FOLDER_IMPLEMENTION="$(_mod_.get_efde_folder)"
 
   if common.tasks.directory.exists "$FOLDER_PROJECT"; then
-    common.tasks.message.danger "Error: The project name already exists in this directory.\nVerify: $FOLDER_PROJECT"
-    _mod_.setup_environment
+    common.tasks.message.danger "$(printf "%s\n%s %s" \
+      "The project name already exists in this directory." \
+      "Verify" \
+      $FOLDER_PROJECT
+    )"
+    return 1
   fi
+
   common.tasks.directory.create_recursive "$FOLDER_IMPLEMENTION"
 }
 
 _mod_.set_envs(){
-  local FILE="$(_mod_.get_new_path_env_file)"
+  local FILE="$(_mod_.get_efde_file_env)"
   common.tasks.env_variable.set_variable $1 $2 $FILE
 }
 
 _mod.set_all_env(){
-  local FILE="$(_mod_.get_new_path_env_file)"
-  local DATA_ENV="$(common.tasks.env_variable.prepare_string_to_env GLOBAL_SETUP_IMPLEMENTION)"
+  declare -A FILTERED_ENV
+  for key in "${!GLOBAL_SETUP_IMPLEMENTION[@]}"; do
+    if [[ $key != TMP_* ]]; then
+      FILTERED_ENV["$key"]="${GLOBAL_SETUP_IMPLEMENTION[$key]}"
+    fi
+  done
+
+  local FILE="$(_mod_.get_efde_file_env)"
+
+  local -a ORDER=("efde" "docker" "php" "mysql" "pma")
+
+  local -a SORTED_KEYS=()
+  local -a OTHER_KEYS=()
+
+  for prefix in "${ORDER[@]}"; do
+    local prefix_keys=()
+    for key in "${!FILTERED_ENV[@]}"; do
+      if [[ $key == ${prefix^^}_* ]]; then
+        prefix_keys+=("$key")
+      fi
+    done
+    if [[ ${#prefix_keys[@]} -gt 0 ]]; then
+      SORTED_KEYS+=("${prefix_keys[@]}")
+      SORTED_KEYS+=("")
+    fi
+  done
+
+  for key in "${!FILTERED_ENV[@]}"; do
+    local matched=false
+    for prefix in "${ORDER[@]}"; do
+      if [[ $key == ${prefix^^}_* ]]; then
+        matched=true
+        break
+      fi
+    done
+    if [ "$matched" = false ]; then
+      OTHER_KEYS+=("$key")
+    fi
+  done
+
+  SORTED_KEYS+=("${OTHER_KEYS[@]}")
+  local DATA_ENV=""
+  for key in "${SORTED_KEYS[@]}"; do
+    if [[ -z $key ]]; then
+      DATA_ENV+="\n"
+    else
+      DATA_ENV+="${key}=\"${FILTERED_ENV[$key]}\"\n"
+    fi
+  done
 
   echo -e "$DATA_ENV" > "$FILE"
-  sort -o "$FILE" "$FILE"
 
   _mod_.create_symbolic_link_env
 }
 
+
+
 _mod_.copy_environment(){
-  local ORIGIN="$PATH_CONSOLE/implemention/${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']}/environment"
+  local ORIGIN=$(printf "%s/implemention/%s/environment" \
+    "$PATH_CONSOLE" \
+    "${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']}"
+  )
   local TARGET="$(_mod_.get_new_path_project)"
   shopt -s dotglob
   cp -r "$ORIGIN"/* "$TARGET"
   shopt -u dotglob
+
+  # Extra
+  _mod_.create_gitignore
+}
+
+_mod_.create_gitignore(){
+  local TARGET=$(printf "%s/%s" \
+    "$(_mod_.get_new_path_project)" \
+    ".gitignore"
+  )
+  local DEFAULT=".docker/database\ndumps"
+  local CONTENT="${GLOBAL_EFDE_CONFIG['EFDE_GITIGNORE_DEFAULT']:-$DEFAULT}"
+
+  echo -e "$CONTENT" > "$TARGET"
 }
 
 _mod_.project_name(){
-  local -A MSG
-  local value
-
-  MSG=(
+  local FOLDER_PROJECT="$(pwd)"
+  local -A MSG=(
     [MAIN]=""
-    [START]=$(common.tasks.message.warning "Enter the project name\nProject name:")
-    [ERROR]=$(common.tasks.message.danger "The entered value can only contain letters, numbers, dots, hyphens, and underscores (no spaces allowed).")
+    [INPUT]=$(common.tasks.message.warning "Enter the project name:")
+    [VALIDATE]=$(common.tasks.message.danger "The entered value can only contain letters, numbers, dots, hyphens, and underscores (no spaces allowed).")
+    [EXISTS]=$(common.tasks.message.danger "The project name already exists in this directory.\nVerify:")
     [EXIT]=$(common.tasks.message.info "Cancel with [ctrl + c]")
   )
-  MSG['MAIN']=${MSG['START']}
+
+  MSG['MAIN']=${MSG['INPUT']}
+
   while true; do
-    value=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
-    if [[ "$value" =~ ^[[:alnum:]._-]+$ ]]; then
-      break
+    local value=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
+    local NEW_FOLDER_PROJECT="$FOLDER_PROJECT/$value"
+    if ! [[ "$value" =~ ^[[:alnum:]._-]+$ ]]; then
+      MSG['MAIN']=$(printf "%s\n%s\n%s" \
+        "${MSG['VALIDATE']}" \
+        "${MSG['EXIT']}" \
+        "${MSG['INPUT']}"
+      )
     else
-      MSG['MAIN']="${MSG['ERROR']}\n${MSG['EXIT']}\n${MSG['START']}"
+      if common.tasks.directory.exists "$NEW_FOLDER_PROJECT"; then
+        MSG['MAIN']=$(printf "%s %s\n%s\n%s" \
+          "${MSG['EXISTS']}" \
+          "$(common.tasks.message.danger "$NEW_FOLDER_PROJECT")" \
+          "${MSG['EXIT']}" \
+          "${MSG['INPUT']}"
+        )
+      else
+        break #success
+      fi
     fi
   done
 
   echo "$(common.tasks.string.convert_string_to_lowercase "$value")"
 }
 
+# Replace domain_name_request
+_mod_.domain_name_set(){
+  local DOMAIN_SUFFIX="${efde_props_implemention_MAIN['DOMAIN_SUFFIX']}"
+  echo "$(common.tasks.string.convert_string_to_lowercase "$DOMAIN_SUFFIX")"
+}
+
+_mod_.domain_name_request(){
+  local DOMAIN_SUFFIX="${efde_props_implemention_MAIN['DOMAIN_SUFFIX']}"
+  local -A MSG=(
+    [MAIN]=""
+    [INPUT]=$(common.tasks.message.warning "Enter the domain:")
+    [ERROR]=$(common.tasks.message.danger "The entered value can only contain letters, numbers, dots, and hyphens (no spaces allowed, cannot start or end with a hyphen).")
+    [EXIT]=$(common.tasks.message.info "Cancel with [ctrl + c]")
+  )
+
+  MSG['MAIN']=${MSG['INPUT']}
+  while true; do
+    local value=$(common.tasks.prompt.request_input "${MSG['MAIN']}")
+    if [[ "$value" =~ ^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$ ]]; then
+      break
+    else
+      MSG['MAIN']=$(printf "%s\n%s\n%s" \
+        "${MSG['ERROR']}" \
+        "${MSG['EXIT']}" \
+        "${MSG['INPUT']}"
+      )
+    fi
+  done
+
+  echo "$(common.tasks.string.convert_string_to_lowercase "$value.$DOMAIN_SUFFIX")"
+}
+
+# shellcheck disable=SC2120
 _mod_.setup_environment(){
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']=$(_mod_.project_name)
+  #_mod_.clear_global_variables
+
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="comming soon"
   GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_CREATE_AT']=$(common.tasks.datetime.get_formatted_datetime "%Y-%m-%d")
+
+  # Request user
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']="$(_mod_.project_name)"
+
+  # GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_DOMAIN']="$(_mod_.domain_name_request)"
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_DOMAIN']=$(printf "%s.%s" \
+      "${GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_NAME']}" \
+      "$(_mod_.domain_name_set)"
+  )
+
+  # TMP
+  GLOBAL_SETUP_IMPLEMENTION['TMP_PATH_NEW_PROJECT']="$(_mod_.get_new_path_project)"
 
   _mod_.create_folder
   _mod_.copy_environment
+  traefik.tasks.main.check_running
+
+  common.tasks.command_line.run false false "cd $(_mod_.get_new_path_project)"
+
+  _mod_.run_callbacks "$@"
   _mod.set_all_env
+
+  _mod_.clear_global_variables
 }
 
+_mod_.run_callbacks() {
+  local CALLBACKS=()
+
+  while [[ "${1-}" != "" ]]; do
+    case $1 in
+      --callback )
+        shift
+        IFS=',' read -ra CALLBACKS <<< "$1"
+        ;;
+      * )
+        common.tasks.message.danger "Unrecognized option: $1"
+        return 1
+    esac
+    shift
+  done
+
+  if [[ -n "${CALLBACKS[*]}" ]]; then
+    for callback in "${CALLBACKS[@]}"; do
+      callback=$(echo "$callback" | xargs)
+      if declare -f "$callback" > /dev/null; then
+        $callback
+      else
+        common.tasks.message.danger "$callback function not found"
+        return 1
+      fi
+    done
+  fi
+}
 

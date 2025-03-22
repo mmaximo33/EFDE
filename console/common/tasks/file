@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# return
+#   0 = true (Exists)
+#   1 = false (Not Exists)
 _mod_.exists() {
   [ -e "$1" ]
 }

@@ -21,7 +21,6 @@ _mod_.permissions_fix(){
   common.tasks.command_line.run true false "find $PATH_APP -type d -exec chmod 755 {} \;"
   common.tasks.command_line.run true false "find $PATH_APP -type f -exec chmod 644 {} \;"
   common.tasks.command_line.run true false "chmod -R 775 $PATH_APP/wp-content"
-
 }
 
 _mod_.console_run_command(){

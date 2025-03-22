@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  declare -gA _mod_MAIN=(
+    [LINUX_PATH_FILE]="/etc/hosts"
+  )
+}

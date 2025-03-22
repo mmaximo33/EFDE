@@ -1,6 +1,71 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+_mod_.new_environment(){
+  _mod_.prepare_setup_environment --type new
+}
+
+_mod_.clone_environment(){
+  _mod_.prepare_setup_environment --type clone
+}
+
+_mod_.prepare_setup_environment(){
+  local -A MSG=(
+    [NEW]="For new projects, some default configurations are established."
+    [CLONE]="For existing projects, we will ask you for some information."
+    [REMINDER]="Reminder:\n- Review config app/wp-config.php\n- Import project database."
+  )
+
+  # CHECK TYPE [NEW CLONE]
+  if [[ -z "${1-}" || "$1" != "--type" || ( "$2" != "new" && "$2" != "clone" ) ]]; then
+    if [[ -z "${1-}" ]]; then
+      common.tasks.message.danger "No option provided. Expected --type"
+    elif [[ "$1" != "--type" ]]; then
+      common.tasks.message.danger "Invalid option: $1. Expected --type"
+    elif [[ "$2" != "new" && "$2" != "clone" ]]; then
+      common.tasks.message.danger "Invalid value for --type: $2. It must be 'new' or 'clone'."
+    fi
+    return 1
+  fi
+
+  #Default variables
+  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="${wordpress_props_menu_IMPLEMENT}"
+  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="latest"
+  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_FPM_VERSION']="fpm"
+  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_CLI_VERSION']="cli"
+
+  # For type environment
+  if [[ "$2" == "new" ]]; then
+    common.tasks.message.info "${MSG['NEW']}"
+    efde.tasks.implemention.setup_environment --callback "_mod_.set_database_variables"
+  else
+    common.tasks.message.info "${MSG['CLONE']}"
+    efde.tasks.implemention.setup_environment --callback "_mod_.set_database_variables,_mod_.choose_php_versions,_mod_.clone_repository"
+  fi
+
+  _mod_.docker_start
+
+  if [[ "$2" == "clone" ]]; then
+    common.tasks.message.warning "${MSG['REMINDER']}"
+  fi
+}
+
+_mod_.docker_start(){
+  docker.tasks.main.apache_stop
+  docker.tasks.main.dp_all_stop
+  docker.tasks.main.dp_build
+  wordpress.tasks.main.permissions_fix
+
+  local DOMAIN=$(common.tasks.env_variable.get_variable "EFDE_PROJECT_DOMAIN" "$(efde.tasks.implemention.get_current_path_env_file)")
+
+  common.tasks.message.success "$(printf \
+    "\n%s\n-http://%s/\n-http//%s:8080/\n" \
+    "Project installed successfully, check the url." \
+    "$DOMAIN" \
+    "$DOMAIN"
+  )"
+}
+
 _mod_.choose_php_versions(){
   local PHP_VERSION=""
   # while for call function see versions
@@ -9,7 +74,6 @@ _mod_.choose_php_versions(){
     PHP_VERSION=${GLOBAL_MENU_RESPONSE_ARRAY_ASOCITIVE['function']}
   done
 
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="wordpress"
   GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="$PHP_VERSION"
   GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_FPM_VERSION']="php$PHP_VERSION-fpm"
   GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_CLI_VERSION']="cli-php$PHP_VERSION"
@@ -25,49 +89,8 @@ _mod_.set_database_variables(){
   GLOBAL_SETUP_IMPLEMENTION['WORDPRESS_DB_NAME']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_DATABASE']}"
 }
 
-_mod_.prepare_setup_environment(){
-  _mod_.set_database_variables
-  efde.tasks.implemention.setup_environment
-  # IMPORTANT: Siempre entro al proyecto
-  common.tasks.command_line.run false false "cd $(efde.tasks.implemention.get_new_path_project)"
-}
-
-_mod_.docker_start(){
-  docker.tasks.main.apache_stop
-  docker.tasks.main.dp_all_stop
-  docker.tasks.main.dp_build
-}
-
-_mod_.new_environment(){
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="wordpress"
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="latest"
-  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="latest"
-  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_FPM_VERSION']="fpm"
-  GLOBAL_SETUP_IMPLEMENTION['DOCKER_APP_CLI_VERSION']="cli"
-
-  _mod_.prepare_setup_environment
-  _mod_.docker_start
-  wordpress.tasks.main.permissions_fix
-  common.tasks.message.success "\nProject installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
-  efde.tasks.implemention.clear_global_variables
-}
-
-_mod_.clone_environment(){
-  _mod_.choose_php_versions
-  _mod_.prepare_setup_environment
-  _mod_.docker_start
-  _mod_.clone_repository
-  wordpress.tasks.main.permissions_fix
-  common.tasks.message.warning "Reminder:\n- Review config app/wp-config.php\n- Import project database"
-  common.tasks.message.success "Project installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
-  efde.tasks.implemention.clear_global_variables
-}
-
 _mod_.clone_repository(){
-  sleep 3
-  common.tasks.command_line.run true false "sudo chown -R $UID:www-data ./app"
-  docker.tasks.main.dp_command_run exec app_fpm find /var/www/html/ -mindepth 1 -delete
-
+  sleep 1
   common.tasks.git.request_url_and_clone_repository
 
   [ -e ./app/wp-config.php ] && mv ./app/wp-config.php ./app/wp-config.php.bkp
@@ -78,4 +101,3 @@ _mod_.clone_repository(){
       cp -f ./app/wp-config-docker.php ./app/wp-config.php
   fi
 }
-

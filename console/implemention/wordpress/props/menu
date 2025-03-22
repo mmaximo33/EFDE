@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 {
   # shellcheck disable=SC2168
-  local IMPLEMENT="Wordpress"
+  _mod_IMPLEMENT="wordpress"
   # shellcheck disable=SC2168
-  local PATH_MENU="${IMPLEMENT,,}.tasks"
+  local PATH_MENU="${_mod_IMPLEMENT,,}.tasks"
 
-  _mod_TITLE="$IMPLEMENT https://wordpress.org/ \nSelect an option:"
+  _mod_TITLE="${_mod_IMPLEMENT^} https://wordpress.org/ \nSelect an option:"
 
   _mod_MAIN=(
-    "${IMPLEMENT,,}:project:config,      $PATH_MENU.menu.show_config_project,          Project config,       Settings established in the project"
-    "${IMPLEMENT,,}:cli,                 $PATH_MENU.menu.cli,                          WP-CLI,               $IMPLEMENT command line"
-    "${IMPLEMENT,,}:docker,              docker.tasks.menu.main,                       Docker,               Dockerization management in the project"
-    "${IMPLEMENT,,}:permissions:fix,     $PATH_MENU.menu.fix_permissions,              Fix permissions,      Apply permissions"
-    "${IMPLEMENT,,}:database,            mysql.tasks.menu.main,                        Database,             Database Manager"
+    "${_mod_IMPLEMENT,,}:project:config,      $PATH_MENU.menu.show_config_project,          Project config,       Settings established in the project"
+    "${_mod_IMPLEMENT,,}:cli,                 $PATH_MENU.menu.cli,                          WP-CLI,               ${_mod_IMPLEMENT^} command line"
+    "${_mod_IMPLEMENT,,}:docker,              docker.tasks.menu.main,                       Docker,               Dockerization management in the project"
+    "${_mod_IMPLEMENT,,}:permissions:fix,     $PATH_MENU.menu.fix_permissions,              Fix permissions,      Apply permissions"
+    "${_mod_IMPLEMENT,,}:database,            mysql.tasks.menu.main,                        Database,             Database Manager"
   )
 
   _mod_CREATE_ENVIRONMENT=(
-    "${IMPLEMENT,,}:install:new,                 $PATH_MENU.install.new_environment,          Create new project,        Use latest version available"
-    "${IMPLEMENT,,}:install:clone,               $PATH_MENU.install.clone_environment,        Clone existing project,    Choose PHP version and clone your git repository"
+    "${_mod_IMPLEMENT,,}:install:new,                 $PATH_MENU.install.new_environment,          Create new project,        Use latest version available"
+    "${_mod_IMPLEMENT,,}:install:clone,               $PATH_MENU.install.clone_environment,        Clone existing project,    Choose PHP version and clone your git repository"
   )
 
   _mod_CREATE_ENVIRONMENT_VERSION=(
-    "${IMPLEMENT,,}:doc:compatibility,  $PATH_MENU.main.see_compatibility_versions,   See versions compatibility,"
+    "${_mod_IMPLEMENT,,}:doc:compatibility,  $PATH_MENU.main.see_compatibility_versions,   See versions compatibility,"
     "shortcut:off,                      5.6,                                          PHP 5.6,"
     "shortcut:off,                      7.1,                                          PHP 7.1,"
     "shortcut:off,                      7.2,                                          PHP 7.2,"

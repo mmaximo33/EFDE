@@ -1,0 +1,6 @@
+"The local domain already exists $DOMAIN"."El dominio local ya existe $DOMAIN"
+"The local domain was added $DOMAIN"."El dominio local se agrego $DOMAIN"
+"You must enter a domain.","Ingrese el dominio."
+"The domain $DOMAIN does not exist in $HOSTS_FILE.","El dominio $DOMAIN no existe en $HOSTS_FILE."
+"Domain $DOMAIN successfully deleted.","Dominio $DOMAIN eliminado exitosamente."
+"'$DOMAIN' is not valid.","'$DOMAIN' no es válido."

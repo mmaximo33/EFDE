@@ -20,7 +20,7 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - ./app/:/var/www/html
+      - ./app/:/var/www/html:delegated
     depends_on: ['database']
 
   app_cli:
@@ -32,7 +32,7 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - ./app/:/var/www/html
+      - ./app/:/var/www/html:delegated
     depends_on: ['database']
 
   database:

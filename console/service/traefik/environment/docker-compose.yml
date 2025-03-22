@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  dnsmasq:
+    image: andyshinn/dnsmasq:latest
+    container_name: dnsmasq
+    restart: always
+    ports:
+      #- "127.0.0.1:53/tcp"
+      - "127.0.0.1:53:53/udp"
+    volumes:
+      - ./dnsmasq.conf:/etc/dnsmasq.conf
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dnsmasq.tls=true
+      - traefik.http.routers.dnsmasq.rule=Host(`dnsmasq.efde`)
+      - traefik.http.services.dnsmasq.loadbalancer.server.port=8080
+    networks:
+      - efde-network
+
+  traefik:
+    image: traefik:latest
+    container_name: ${EFDE_CONTAINER_NAME}
+    env_file: .env
+    ports:
+      - "${EFDE_TRAEFIK_LISTEN:-127.0.0.1}:80:80"
+      - "${EFDE_TRAEFIK_LISTEN:-127.0.0.1}:443:443"
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml
+#      - ${WARDEN_HOME_DIR}/etc/traefik/dynamic.yml:/etc/traefik/dynamic.yml
+#      - ${WARDEN_HOME_DIR}/ssl/certs:/etc/ssl/certs
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.tls=false
+      - traefik.http.routers.traefik.rule=Host(`${EFDE_TRAEFIK_DOMAIN:-traefik.efde}`)
+      - traefik.http.routers.traefik.service=api@internal
+    restart: always
+    networks:
+      - efde-network
+
+networks:
+  efde-network:
+    external:
+      name: ${EFDE_NETWORK_NAME}

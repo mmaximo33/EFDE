@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+{
+  # shellcheck disable=SC2168
+  local PATH_MENU="localdomains.tasks.main"
+
+  _mod_TITLE="Local Domains\nSelect an option:"
+
+  _mod_MAIN=(
+    "localdomans:show:efde,   $PATH_MENU.show_efde,         EFDE domains,       Show EFDE domains."
+    "localdomans:show:all,    $PATH_MENU.show_all,          All Domains,        Show All Domains"
+    "localdomans:add,         $PATH_MENU.domain_add,        Add new domain,     Add new domain"
+    "localdomans:remove,      $PATH_MENU.domain_remove,     Remove domain,      Remove domain"
+  )
+}

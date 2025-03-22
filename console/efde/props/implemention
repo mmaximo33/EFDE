@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  declare -gA _mod_MAIN=(
+    [EFDE_FOLDER]=".efde"
+    [EFDE_FILE_ENV]=".env"
+    [DOMAIN_PREFIX]="efde"
+    [DOMAIN_SUFFIX]="efde"
+  )
+}

@@ -4,7 +4,7 @@ set -euo pipefail
 declare -gA GLOBAL_EFDE_CONFIG=(
   [LANGUAGE_DEFAULT]="en_US"
   [EFDE_MODE_DEBUG]=false          # Debug Messages
-  [EFDE_MODE_DEVELOP]=false        # MMTodo: Prepared for create tmps
+  [EFDE_MODE_DEVELOP]=true         # MMTodo: Prepared for create tmps
 )
 
 resolve_absolute_dir() {
@@ -24,7 +24,14 @@ resolve_absolute_dir() {
 init_dirs()
 {
     EFDE_PATH_INSTALL="$(resolve_absolute_dir)"
+
     export PATH_CONSOLE="${EFDE_PATH_INSTALL}/console"
+    suffixes=("common" "efde" "implemention" "service")
+    for suffix in "${suffixes[@]}"; do
+      var_name="PATH_CONSOLE_${suffix^^}"
+      export "$var_name=${PATH_CONSOLE}/$suffix"
+    done
+
     export PATH_BIN="${EFDE_PATH_INSTALL}/bin"
     source "$PATH_CONSOLE/init"
 }
@@ -39,6 +46,7 @@ menu_implementation(){
   fi
 }
 
+
 generate_extra_elements(){
   efde.tasks.config.check_config
   common.core.generate_shortcuts_file
@@ -50,12 +58,13 @@ generate_extra_elements(){
   fi
 }
 
+
 menu(){
-  if ! efde.tasks.implemention.has_folder_implementation ; then
+  if efde.tasks.implemention.has_folder_implementation ; then
+    menu_implementation
+  else
     efde.tasks.menu.main
   fi
-
-  menu_implementation
 }
 
 shortcuts(){
@@ -71,5 +80,4 @@ main() {
     menu
   fi
 }
-
 main "$@"

@@ -10,17 +10,21 @@ else
   GLOBAL_DOCKER_COMPOSE_COMMAND="docker-compose"
 fi
 
+_mod_.d_command_run(){
+  local COMMAND_RUN="docker $@"
+  common.tasks.command_line.run true false "${COMMAND_RUN}"
+}
 _mod_.dp_command_run(){
   local COMMAND_RUN="${GLOBAL_DOCKER_COMPOSE_COMMAND} $@"
   common.tasks.command_line.run true false "${COMMAND_RUN}"
 }
 
 _mod_.dp_build(){
-  _mod_.dp_all_stop
   _mod_.dp_command_run "up -d --build"
 }
 
 _mod_.dp_start(){
+  traefik.tasks.main.check_running
   _mod_.dp_command_run "start"
 }
 
@@ -28,14 +32,30 @@ _mod_.dp_stop(){
   _mod_.dp_command_run "stop"
 }
 
-_mod_.dp_all_stop(){
-  local CONTAINERS=$(docker ps -q | tr '\n' ' ')
-  if [ -n "$CONTAINERS" ]; then
-    common.tasks.command_line.run true false "docker stop $CONTAINERS"
+_mod_.dp_all_stop() {
+  local TRAEFIK=$(traefik.tasks.main.get_environment_container_name)
+  local CONTAINERS=$(docker ps --format "{{.Names}}")
+  local -A MSG=(
+    [OFF]="All containers will be turned off, except $TRAEFIK."
+    [EMPTY]="There are no containers running at this time."
+  )
+
+  local CONTAINER_STOP=()
+  for line in $CONTAINERS; do
+    if [[ $line != "$TRAEFIK" ]]; then
+      CONTAINER_STOP+=("$line")
+    fi
+  done
+
+  if [ ${#CONTAINER_STOP[@]} -gt 0 ]; then
+    common.tasks.message.info "${MSG['OFF']}"
+    # shellcheck disable=SC2145
+    common.tasks.command_line.run true false "docker stop ${CONTAINER_STOP[@]}"
   else
-    common.tasks.message.info "> There are no containers running at this time."
+    common.tasks.message.debug "${MSG['EMPTY']}"
   fi
 }
+
 
 _mod_.apache_stop(){
   if systemctl is-active --quiet apache2; then
