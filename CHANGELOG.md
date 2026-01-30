@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **EFDE**: Comparación de versiones con `sort -V` en lifecycle; comprobación de que ORIGIN existe en `copy_environment`; typos (WooCommerce, Set settings).
 - **Implementation**: Consistencia Laravel/Symfony/WordPress (config_show, permissions_fix, console), URLs con `common.tasks.os.open_url`, comparación de versión PHP en WordPress con `sort -V`, typos.
 - **Service**: Docker `apache_stop` solo cuando `systemctl` está disponible (evita fallo en macOS); MySQL: eliminado env_show duplicado, typo `--isfunction`, mensaje de importación, MSG_CUSTOM sin sed.
+- **Update check**: Default de `UPDATE_CHECK_AVAILABLE` corregido a `false` en message; lifecycle: sin falsos positivos cuando el remoto no responde (NEW_TAG vacío), `ls-remote` con `2>/dev/null`, mensaje "Could not reach remote to check tags"; config: `set_core_update_last` solo después de ejecutar la comprobación.
+- **Uninstall**: Uso de `command -v` en lugar de `type -P` (portable); solo se elimina el launcher si la ruta existe y no está vacía.
 
 ## [2.3.1] 2025-03-13
 

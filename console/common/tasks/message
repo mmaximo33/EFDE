@@ -72,7 +72,7 @@ _mod_.title(){
     SUFFIX="EFDE [${POINT:-0.0.0}]"
     HIPERLINK="🯄"
     HYPERLINK="\e]8;;$URL\a$HIPERLINK\e]8;;\a"
-    if [[ "${EFDE_CONFIG_CORE['UPDATE_CHECK_AVAILABLE']:-EFDE_CORE_CONFIG['UPDATE_AVAILABLE']}" == "true" ]]; then
+    if [[ "${EFDE_CONFIG_CORE['UPDATE_CHECK_AVAILABLE']:-false}" == "true" ]]; then
       URL="${EFDE_CORE_CONFIG['REPOSITORY']}/releases/latest"
       SUFFIX=$(_mod_.echo success "[Check NEW version]")
       HIPERLINK="$(_mod_.echo warning $HIPERLINK)"

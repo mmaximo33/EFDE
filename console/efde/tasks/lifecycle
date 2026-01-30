@@ -95,10 +95,14 @@ set -euo pipefail
       # CHECK TAGS
       _mod_.update_tree "$SILENT" "Checking updates." 1 0 info
       local CURRENT_TAG=$(git -C "$EFDE_PATH_INSTALL" tag --sort=-v:refname | head -n1)
-      local REMOTE_TAGS=$(git -C "$EFDE_PATH_INSTALL" ls-remote --tags origin | awk -F'/' '{print $3}' | grep -v '\^{}' | sort -V)
+      local REMOTE_TAGS=$(git -C "$EFDE_PATH_INSTALL" ls-remote --tags origin 2>/dev/null | awk -F'/' '{print $3}' | grep -v '\^{}' | sort -V)
       local NEW_TAG=$(echo "$REMOTE_TAGS" | tail -n1)
 
-      if [[ "$CURRENT_TAG" != "$NEW_TAG" ]]; then
+      # No remote tags (e.g. offline): do not report update available
+      if [[ -z "$NEW_TAG" ]]; then
+        CHECK_TAGS=1
+        [[ "$SILENT" == "false" ]] && _mod_.update_tree "$SILENT" "TAGs: Could not reach remote to check tags." 2 0 warning
+      elif [[ "$CURRENT_TAG" != "$NEW_TAG" ]]; then
         MSG=$(common.tasks.message.msg_color warning "New tag detected: $NEW_TAG.")
         _mod_.update_tree "$SILENT" "TAGs: $MSG" 2 0 info
         CHECK_TAGS=0 # true
@@ -153,7 +157,7 @@ set -euo pipefail
       fi
   }
 
-  # Uninstalls
+  # Uninstalls (portable: command -v, /bin/rm in file/directory.remove)
   _mod_.uninstall() {
     common.tasks.message.info "You are about to eliminate one of the best tools for application development in local environments"
     if common.tasks.prompt.confirm_default_no $(common.tasks.message.msg_color warning "Are you sure you want to do it?"); then
@@ -162,7 +166,11 @@ set -euo pipefail
       local QUESTION=$(common.tasks.message.msg_color warning "If you are completely sure, write '$CONFIRM_COLOR':")
       local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
       if [[ "$RESPONSE" == "$CONFIRM" ]]; then
-        common.tasks.file.remove "$(type -P "$GLOBAL_RUN_EFDE")"
+        local EFDE_BIN_PATH
+        EFDE_BIN_PATH=$(command -v "$GLOBAL_RUN_EFDE" 2>/dev/null) || true
+        if [[ -n "$EFDE_BIN_PATH" ]] && [[ -e "$EFDE_BIN_PATH" ]]; then
+          common.tasks.file.remove "$EFDE_BIN_PATH"
+        fi
         common.tasks.directory.remove force "$EFDE_PATH_INSTALL"
         common.tasks.message.success "${EFDE_CORE_CONFIG['PROJECT_NAME']} was successfully uninstalled from your computer"
         common.tasks.message.warning "We hope to work together again"

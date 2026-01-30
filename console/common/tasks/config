@@ -274,14 +274,16 @@ _mod_.updates_availables() {
   esac
 
   if [[ "$RUN_UPDATE" == "true" ]]; then
-    _mod_.set_core_update_last
     if efde.tasks.lifecycle.update --silent; then
+      _mod_.set_core_update_last
       _mod_.set_core_update_available "true"
 
       if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
         _mod_.set_core_update_available "false"
         efde.tasks.lifecycle.update
       fi
+    else
+      _mod_.set_core_update_last
     fi
   fi
 }
