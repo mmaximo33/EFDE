@@ -49,63 +49,7 @@ git push origin <issue-new-feature> --force-with-lease
 
 #### For full developer
 
-To have all developer features enabled, modify the `bin/cfg.core` file generated after the first run 
-
-```sh
-
-DEBUG="false"             # Debug general (It is required for the rest of MODE)
-DEBUG_CONFIG="false"      # Debug load config
-DEBUG_MODULE="false"      # Debug load modules
-DEBUG_SHORTCUTS="false"   # Debug load shortcuts
-DEBUG_I18N="false"        # Debug load translations
-DEBUG_MENU="false"        # Debug load menu
-
-```
-<details>
-<summary>Debug Essential</summary>
-
-![efde_mode_debug_essential.png](media/efde_mode_debug_essential.png)
-</details>
-
-<details>
-
-<summary>Debug CONFIG</summary>
-
-![efde_mode_debug_config.png](media/efde_mode_debug_config.png)
-</details>
-
-<details>
-
-<summary>Debug MODULES</summary>
-
-![efde_mode_debug_modules.png](media/efde_mode_debug_modules.png)
-</details>
-<details>
-
-<summary>Debug SHORTCUTS</summary>
-
-![efde_mode_debug_shortcuts.png](media/efde_mode_debug_shortcuts.png)
-</details>
-<details>
-
-<summary>Debug I18N</summary>
-
-![efde_mode_debug_i18n.png](media/efde_mode_debug_i18n.png)
-</details>
-<details>
-
-<summary>Debug MENU</summary>
-
-![efde_mode_debug_menu.png](media/efde_mode_debug_menu.png)
-</details>
-
-### EFDE_MODE_DEBUG
-
-|                                                    |                                                                                  | 
-|----------------------------------------------------|----------------------------------------------------------------------------------|
-| Shows additional information for debugging actions | On each run, clean the `bin/.tmp` directory and transform the files individually | 
-| ![Efde mode debug](./media/efde_mode_debug.png)    | ![Efde mode debug](./media/efde_mode_debug_files.png)                            |       
-
+To enable debug and developer features (regenerate `.tmp`, see module/shortcuts/i18n/config/menu flow), edit `bin/cfg.core` and see **[debug-workflow.md](debug-workflow.md)** for full documentation (configuration, what each flag does, and reference images).
 
 ### Rules for developer
 If you want to add a new feature you must keep the following rules in mind
@@ -180,7 +124,7 @@ Taking into account the installation carried out previously.
   - Generate the shortcuts
     - Finds all files in `../props/shortcuts` locations and merges them into `~/Domains/bin/.tmp/common.props.shortcuts` to improve speed on future runs
   - Apply translations
-    - Translations apply only if the language set in `bin/cfg.host` (variable `HOST_I18N`) is different from the default in `bin/cfg.core` (`I18N_DEFAULT`). With `DEBUG=true`, I18N steps are shown. See [i18n.md](i18n.md).
+    - Translations apply only if the language set in `bin/cfg.host` (variable `HOST_I18N`) is different from the default in `bin/cfg.core` (`I18N_DEFAULT`). With `DEBUG=true` and `DEBUG_I18N="true"`, I18N steps are shown. See [debug-workflow.md](debug-workflow.md); [i18n.md](i18n.md) for format and flow.
     - The system parses each module's `i18n/<locale>` file (CSV format), escapes strings for `sed`, and replaces origin strings with translations in the generated files under `bin/.tmp`; when done it restarts EFDE. 
 
 
