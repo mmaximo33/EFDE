@@ -66,7 +66,7 @@ set -euo pipefail
 
     local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var)"
 
-    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"$*;\""
+    docker.tasks.main.dc_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"$*;\""
   }
 
   _mod_.run_custom_query(){
@@ -94,7 +94,7 @@ set -euo pipefail
 
     ! common.tasks.directory.exists "$PATH_DUMPS" && common.tasks.directory.create_recursive "$PATH_DUMPS"
 
-    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} --add-drop-database > $FILE_PATH"
+    docker.tasks.main.dc_command_run -i true -o true -c "${MYSQL_QUERY_BASE} --add-drop-database > $FILE_PATH"
     common.tasks.message.success "Success: The database was exported $FILE_PATH\n"
   }
 
@@ -136,7 +136,7 @@ set -euo pipefail
     if [[ "$RESPONSE" == "$CONFIRM" ]]; then
       #_mod_.database_drop
       _mod_.database_create
-      docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} < $FILE_PATH"
+      docker.tasks.main.dc_command_run -i true -o true -c "${MYSQL_QUERY_BASE} < $FILE_PATH"
       common.tasks.message.success "Success: Import file $FILE_PATH\n"
     else
       common.tasks.message.warning "Aborted action."
@@ -171,7 +171,7 @@ set -euo pipefail
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
     local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var false)"
 
-    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};\""
+    docker.tasks.main.dc_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};\""
   }
 
   _mod_.database_drop(){
@@ -179,7 +179,7 @@ set -euo pipefail
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
     local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var false)"
 
-    docker.tasks.main.dp_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"DROP DATABASE IF EXISTS \\\`${MYSQL_DATABASE}\\\`;\""
+    docker.tasks.main.dc_command_run -i true -o true -c "${MYSQL_QUERY_BASE} -e\"DROP DATABASE IF EXISTS \\\`${MYSQL_DATABASE}\\\`;\""
   }
 
   _mod_.env_show(){

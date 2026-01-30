@@ -158,6 +158,11 @@ The file must contain the following format, where each column represents a piece
 #### Menu flow (entry, history, return)
 - Full documentation: [menu-flow.md](menu-flow.md) (entry point, which menu is shown, `common.tasks.menu.show`, choice_options, [R]eturn/[Q]uit/[I]nfo, history, and how actions return to menu).
 
+#### Docker and project directory
+- The **Docker** service assumes an **EFDE project** = a directory that contains `docker-compose.yml` and/or `.efde`. It resolves the project root by walking up from the current working directory until it finds one of these markers.
+- **Implementations** (Laravel, Symfony, WordPress): during install, the process changes to the project root (`cd` to the new project) before calling Docker; the same detection then finds that directory.
+- The **Docker menu** (Build, Start, Logs, etc.) can be used from the project root or from any subdirectory of the project; if no project is detected, a clear error is shown. The same applies to **MySQL** when it runs commands via Docker.
+
 #### Details
 Taking into account the installation carried out previously.
 

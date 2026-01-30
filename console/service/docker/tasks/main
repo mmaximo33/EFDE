@@ -10,10 +10,27 @@ else
   GLOBAL_DOCKER_COMPOSE_COMMAND="docker-compose"
 fi
 
-_mod_.dp_command_run() {
+# Resolve project root: walk up from CWD until docker-compose.yml or .efde is found.
+# Outputs the absolute path of the project root, or nothing if not found.
+_mod_.dc_project_root() {
+  local dir
+  dir=$(pwd)
+  while [[ -n "$dir" ]]; do
+    if [[ -f "$dir/docker-compose.yml" || -d "$dir/.efde" ]]; then
+      echo "$dir"
+      return 0
+    fi
+    [[ "$dir" == "/" ]] && break
+    dir="${dir%/*}"
+  done
+  return 1
+}
+
+_mod_.dc_command_run() {
   local INPUT="true"
   local OUTPUT="false"
   local COMMAND=""
+  local ROOT
 
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
@@ -41,29 +58,35 @@ _mod_.dp_command_run() {
     return 1
   fi
 
-  common.tasks.command_line.run "${INPUT}" "${OUTPUT}" "${GLOBAL_DOCKER_COMPOSE_COMMAND}" "${COMMAND}"
+  ROOT=$(_mod_.dc_project_root) || true
+  if [[ -z "$ROOT" ]]; then
+    common.tasks.message.danger "No EFDE project detected (docker-compose.yml or .efde). Run from the project root or a subdirectory." >&2
+    return 1
+  fi
+
+  common.tasks.command_line.run "${INPUT}" "${OUTPUT}" "${GLOBAL_DOCKER_COMPOSE_COMMAND} --project-directory \"${ROOT}\" -f \"${ROOT}/docker-compose.yml\" ${COMMAND}"
 }
 
 
 
-_mod_.dp_build(){
-  _mod_.dp_all_stop
-  _mod_.dp_command_run --cli "up -d --build"
+_mod_.dc_build(){
+  _mod_.dc_all_stop
+  _mod_.dc_command_run --cli "up -d --build"
 }
 
-_mod_.dp_start(){
-  _mod_.dp_command_run --cli "start"
+_mod_.dc_start(){
+  _mod_.dc_command_run --cli "start"
 }
 
-_mod_.dp_stop(){
-  _mod_.dp_command_run --cli "stop"
+_mod_.dc_stop(){
+  _mod_.dc_command_run --cli "stop"
 }
 
-_mod_.dp_restart(){
-  _mod_.dp_command_run --cli "restart"
+_mod_.dc_restart(){
+  _mod_.dc_command_run --cli "restart"
 }
 
-_mod_.dp_all_stop(){
+_mod_.dc_all_stop(){
   local CONTAINERS=$(docker ps -q | tr '\n' ' ')
   if [ -n "$CONTAINERS" ]; then
     common.tasks.command_line.run true false "docker stop $CONTAINERS"
@@ -82,15 +105,15 @@ _mod_.apache_stop(){
   fi
 }
 
-_mod_.dp_down(){
+_mod_.dc_down(){
   local QUESTION=$(common.tasks.message.msg_color danger "Do you want to remove services from the project?")
-  _mod_.dp_show_container
+  _mod_.dc_show_container
   if common.tasks.prompt.confirm_default_no "$QUESTION" ; then
-    _mod_.dp_command_run --cli "down"
+    _mod_.dc_command_run --cli "down"
   fi
 }
 
-_mod_.dp_logs(){
+_mod_.dc_logs(){
   local -A MSG
   local COMMAND_RUN VALUES SEARCH
   COMMAND_RUN="logs -f"
@@ -119,10 +142,10 @@ _mod_.dp_logs(){
   if [[ -n "$VALUES" ]]; then
       COMMAND_RUN="${COMMAND_RUN} | egrep --color=always -E \"$VALUES\""
   fi
-  _mod_.dp_command_run -i true -o true -c "${COMMAND_RUN}"
+  _mod_.dc_command_run -i true -o true -c "${COMMAND_RUN}"
 }
 
-_mod_.dp_show_container() {
+_mod_.dc_show_container() {
   local COMMAND="ps -a --format \"table {{.Service}}\t{{.Name}}\t{{.Ports}}\t{{.Status}}\t{{.Image}}\""
   local quit=false
 
@@ -138,7 +161,7 @@ _mod_.dp_show_container() {
     esac
   fi
 
-  _mod_.dp_command_run -i true -o true -c "$COMMAND"
+  _mod_.dc_command_run -i true -o true -c "$COMMAND"
 
   if [[ "$quit" == true ]]; then
     return 1
@@ -148,7 +171,7 @@ _mod_.dp_show_container() {
 
 #_mod_.container_select() {
 #  local MSG SERVICE
-#  _mod_.dp_show_container
+#  _mod_.dc_show_container
 #q
 #  local MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
 #  local SERVICE
@@ -159,14 +182,14 @@ _mod_.dp_show_container() {
 #    SERVICE=$(common.tasks.prompt.request_input "$MSG")
 #  done
 #
-#  _mod_.dp_command_run --cli "ps --filter name=$SERVICE"
+#  _mod_.dc_command_run --cli "ps --filter name=$SERVICE"
 #  echo "$SERVICE"
 #}
 
 _mod_.container_entry(){
   local COMMAND_RUN VALUES MSG SERVICE
 
-  _mod_.dp_show_container
+  _mod_.dc_show_container
   MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
   SERVICE=$(common.tasks.prompt.request_input "$MSG")
 
@@ -176,13 +199,13 @@ _mod_.container_entry(){
   else
     COMMAND_RUN="exec"
   fi
-  _mod_.dp_command_run -i true -o true -c "$COMMAND_RUN $SERVICE bash"
+  _mod_.dc_command_run -i true -o true -c "$COMMAND_RUN $SERVICE bash"
 }
 
 _mod_.container_run_command() {
   local COMMAND_RUN COMMAND_CUSTOM MSG SERVICE
 
-  _mod_.dp_show_container
+  _mod_.dc_show_container
 
   MSG=$(common.tasks.message.msg_color warning 'Enter SERVICE name:')
   SERVICE=$(common.tasks.prompt.request_input "$MSG")
@@ -198,7 +221,7 @@ _mod_.container_run_command() {
     MSG=$(common.tasks.message.msg_color warning 'What command do you want to run?:')
     COMMAND_CUSTOM=$(common.tasks.prompt.request_input "$MSG")
 
-    _mod_.dp_command_run -i true -o true -c "$COMMAND_RUN $SERVICE $COMMAND_CUSTOM"
+    _mod_.dc_command_run -i true -o true -c "$COMMAND_RUN $SERVICE $COMMAND_CUSTOM"
 
     MSG=$(common.tasks.message.msg_color warning 'Do you want to run another command?')
     if common.tasks.prompt.confirm_default_yes "$MSG"; then
@@ -210,7 +233,14 @@ _mod_.container_run_command() {
 }
 
 _mod_.recipe_see(){
-  cat docker-compose.yml
+  local ROOT
+  ROOT=$(_mod_.dc_project_root) || true
+  if [[ -z "$ROOT" ]]; then
+    common.tasks.message.danger "No EFDE project detected (docker-compose.yml or .efde). Run from the project root or a subdirectory." >&2
+    _mod_.main
+    return 1
+  fi
+  cat "${ROOT}/docker-compose.yml"
   _mod_.main
 }
 

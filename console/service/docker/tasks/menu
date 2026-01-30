@@ -8,32 +8,32 @@ _mod_.main(){
 }
 
 _mod_.build(){
-  docker.tasks.main.dp_build
+  docker.tasks.main.dc_build
   _mod_.main
 }
 
 _mod_.show(){
-  docker.tasks.main.dp_show_container --quit true
+  docker.tasks.main.dc_show_container --quit true
   _mod_.main
 }
 
 _mod_.start(){
-  docker.tasks.main.dp_start
+  docker.tasks.main.dc_start
   _mod_.main
 }
 
 _mod_.restart(){
-  docker.tasks.main.dp_restart
+  docker.tasks.main.dc_restart
   _mod_.main
 }
 
 _mod_.stop(){
-  docker.tasks.main.dp_stop
+  docker.tasks.main.dc_stop
   _mod_.main
 }
 
 _mod_.stop_all(){
-  docker.tasks.main.dp_all_stop
+  docker.tasks.main.dc_all_stop
   _mod_.main
 }
 
@@ -43,12 +43,12 @@ _mod_.apache_stop(){
 }
 
 _mod_.down(){
-  docker.tasks.main.dp_down
+  docker.tasks.main.dc_down
   _mod_.main
 }
 
 _mod_.logs(){
-  docker.tasks.main.dp_logs
+  docker.tasks.main.dc_logs
   _mod_.main
 }
 

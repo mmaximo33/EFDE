@@ -46,8 +46,8 @@ _mod_.prepare_setup_environment(){
 
 _mod_.docker_start(){
   docker.tasks.main.apache_stop
-  docker.tasks.main.dp_all_stop
-  docker.tasks.main.dp_build
+  docker.tasks.main.dc_all_stop
+  docker.tasks.main.dc_build
 }
 
 _mod_.new_environment(){

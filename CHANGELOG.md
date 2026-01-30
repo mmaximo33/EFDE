@@ -7,16 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Docker**: Detección de raíz del proyecto (`docker-compose.yml` o `.efde`) hacia arriba desde el CWD; `docker compose` se ejecuta con `--project-directory` y `-f`; menú Docker y `recipe_see` usables desde la raíz o cualquier subdirectorio del proyecto; mensaje claro si no se detecta proyecto. Documentación en `docs/developer.md` (Docker and project directory) y en `agents/efde/module/SKILL.md`.
+
+### Changed
+
+- **i18n**: Idiomas unificados (es_ES, fr_FR, pt_BR, de_DE), archivos `.csv`, parseo CSV robusto y documentación en `docs/i18n.md`.
+- **Docker**: Prefijo de funciones renombrado de `dp_` a `dc_` (docker compose): `dc_project_root`, `dc_command_run`, `dc_build`, `dc_start`, `dc_stop`, `dc_restart`, `dc_all_stop`, `dc_down`, `dc_logs`, `dc_show_container`.
+
 ### Fixed
 
 - **Core / common**: Portabilidad GNU/BSD y macOS (sed, date, find), mensajes de error con variables correctas, iteración segura de archivos, escape para sed en i18n.
 - **EFDE**: Comparación de versiones con `sort -V` en lifecycle; comprobación de que ORIGIN existe en `copy_environment`; typos (WooCommerce, Set settings).
 - **Implementation**: Consistencia Laravel/Symfony/WordPress (config_show, permissions_fix, console), URLs con `common.tasks.os.open_url`, comparación de versión PHP en WordPress con `sort -V`, typos.
 - **Service**: Docker `apache_stop` solo cuando `systemctl` está disponible (evita fallo en macOS); MySQL: eliminado env_show duplicado, typo `--isfunction`, mensaje de importación, MSG_CUSTOM sin sed.
-
-### Changed
-
-- **i18n**: Idiomas unificados (es_ES, fr_FR, pt_BR, de_DE), archivos `.csv`, parseo CSV robusto y documentación en `docs/i18n.md`.
 
 ## [2.3.1] 2025-03-13
 
