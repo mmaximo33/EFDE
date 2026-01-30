@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 {
-  PATH_IMPLEMENTION_CUSTOM_SHORTCUTS="shortcuts"
-  PATH_IMPLEMENTION_CUSTOM_SHORTCUTS_LIST="$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS/list"
+  PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS="shortcuts"
+  PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS_LIST="$PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS/list"
 
   # GENERAL
   _mod_.show(){
@@ -80,7 +80,7 @@ set -euo pipefail
 
   # CUSTOM
   _mod_.load_custom_shortcuts() {
-    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implemention.get_current_path_efde)/$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS_LIST"
+    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implementation.get_current_path_efde)/$PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS_LIST"
     if [[ -f "$PATH_ABSOLUTE_SHORTCUTS" ]]; then
       source "$PATH_ABSOLUTE_SHORTCUTS"
 
@@ -96,7 +96,7 @@ set -euo pipefail
 
   _mod_.show_custom() {
     local PREV_TITLE=""
-    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implemention.get_current_path_efde)/$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS_LIST"
+    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implementation.get_current_path_efde)/$PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS_LIST"
     local PATH_RELATIVE=$(echo "$PATH_ABSOLUTE_SHORTCUTS" | awk -F'/' '{print $(NF-3) "/" $(NF-2) "/" $(NF-1) "/" $NF}')
     local CURRENT_TITLE="custom"
 
@@ -134,7 +134,7 @@ set -euo pipefail
   _mod_.target_custom() {
     local action="$1"
     local found=false
-    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implemention.get_current_path_efde)/$PATH_IMPLEMENTION_CUSTOM_SHORTCUTS"
+    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implementation.get_current_path_efde)/$PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS"
 
     _mod_.load_custom_shortcuts
 

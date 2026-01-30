@@ -185,7 +185,7 @@ Taking into account the installation carried out previously.
 
 
 - Determines whether the launch directory in the `efdev` command console has a project created by it or not (search for `$PATH_PROJECT/.efde/`)
-  - Is TRUE, loads the implementation menu according to what is established in the `$PATH_PROJECT/.efde/.env` file variable `EFDE_PROJECT_IMPLEMENTION`
+  - Is TRUE, loads the implementation menu according to what is established in the `$PATH_PROJECT/.efde/.env` file variable `EFDE_PROJECT_IMPLEMENTATION`
   - Is FALSE, load the default menu to configure `efdev` or install implementations
 
 ## Admin

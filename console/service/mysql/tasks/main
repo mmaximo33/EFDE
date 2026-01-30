@@ -13,10 +13,10 @@ set -euo pipefail
 
     common.tasks.message.info "\n${MESSAGES['INTRO']}"
     if ! common.tasks.prompt.confirm_default_no "${MESSAGES['DEFAULT']}" ; then
-      GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']=toor
-      GLOBAL_SETUP_IMPLEMENTION['MYSQL_USER']=efdeuser
-      GLOBAL_SETUP_IMPLEMENTION['MYSQL_PASSWORD']=efdepassword
-      GLOBAL_SETUP_IMPLEMENTION['MYSQL_DATABASE']=efdedb
+      GLOBAL_SETUP_IMPLEMENTATION['MYSQL_ROOT_PASSWORD']=toor
+      GLOBAL_SETUP_IMPLEMENTATION['MYSQL_USER']=efdeuser
+      GLOBAL_SETUP_IMPLEMENTATION['MYSQL_PASSWORD']=efdepassword
+      GLOBAL_SETUP_IMPLEMENTATION['MYSQL_DATABASE']=efdedb
     else
       for KEY in "${KEYS[@]}"; do
         local MSG_CUSTOM=$(echo "${MESSAGES['SET_VARIABLE']}" | sed "s/VALUE/$KEY/g")
@@ -29,21 +29,21 @@ set -euo pipefail
           fi
         done
 
-        GLOBAL_SETUP_IMPLEMENTION["$KEY"]="$VALUE"
+        GLOBAL_SETUP_IMPLEMENTATION["$KEY"]="$VALUE"
       done
     fi
 
     # Default variables
-    GLOBAL_SETUP_IMPLEMENTION['MYSQL_HOST']=database
-    GLOBAL_SETUP_IMPLEMENTION['PMA_HOST']=${GLOBAL_SETUP_IMPLEMENTION['MYSQL_HOST']}
-    GLOBAL_SETUP_IMPLEMENTION['PMA_USER']=root
-    GLOBAL_SETUP_IMPLEMENTION['PMA_PASSWORD']="${GLOBAL_SETUP_IMPLEMENTION['MYSQL_ROOT_PASSWORD']}"
+    GLOBAL_SETUP_IMPLEMENTATION['MYSQL_HOST']=database
+    GLOBAL_SETUP_IMPLEMENTATION['PMA_HOST']=${GLOBAL_SETUP_IMPLEMENTATION['MYSQL_HOST']}
+    GLOBAL_SETUP_IMPLEMENTATION['PMA_USER']=root
+    GLOBAL_SETUP_IMPLEMENTATION['PMA_PASSWORD']="${GLOBAL_SETUP_IMPLEMENTATION['MYSQL_ROOT_PASSWORD']}"
   }
 
   _mod_.get_env_var(){
     local USE_DATABASE="${1:-true}"
     local MYSQL_USER MYSQL_PASSWORD MYSQL_DATABASE MYSQL_HOST MYSQL_QUERY
-    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+    local PATH_ENV="$(efde.tasks.implementation.get_current_path_env_file)"
 
     MYSQL_HOST=$(common.tasks.env_variable.get_variable "MYSQL_HOST" "$PATH_ENV")
     MYSQL_USER=$(common.tasks.env_variable.get_variable "MYSQL_USER" "$PATH_ENV")
@@ -148,7 +148,7 @@ set -euo pipefail
   }
 
   _mod_.permissions(){
-    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+    local PATH_ENV="$(efde.tasks.implementation.get_current_path_env_file)"
     local MYSQL_HOST=$(common.tasks.env_variable.get_variable "MYSQL_HOST" "$PATH_ENV")
     local MYSQL_USER=$(common.tasks.env_variable.get_variable "MYSQL_USER" "$PATH_ENV")
     local MYSQL_PASSWORD=$(common.tasks.env_variable.get_variable "MYSQL_PASSWORD" "$PATH_ENV")
@@ -171,7 +171,7 @@ set -euo pipefail
   }
 
   _mod_.database_create(){
-    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+    local PATH_ENV="$(efde.tasks.implementation.get_current_path_env_file)"
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
     local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var false)"
 
@@ -179,7 +179,7 @@ set -euo pipefail
   }
 
   _mod_.database_drop(){
-    local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+    local PATH_ENV="$(efde.tasks.implementation.get_current_path_env_file)"
     local MYSQL_DATABASE=$(common.tasks.env_variable.get_variable "MYSQL_DATABASE" "$PATH_ENV")
     local MYSQL_QUERY_BASE="exec database mariadb $(_mod_.get_env_var false)"
 
@@ -187,6 +187,6 @@ set -euo pipefail
   }
 
   _mod_.env_show(){
-    cat "$(efde.tasks.implemention.get_current_path_env_file)" | grep -E "MYSQL|PMA"
+    cat "$(efde.tasks.implementation.get_current_path_env_file)" | grep -E "MYSQL|PMA"
   }
 }

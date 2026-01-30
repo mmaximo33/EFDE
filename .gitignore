@@ -4,3 +4,6 @@ bin/cfg.core
 bin/cfg.host
 bin/efde.sh
 bin/install.sh
+
+AGENTS.md
+agents/*

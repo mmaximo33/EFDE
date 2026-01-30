@@ -2,6 +2,6 @@
 set -euo pipefail
 {
   _mod_.config_show(){
-    cat "$(efde.tasks.implemention.get_current_path_env_file)"
+    cat "$(efde.tasks.implementation.get_current_path_env_file)"
   }
 }

@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - EFDE:
   - #39 error project name folder creation
-  - #41 Correct use of the docker-compose command in implemention
+  - #41 Correct use of the docker-compose command in implementation
   - #44 Adjust indentation in the menu
   - #45 Fix menu return
   - #47 Improve translation debugging
@@ -45,8 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - EFDE: #32 Translation system (en_US es_ES pt_PT)
-- Laravel: #5 Add new implemention
-- Wordpress: #31 Add new implemention
+- Laravel: #5 Add new implementation
+- Wordpress: #31 Add new implementation
 - Symfony: #35 Add new version of Symfony 7.x
 
 ### Fixed
@@ -77,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - EFDE: #15 Migrate from PYTHON to full BASH
-  - Refactoring console/{implemention or service}
+  - Refactoring console/{implementation or service}
   - Improve bin/install.sh
   - Fixed main script bin/efde.sh
   - Core refactoring

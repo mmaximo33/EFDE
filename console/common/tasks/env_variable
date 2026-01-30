@@ -71,14 +71,14 @@ _mod_.get_variable() {
 #   SETUP_ENVIRONMENT=(
 #     [NAME]="MyName"
 #     [CREATE_AT]="2000-01-01"
-#     [IMPLEMENTION]="efde"
+#     [IMPLEMENTATION]="efde"
 #   )
 #   VAR_STRING="$(_mod_.prepare_string_to_env SETUP_ENVIRONMENT)"
 #
 #   echo -e "$VAR_STRING" > "$PATH_FILE"
 #
 # Response:
-#   'NAME="MyName"\nCREATE_AT="2000-01-01"\nIMPLEMENTION="efde"'
+#   'NAME="MyName"\nCREATE_AT="2000-01-01"\nIMPLEMENTATION="efde"'
 _mod_.prepare_string_to_env(){
   local -n env_array=$1
   local env_str=""
@@ -98,9 +98,9 @@ _mod_.prepare_string_to_env(){
 #  variables_string="$(common.tasks.env_variable.load_variables_from_file ${PATH_ENV})"
 #  # Evaluar la cadena de variables
 #  eval "$variables_string"
-#  RUN_FUNCTION_IMPLEMENTATION_MAIN= "$IMPLEMENTION.tasks.menu.main"
+#  RUN_FUNCTION_IMPLEMENTATION_MAIN= "$IMPLEMENTATION.tasks.menu.main"
 #
-# $IMPLEMENTION="TEST"
+# $IMPLEMENTATION="TEST"
 _mod_.load_variables_from_file() {
   local file_path="$1"
   local variables=""

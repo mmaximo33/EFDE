@@ -67,17 +67,17 @@ efdeinit.init_configs() {
 }
 
 efdeinit.menu_implementation(){
-  local PATH_ENV=$(efde.tasks.implemention.get_current_path_env_file)
-  local IMPLEMENTION=$(common.tasks.env_variable.get_variable "EFDE_PROJECT_IMPLEMENTION" "$PATH_ENV")
+  local PATH_ENV=$(efde.tasks.implementation.get_current_path_env_file)
+  local IMPLEMENTATION=$(common.tasks.env_variable.get_variable "EFDE_PROJECT_IMPLEMENTATION" "$PATH_ENV")
 
-  RUN_FUNCTION_IMPLEMENTATION_MAIN="$IMPLEMENTION.tasks.menu.main"
+  RUN_FUNCTION_IMPLEMENTATION_MAIN="$IMPLEMENTATION.tasks.menu.main"
   if  common.tasks.module.exists_function "${RUN_FUNCTION_IMPLEMENTATION_MAIN}"; then
     ${RUN_FUNCTION_IMPLEMENTATION_MAIN}
   fi
 }
 
 efdeinit.menu(){
-  efde.tasks.implemention.has_folder_implementation && \
+  efde.tasks.implementation.has_folder_implementation && \
   efdeinit.menu_implementation || efde.tasks.menu.main
 }
 

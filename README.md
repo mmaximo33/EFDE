@@ -38,9 +38,9 @@ The objective of the project is to be able to manage implementations with docker
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](#)
 
 [![Install PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
-[![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](console/implemention/laravel/docs/README.md)
-[![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](console/implemention/symfony/docs/README.md)
-[![Install Wordpress](https://img.shields.io/badge/Wordpress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](console/implemention/wordpress/docs/README.md)
+[![Install Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](console/implementation/laravel/docs/README.md)
+[![Install Symfony](https://img.shields.io/badge/Symfony-000?logo=symfony&logoColor=fff&style=for-the-badge)](console/implementation/symfony/docs/README.md)
+[![Install Wordpress](https://img.shields.io/badge/Wordpress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)](console/implementation/wordpress/docs/README.md)
 
 ### Coming soon
 
@@ -154,11 +154,11 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 - In case you are in a project created with **EFDE**. Example: `~/Domains/demo`
 - The menu for that implementation will be displayed (Symfony, Laravel, Magento, Wordpress, WooComerce, Prestashop, React, Angular, Vue, Others)
 
-![efde symfony install](./console/implemention/symfony/docs/media/install.gif)
+![efde symfony install](./console/implementation/symfony/docs/media/install.gif)
 
 ### Use in project 
 
-![efde symfony use](./console/implemention/symfony/docs/media/use.gif)
+![efde symfony use](./console/implementation/symfony/docs/media/use.gif)
 
 ### Shortcuts
 

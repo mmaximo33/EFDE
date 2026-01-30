@@ -23,13 +23,13 @@ _mod_.choose_php_versions(){
   #VERSION_PHP=$( [ "$VERSION_LARAVEL" == "5" ] && echo "7.4" || echo "8.2" )
   VERSION_PHP="8.2"
 
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="laravel"
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="$VERSION_LARAVEL"
-  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="$VERSION_PHP"
+  GLOBAL_SETUP_IMPLEMENTATION['EFDE_PROJECT_IMPLEMENTATION']="laravel"
+  GLOBAL_SETUP_IMPLEMENTATION['EFDE_PROJECT_VERSION']="$VERSION_LARAVEL"
+  GLOBAL_SETUP_IMPLEMENTATION['PHP_VERSION']="$VERSION_PHP"
 }
 
 _mod_.get_env_version(){
-  local PATH_ENV="$(efde.tasks.implemention.get_current_path_env_file)"
+  local PATH_ENV="$(efde.tasks.implementation.get_current_path_env_file)"
   echo $(common.tasks.env_variable.get_variable "EFDE_PROJECT_VERSION" "$PATH_ENV")
 }
 
@@ -39,9 +39,9 @@ _mod_.set_database_variables(){
 
 _mod_.prepare_setup_environment(){
   _mod_.set_database_variables
-  efde.tasks.implemention.setup_environment
+  efde.tasks.implementation.setup_environment
   # IMPORTANT: Siempre entro al proyecto
-  common.tasks.command_line.run false false "cd $(efde.tasks.implemention.get_new_path_project)"
+  common.tasks.command_line.run false false "cd $(efde.tasks.implementation.get_new_path_project)"
 }
 
 _mod_.docker_start(){
@@ -51,9 +51,9 @@ _mod_.docker_start(){
 }
 
 _mod_.new_environment(){
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_IMPLEMENTION']="laravel"
-  GLOBAL_SETUP_IMPLEMENTION['EFDE_PROJECT_VERSION']="11"
-  GLOBAL_SETUP_IMPLEMENTION['PHP_VERSION']="8.2"
+  GLOBAL_SETUP_IMPLEMENTATION['EFDE_PROJECT_IMPLEMENTATION']="laravel"
+  GLOBAL_SETUP_IMPLEMENTATION['EFDE_PROJECT_VERSION']="11"
+  GLOBAL_SETUP_IMPLEMENTATION['PHP_VERSION']="8.2"
 
   _mod_.prepare_setup_environment
   _mod_.docker_start
@@ -62,7 +62,7 @@ _mod_.new_environment(){
   laravel.tasks.main.permissions_fix
 
   common.tasks.message.success "\nProject installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
-  efde.tasks.implemention.clear_global_variables
+  efde.tasks.implementation.clear_global_variables
 }
 
 _mod_.clone_environment(){
@@ -74,7 +74,7 @@ _mod_.clone_environment(){
 
   common.tasks.message.warning "Reminder:\n- Review config app/.env\n- Import project database"
   common.tasks.message.success "Project installed successfully, check the url \n- http://localhost \n- http://localhost:8080\n"
-  efde.tasks.implemention.clear_global_variables
+  efde.tasks.implementation.clear_global_variables
 }
 
 _mod_.clone_repository(){

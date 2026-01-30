@@ -295,7 +295,7 @@ _mod_.replacemod () {
 # SHORTCUTS
 ###########################################################
 _mod_.generate_shortcuts_file() {
-  local FILES FILE FILE_NAME VARIABLE_NAME IMPLEMENTION NEW_ROWS=""
+  local FILES FILE FILE_NAME VARIABLE_NAME IMPLEMENTATION NEW_ROWS=""
   local TARGET_SHORTCUTS="$DIRECTORY_TMP/common.props.shortcuts"
 
   # Check
@@ -317,9 +317,9 @@ _mod_.generate_shortcuts_file() {
   for FILE in "${FILES[@]}"; do
     FILE_NAME=$(basename "$FILE")
     VARIABLE_NAME="${FILE_NAME//./_}_ITEMS"
-    IMPLEMENTION="${VARIABLE_NAME%%_*}"
+    IMPLEMENTATION="${VARIABLE_NAME%%_*}"
 
-    _mod_.debug_msg --type "SHORTCUTS" --msg "${IMPLEMENTION^^}" --level 1
+    _mod_.debug_msg --type "SHORTCUTS" --msg "${IMPLEMENTATION^^}" --level 1
     _mod_.debug_msg --type "SHORTCUTS" --msg "VARIABLE_NAME: $VARIABLE_NAME" --level 2
     _mod_.debug_msg --type "SHORTCUTS" --msg "FILE: $FILE" --level 2
     if [[ "$(declare -p "$VARIABLE_NAME" 2>/dev/null)" =~ "declare -a" ]]; then
