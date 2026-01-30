@@ -48,7 +48,11 @@ _mod_.has_folder_implementation(){
 _mod_.create_symbolic_link_env(){
   local ORIGIN="${GLOBAL_IMPLEMENTATION_EFDE_FOLDER['FOLDER']}/${GLOBAL_IMPLEMENTATION_EFDE_FOLDER['FILE_ENV']}"
   local TARGET="$(_mod_.get_new_path_project)/.env"
-  ln -sfT "$ORIGIN" "$TARGET"
+  if [[ "${HOST_SO:-$(uname -s)}" == "Darwin" ]] || [[ "${HOST_SO:-}" == "macOS" ]]; then
+    ln -sf "$ORIGIN" "$TARGET"
+  else
+    ln -sfT "$ORIGIN" "$TARGET"
+  fi
 }
 
 _mod_.create_folder(){
@@ -64,10 +68,10 @@ _mod_.create_folder(){
 
 _mod_.set_envs(){
   local FILE="$(_mod_.get_new_path_env_file)"
-  common.tasks.env_variable.set_variable $1 $2 $FILE
+  common.tasks.env_variable.set_variable "$1" "$2" "$FILE"
 }
 
-_mod.set_all_env(){
+_mod_.set_all_env(){
   local FILE="$(_mod_.get_new_path_env_file)"
   local DATA_ENV="$(common.tasks.env_variable.prepare_string_to_env GLOBAL_SETUP_IMPLEMENTATION)"
 
@@ -123,7 +127,7 @@ _mod_.create_shortcuts_example(){
     )
   }
   '
-  echo "$file_content" > $PATH_FILE_LIST
+  echo "$file_content" > "$PATH_FILE_LIST"
 
 
   file_content='#!/usr/bin/env bash
@@ -148,7 +152,7 @@ _mod_.setup_environment(){
 
   _mod_.create_folder
   _mod_.copy_environment
-  _mod.set_all_env
+  _mod_.set_all_env
   _mod_.create_shortcuts_example
 }
 

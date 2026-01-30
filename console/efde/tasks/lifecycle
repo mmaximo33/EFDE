@@ -118,18 +118,18 @@ set -euo pipefail
         REMOTE_COMMIT=$(git -C "$EFDE_PATH_INSTALL" rev-parse --short=7 origin/develop)
         if [[ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]]; then
           MSG=$(common.tasks.message.msg_color warning "Updates available for branch 'develop'.")
-          _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
-          CHECK_DEVELOP=0 # true
-        else
-          MSG=$(common.tasks.message.msg_color success "Branch 'develop' is up to date.")
-          _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
-          CHECK_DEVELOP=1 # false
-        fi
-      else
-        MSG=$(common.tasks.message.msg_color danger "'develop' does not exist. No updates checked.")
         _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
-        CHECK_DEVELOP=0 # false
+        CHECK_DEVELOP=0 # true
+      else
+        MSG=$(common.tasks.message.msg_color success "Branch 'develop' is up to date.")
+        _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+        CHECK_DEVELOP=1 # false
       fi
+    else
+      MSG=$(common.tasks.message.msg_color danger "'develop' does not exist. No updates checked.")
+      _mod_.update_tree "$SILENT" "BRANCH: $MSG" 2 0 info
+      CHECK_DEVELOP=1 # false (no branch to check)
+    fi
 
       if [[ "$CHECK_DEVELOP" -eq 0 || "$CHECK_TAGS" -eq 0 ]]; then
         sleep 1
@@ -174,7 +174,7 @@ set -euo pipefail
   }
 
   _mod_.more_info(){
-    url="${EFDE_CORE_CONFIG['REPOSITORY']}?tab=readme-ov-file#easy-and-fast-development-environment-efde-"
-    common.tasks.command_line.run false false "xdg-open $url"
+    local url="${EFDE_CORE_CONFIG['REPOSITORY']}?tab=readme-ov-file#easy-and-fast-development-environment-efde-"
+    common.tasks.command_line.run false false "common.tasks.os.open_url \"$url\""
   }
 }

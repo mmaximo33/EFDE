@@ -18,6 +18,6 @@
     "${IMPLEMENT,,}:report:issue,         $PREFIX_TASKS.main.report_github,           Report Bug | Improvements | New Features | others"
 
     "project:config:show,                 $PREFIX_TASKS.project.config_show,          Show settings in the project"
-    "project:config:set,                  $PREFIX_TASKS.menu.coming_soon,             Settings settings in the project"
+    "project:config:set,                  $PREFIX_TASKS.menu.coming_soon,             Set settings in the project"
   )
  }

@@ -16,6 +16,21 @@ _mod_.has() {
   type "$1" >/dev/null 2>&1
 }
 
+# Portable: open URL in default browser (macOS: open, Linux: xdg-open)
+_mod_.open_url() {
+  local url="$1"
+  local cmd
+  if [ -z "${EFDE_CONFIG_HOST['HOST_SO']:-}" ]; then
+    EFDE_CONFIG_HOST['HOST_SO']="$(_mod_.get_operating_system)"
+  fi
+  case "${EFDE_CONFIG_HOST['HOST_SO']}" in
+    macOS|Darwin) cmd="open" ;;
+    Linux)        cmd="xdg-open" ;;
+    *)            cmd="xdg-open" ;;
+  esac
+  $cmd "$url"
+}
+
 _mod_.console_clear() {
   local COMMAND
   if [ -z "${EFDE_CONFIG_HOST:-}" ] || [ -z "${EFDE_CONFIG_HOST['HOST_SO']:-}" ]; then

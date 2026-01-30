@@ -13,14 +13,14 @@ set -euo pipefail
   }
 
   _mod_.more_info(){
-    url="${EFDE_CORE_CONFIG['REPOSITORY']}?tab=readme-ov-file#easy-and-fast-development-environment-efde-"
-    common.tasks.command_line.run false false "xdg-open $url"
+    local url="${EFDE_CORE_CONFIG['REPOSITORY']}?tab=readme-ov-file#easy-and-fast-development-environment-efde-"
+    common.tasks.command_line.run false false "common.tasks.os.open_url \"$url\""
     _mod_.run_global_efde
   }
 
   _mod_.report_github(){
-    url="${EFDE_CORE_CONFIG['REPOSITORY']}/issues/new/choose"
-    common.tasks.command_line.run false false "xdg-open $url"
+    local url="${EFDE_CORE_CONFIG['REPOSITORY']}/issues/new/choose"
+    common.tasks.command_line.run false false "common.tasks.os.open_url \"$url\""
     _mod_.run_global_efde
   }
 }
