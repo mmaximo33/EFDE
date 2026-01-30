@@ -23,4 +23,8 @@ set -euo pipefail
     common.tasks.command_line.run false false "common.tasks.os.open_url \"$url\""
     _mod_.run_global_efde
   }
+
+  _mod_.console_check(){
+    common.tasks.command_line.run true true "bash \"${EFDE_CORE_PATH['BIN']}/check.sh\""
+  }
 }
