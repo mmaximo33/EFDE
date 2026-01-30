@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Core / common**: Portabilidad GNU/BSD y macOS (sed, date, find), mensajes de error con variables correctas, iteración segura de archivos, escape para sed en i18n.
+- **EFDE**: Comparación de versiones con `sort -V` en lifecycle; comprobación de que ORIGIN existe en `copy_environment`; typos (WooCommerce, Set settings).
+- **Implementation**: Consistencia Laravel/Symfony/WordPress (config_show, permissions_fix, console), URLs con `common.tasks.os.open_url`, comparación de versión PHP en WordPress con `sort -V`, typos.
+- **Service**: Docker `apache_stop` solo cuando `systemctl` está disponible (evita fallo en macOS); MySQL: eliminado env_show duplicado, typo `--isfunction`, mensaje de importación, MSG_CUSTOM sin sed.
+
+### Changed
+
+- **i18n**: Idiomas unificados (es_ES, fr_FR, pt_BR, de_DE), archivos `.csv`, parseo CSV robusto y documentación en `docs/i18n.md`.
+
 ## [2.3.1] 2025-03-13
 
 ### Fixed

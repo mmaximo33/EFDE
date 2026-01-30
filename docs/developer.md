@@ -142,7 +142,7 @@ The file must contain the following format, where each column represents a piece
 ### Translations
 - Translations must be incorporated into each implementation and service with the **i18n** directory.
 - Languages: **en_US** (default), **es_ES**, **fr_FR**, **pt_BR**, **de_DE** (códigos con guión bajo: idioma_PAÍS).
-- Format: one file per locale with extension `.csv` (e.g. `es_ES.csv`, `pt_PT.csv`) in `console/<module>/i18n/`. Each line has two quoted fields: `"text_in_english","translated_text"`. The first field must match the string in the code exactly (including variables like `$DIR_PATH`, `$FILE_PATH`). Commas and quotes inside a field are supported (use `""` for a literal quote).
+- Format: one file per locale with extension `.csv` (e.g. `es_ES.csv`, `pt_BR.csv`) in `console/<module>/i18n/`. Each line has two quoted fields: `"text_in_english","translated_text"`. The first field must match the string in the code exactly (including variables like `$DIR_PATH`, `$FILE_PATH`). Commas and quotes inside a field are supported (use `""` for a literal quote).
 - Full documentation: [i18n.md](i18n.md) (format, parsing, when applied, adding strings, debugging).
 
 ### Boot sequence | Workflow
