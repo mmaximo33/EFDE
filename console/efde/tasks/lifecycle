@@ -30,7 +30,7 @@ set -euo pipefail
        "develop")")
     while IFS= read -r tag; do
 
-      [[ "$tag" < $(_mod_.version_min ) ]] && continue
+      [[ $(printf "%s\n%s" "$tag" "$(_mod_.version_min)" | sort -V | head -1) == "$tag" ]] && continue
 
       VERSIONS+=("$(printf "%s, %s%s, %s" \
         "$tag" \

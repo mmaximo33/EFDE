@@ -84,6 +84,10 @@ _mod_.set_all_env(){
 _mod_.copy_environment(){
   local ORIGIN="${EFDE_CORE_PATH['CONSOLE']}/implementation/${GLOBAL_SETUP_IMPLEMENTATION['EFDE_PROJECT_IMPLEMENTATION']}/environment"
   local TARGET="$(_mod_.get_new_path_project)"
+  if [[ ! -d "$ORIGIN" ]]; then
+    common.tasks.message.danger "Error: Environment path does not exist: $ORIGIN"
+    return 1
+  fi
   shopt -s dotglob
   cp -r "$ORIGIN"/* "$TARGET"
   shopt -u dotglob
