@@ -111,8 +111,8 @@ DEBUG_MENU="false"        # Debug load menu
 If you want to add a new feature you must keep the following rules in mind
 - Define type
   - **Service**: (docker, mysql, phpmyadmin, mailhog, others)
-  - **Implementation**: frameworks, cms, others (symfony, laravel, magento, woordpress, prestashop, others)
-- Inside `console/{Implementation | Service}`, create a directory named after your new implementation or service (example: `myserv`)
+  - **Implementation**: frameworks, cms, others (symfony, laravel, magento, wordpress, prestashop, others)
+- Inside `console/implementation` or `console/service`, create a directory named after your new implementation or service (example: `myserv`)
   - In `console/service/myserv`
   - Create the directories
     - `./tasks`
@@ -164,11 +164,11 @@ The file must contain the following format, where each column represents a piece
 #### Details
 Taking into account the installation carried out previously.
 
-- When executing in glogal symbolic link `~/bin/efdev -> ~/Domains/bin/efde.sh`
+- When executing in global symbolic link `~/bin/efdev -> ~/Domains/bin/efde.sh`
 - Is loaded `console/init`
   - By default change the CORE `console/common/core` in `bin/.tmp/common.core` **(to work on the transformation)**
-  - It loops through all the directories within `./console` recursively until it finds a folder called `../task`
-  - At that moment the transformation of the files found in that implementation or service begins `./console/.../wordpress/{tasks | props |  accessories}`
+  - It loops through all the directories within `./console` recursively until it finds a folder called `tasks`
+  - At that moment the transformation of the files found in that implementation or service begins `./console/.../wordpress/{tasks | props}`
     - Renaming methods and variables according to the rules mentioned before
       - Files: multiple files from
         - `console/efde/tasks/menu` to `bin/.tmp/efde.tasks.menu`

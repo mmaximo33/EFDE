@@ -264,7 +264,7 @@ _mod_.updates_availables() {
   local QUESTION=$(common.tasks.message.msg_color warning "There is a new version available. \nDo you want to update")
 
   local TODAY=$(date +%Y-%m-%d)
-  local DAYS_DIFF=$(( ( $(date -d "$TODAY" +%s) - $(date -d "$CHECK_LAST" +%s) ) / 86400 ))
+  local DAYS_DIFF=$(( ( $(common.core.date_to_epoch "$TODAY") - $(common.core.date_to_epoch "$CHECK_LAST") ) / 86400 ))
 
   case "$UPDATE_FREQUENCY" in
     daily)    [[ "$DAYS_DIFF" -ge 1 ]] && RUN_UPDATE="true" ;;

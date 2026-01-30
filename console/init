@@ -40,7 +40,7 @@ init.check_construct(){
 
 init.load_modules(){
   local PATH_TO_INSPECT="$@"
-  local DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" -printf "%f\n")
+  local DIRECTORIES=$(find "$PATH_TO_INSPECT" -maxdepth 1 -type d ! -path "$PATH_TO_INSPECT" ! -name "$(basename "$PATH_TO_INSPECT")" | while read -r dir; do basename "$dir"; done)
   for DIRECTORY in $DIRECTORIES; do
     [ "$DIRECTORY" = "common" ] && continue
 

@@ -20,7 +20,7 @@
 ## Index
 
 - [Intro](#intro)
-- [Installing, Manager Versions, Updating & Uninstall](#install--update)
+- [Installing, Manage Versions, Updating & Uninstall](#install--update)
 - [Usage](#usage)
 - [Mission](#mission)
 - [Documentation](#documentation)
@@ -138,8 +138,8 @@ wget -qO- https://raw.githubusercontent.com/mmaximo33/efde/main/bin/install.sh |
 
 ![Efde process install](./docs/media/efde_process_install.gif)
 
-### Manager Version, Update & Uninstall
-![efde process versiosn update uninstall](./docs/media/efde_process_version_update_uninstall.gif)
+### Manage Version, Update & Uninstall
+![efde process version update uninstall](./docs/media/efde_process_version_update_uninstall.gif)
 
 ## Usage
 

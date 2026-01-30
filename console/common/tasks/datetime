@@ -13,6 +13,5 @@ set -euo pipefail
 # echo "Hora actual: $formatted_time"
 _mod_.get_formatted_datetime() {
     local format="${1:-%Y-%m-%d %H:%M:%S}"  # Formato por defecto: AAAA-MM-DD HH:MM:SS
-    local datetime=$(awk "BEGIN {print strftime(\"$format\")}")
-    echo "$datetime"
+    date +"$format"
 }

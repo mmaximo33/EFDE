@@ -30,7 +30,7 @@ _mod_.set_variable() {
 
     if grep -q "^$key=" "$file"; then
         # Update existing
-        sed -i "s/^$key=.*/$key=\"$value\"/" "$file"
+        common.core.sed_inplace "s/^$key=.*/$key=\"$value\"/" "$file"
     else
         # add new
         echo "$key=\"$value\"" >> "$file"
@@ -55,18 +55,19 @@ _mod_.get_variable() {
             echo -n "$value"
         else
             common.tasks.message.danger  "[Error]: Variable not found: \n- Parent: ${FUNCNAME[1]} \n- FILE: $file \n- KEY: $key" >&2
+            return 1
         fi
     else
         #echo $(common.tasks.module.debug_function_moment) >&2
         common.tasks.message.danger "[Error]: File $file does not exist " >&2
         common.tasks.message.danger "- Function: $FUNCNAME" >&2
         common.tasks.message.danger "- CallFunction: $FUNCNAME" >&2
-        return 0
+        return 1
     fi
 }
 
 
-# USAGED
+# USAGE
 # Call:
 #   SETUP_ENVIRONMENT=(
 #     [NAME]="MyName"
@@ -88,7 +89,7 @@ _mod_.prepare_string_to_env(){
     env_str+="\n$key=\"$value\""
   done
 
-  env_str="${env_str:2}" # Remove firts \n
+  env_str="${env_str:2}" # Remove first \n
 
   echo "$env_str"
 }
