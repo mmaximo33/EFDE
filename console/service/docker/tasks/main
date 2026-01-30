@@ -73,12 +73,12 @@ _mod_.dp_all_stop(){
 }
 
 _mod_.apache_stop(){
-  if systemctl is-active --quiet apache2; then
-      local QUESTION="APACHE2 is ON, do you want to turn it OFF?"
-      if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
-        local COMMAND_RUN="sudo service apache2 stop"
-        common.tasks.command_line.run true false "$COMMAND_RUN"
-      fi
+  if command -v systemctl >/dev/null 2>&1 && systemctl is-active --quiet apache2 2>/dev/null; then
+    local QUESTION="APACHE2 is ON, do you want to turn it OFF?"
+    if common.tasks.prompt.confirm_default_yes "$QUESTION" ; then
+      local COMMAND_RUN="sudo service apache2 stop"
+      common.tasks.command_line.run true false "$COMMAND_RUN"
+    fi
   fi
 }
 

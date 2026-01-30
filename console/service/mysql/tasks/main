@@ -19,7 +19,7 @@ set -euo pipefail
       GLOBAL_SETUP_IMPLEMENTATION['MYSQL_DATABASE']=efdedb
     else
       for KEY in "${KEYS[@]}"; do
-        local MSG_CUSTOM=$(echo "${MESSAGES['SET_VARIABLE']}" | sed "s/VALUE/$KEY/g")
+        local MSG_CUSTOM="${MESSAGES['SET_VARIABLE']//VALUE/$KEY}"
         while true; do
           VALUE=$(common.tasks.prompt.request_input "$MSG_CUSTOM")
           if [ -n "$VALUE" ] && [ "${#VALUE}" -ge 4 ]; then
@@ -56,10 +56,6 @@ set -euo pipefail
     [[ "$USE_DATABASE" == "true" ]] && result="$result $MYSQL_DATABASE"
 
     echo "$result"
-  }
-
-  _mod_.env_show(){
-    symfony.tasks.menu.config_show
   }
 
   _mod_.run_query(){
@@ -127,7 +123,7 @@ set -euo pipefail
     common.tasks.menu.show \
       --title "$mysql_props_menu_TITLE" \
       --data "${MENU_FILES[@]}" \
-      --isfuntion false
+      --isfunction false
 
     FILE_NAME=$(common.tasks.menu.get_selected_value)
     FILE_PATH="$PATH_DUMPS/$FILE_NAME"
@@ -135,7 +131,7 @@ set -euo pipefail
     local CONFIRM="Import DATABASE"
     local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
     local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR':")
-    common.tasks.message.warning "We are about to delete the directory $(common.tasks.message.msg_color info "$FILE_PATH")"
+    common.tasks.message.warning "We are about to import the database from the file $(common.tasks.message.msg_color info "$FILE_PATH")"
     local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
     if [[ "$RESPONSE" == "$CONFIRM" ]]; then
       #_mod_.database_drop
