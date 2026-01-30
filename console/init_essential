@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+############################################################
+# ESSENTIAL BOOTSTRAP (#49)
+# Logic to load the common module (tasks + props) and config.
+# Sourced from init after common/core; common.core delegates here.
+# In this file we use common.core.* and common.tasks.* (already loaded).
+############################################################
+set -euo pipefail
+
+init_essential.essential_to_run_check() {
+  if ! type "common.tasks.message.echo" &> /dev/null; then
+    init_essential.essential_to_run_load
+    common.core.debug_step --type "MODULES"
+  fi
+}
+
+init_essential.essential_to_run_load() {
+  local MODULE_NAME="common"
+  local CONSOLE_PATH="${EFDE_CORE_PATH['CONSOLE']}"
+  local -A ACTIONS=(
+    [TASKS]="${ESSENTIAL_MODULES['TASKS']}"
+    [PROPS]="${ESSENTIAL_MODULES['PROPS']}"
+  )
+  init_essential.essential_to_run_msg --type "STEP" --msg "LOAD ${MODULE_NAME^^} (ESSENTIAL TO RUN)"
+
+  load_module() {
+    local element="$1"
+    local file="$2"
+    common.core.replacemod --file-name="$file" \
+                     --new-name="$MODULE_NAME.$element.$file" \
+                     --source-path="$CONSOLE_PATH/$MODULE_NAME/$element/$file"
+  }
+
+  init_essential.essential_to_run_msg --type "MSG" --msg "├── Module ${MODULE_NAME^^} "
+  for element in "${!ACTIONS[@]}"; do
+    init_essential.essential_to_run_msg --type "MSG" --msg "│   ├── $element"
+    for file in ${ACTIONS[$element]}; do
+      init_essential.essential_to_run_msg --type "MSG" --msg "│   │   ├── $file"
+      load_module "${element,,}" "$file"
+    done
+  done
+
+  common.tasks.config.check
+}
+
+init_essential.essential_to_run_msg() {
+  local TYPE="" MSG=""
+  local HELPER="Usage: ${FUNCNAME[0]} --type \"[STEP || MSG]\" --msg \"NEW ACTION\""
+
+  ! [[ "${ESSENTIAL_MODULES['DEBUG']}" == "true" ]] && return 0
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --type)   TYPE="$2";            shift 2 ;;
+      --msg)    MSG="$2";             shift 2 ;;
+      *)        common.core.msg --type danger --msg "$HELPER";     exit 1 ;;
+    esac
+  done
+
+  [[ -z "$TYPE" || -z "$MSG" ]] && { common.core.msg --type danger --msg "$HELPER"; exit 1; }
+
+  print_message() {
+    local color="$1"
+    shift
+    printf "\033[${color}m%s\033[0m\n" "$@" 2>/dev/null
+  }
+
+  case "${TYPE^^}" in
+    "STEP")
+      print_message "1;35" "$(printf '#%.0s' {1..75})"
+      print_message "1;35" "# $MSG"
+      print_message "1;35" "$(printf '#%.0s' {1..75})"
+      ;;
+    "MSG")
+      print_message "1;35" "$MSG"
+      ;;
+    *)
+      print_message "1;31" "ERROR: COMMON ESSENTIAL TO RUN"
+      return 1
+      ;;
+  esac
+}

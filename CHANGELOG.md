@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Boot (#49)**: Refactor essential common.elements: `console/init_essential` creado con la lógica de bootstrap (check, load, message); `console/common/core` pasa a ser stubs que delegan en `init_essential`; `console/init` usa fases explícitas (Fase 1: essentials) y renombra `check_construct` a `load_essential`.
 - **i18n**: Idiomas unificados (es_ES, fr_FR, pt_BR, de_DE), archivos `.csv`, parseo CSV robusto y documentación en `docs/i18n.md`.
 - **Docker**: Prefijo de funciones renombrado de `dp_` a `dc_` (docker compose): `dc_project_root`, `dc_command_run`, `dc_build`, `dc_start`, `dc_stop`, `dc_restart`, `dc_all_stop`, `dc_down`, `dc_logs`, `dc_show_container`.
 

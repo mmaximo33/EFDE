@@ -19,7 +19,9 @@ declare -gA EFDE_INIT=(
   #[TASKS]="config message menu os datetime git prompt file env_variable"
 )
 
-init.check_construct(){
+# Phase 1: essentials — common core + common module bootstrap (transform, load common/tasks and common/props, config.check).
+# Kept in init so "essentials" are clearly separated from the rest of the modules (#49).
+init.load_essential(){
   local MODULE_NAME="common"
   local IMPORT_FILE="core"
   local PATH_SOURCE="${EFDE_INIT['CONSOLE']}/$MODULE_NAME/$IMPORT_FILE"
@@ -33,8 +35,9 @@ init.check_construct(){
       sed "/sed/! s/_mod_/$MODULE_NAME.$IMPORT_FILE/g" "$PATH_SOURCE" > "$PATH_TARGET"
   fi
 
-
   init.load_scripts "$PATH_TARGET"
+  # Bootstrap logic lives in init_essential (#49)
+  source "${EFDE_INIT['CONSOLE']}/init_essential"
   init.load_scripts "${EFDE_INIT['CONSOLE']}/$MODULE_NAME"
 }
 
@@ -64,8 +67,11 @@ init.load_scripts(){
 }
 
 init.main() {
-  init.check_construct
+  # Phase 1: essentials (common core + common bootstrap)
+  init.load_essential
+  # Phase 2: rest of modules (efde, implementation/*, service/*)
   init.load_modules "${EFDE_INIT['CONSOLE']}"
+  # Phase 3: shortcuts, i18n (if debug), updates check
   common.core.generate_extra_elements
   common.tasks.config.updates_availables
 }
