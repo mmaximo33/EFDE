@@ -92,7 +92,7 @@ The file must contain the following format, where each column represents a piece
 ### Boot sequence | Workflow
 
 #### Basic 
-- Load essential elements
+- **Phase 1 — Essentials:** `console/init` loads `common/core` (stub) and then `console/init_essential`; the latter holds the bootstrap logic (check, load, message) used by the core. See refactor [#49](https://github.com/mmaximo33/EFDE/issues/49).
 - Load `bin/cfg.core` and `bin/cfg.host` configuration
 - Load modules
 - Build shortcuts

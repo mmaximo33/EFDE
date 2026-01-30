@@ -122,8 +122,23 @@ run_checks() {
   check_structure
 }
 
+# --- Boot: init_essential (#49) ---
+check_init_essential() {
+  if [[ ! -f "${CONSOLE}/init_essential" ]]; then
+    echo "  [FAIL] boot: console/init_essential missing"
+    FAIL=1
+  fi
+  if ! grep -q 'init_essential' "${CONSOLE}/init" 2>/dev/null; then
+    echo "  [FAIL] boot: console/init does not load init_essential"
+    FAIL=1
+  fi
+}
+
 # --- Main ---
 [[ ! -d "$CONSOLE" ]] && { echo "Error: $CONSOLE not found."; usage; exit 2; }
+
+echo "--- Boot (init_essential) ---"
+check_init_essential
 
 run_checks
 

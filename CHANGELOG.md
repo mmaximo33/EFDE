@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Boot (#49)**: Validación en `bin/check.sh`: comprueba que `console/init_essential` existe y que `console/init` lo carga. Documentación en `docs/developer.md` (Boot sequence) de la Fase 1 — essentials e `init_essential`.
 - **Docker**: Detección de raíz del proyecto (`docker-compose.yml` o `.efde`) hacia arriba desde el CWD; `docker compose` se ejecuta con `--project-directory` y `-f`; menú Docker y `recipe_see` usables desde la raíz o cualquier subdirectorio del proyecto; mensaje claro si no se detecta proyecto. Documentación en `docs/developer.md` (Docker and project directory) y en `agents/efde/module/SKILL.md`.
 
 ### Changed
