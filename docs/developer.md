@@ -179,8 +179,8 @@ Taking into account the installation carried out previously.
     - Finds all files in `../props/shortcuts` locations and merges them into `~/Domains/bin/.tmp/common.props.shortcuts` to improve speed on future runs
   - Apply translations
     - Translations apply only if
-      - The language set `bin/cfg.host HOST_I18N` is different from the default `en_US`
-      - If the variable MODE_DEBUG is true in `bin/cfg.host`
+      - The language set in `bin/cfg.host` (variable `HOST_I18N`) is different from the default `en_US`
+      - Or the variable `DEBUG` in `bin/cfg.core` is true (debug mode)
     - It goes through all the files looking for text matches and replacing them with the established ones, when finished it restarts EFDE 
 
 

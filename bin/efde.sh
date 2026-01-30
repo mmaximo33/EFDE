@@ -22,18 +22,24 @@ declare -gA EFDE_CONFIG_HOST=(
   [KEYS_OPTIONAL]=""
 ) # Sets in cfg.core
 
+# Portable resolution of install root (parent of bin/). Works on Linux, macOS, WSL, Git Bash/Cygwin.
 efdeinit.resolve_absolute_dir() {
-  local ABSOLUTE_BIN_PATH
-  case "$OSTYPE" in
-    linux-gnu) #Linux
-      ABSOLUTE_BIN_PATH=$(dirname $(dirname "$(readlink -f "$0")"))
-      ;;
-    darwin*)      os="macOS"                                                    ;;
-    cygwin|msys)  os="Windows"                                                  ;;
-    *)            os="Undefined"                                                ;;
-  esac
-
-  echo "${ABSOLUTE_BIN_PATH}"
+  local script_path="$0"
+  local script_dir
+  # If $0 has no path (e.g. "efde" from PATH), resolve via command -v
+  [[ "$script_path" != */* ]] && script_path="$(command -v "$0" 2>/dev/null)" || true
+  [[ -z "$script_path" ]] && script_path="$0"
+  # Make absolute if relative
+  [[ "$script_path" != /* ]] && script_path="$(pwd)/$script_path"
+  # Follow symlinks (readlink without -f is portable; loop handles multiple levels)
+  while [ -L "$script_path" ]; do
+    script_dir="$(cd "$(dirname "$script_path")" && pwd)"
+    script_path="$(readlink "$script_path")"
+    [[ "$script_path" != /* ]] && script_path="$script_dir/$script_path"
+  done
+  script_dir="$(cd "$(dirname "$script_path")" && pwd)"
+  # Script lives in INSTALL/bin/efde.sh -> install root is parent of script_dir
+  echo "$(cd "$script_dir/.." && pwd)"
 }
 
 efdeinit.init_dirs()
