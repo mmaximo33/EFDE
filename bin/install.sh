@@ -7,7 +7,7 @@
 # Description:
 #   This script is in charge of carrying out the installation
 # ToDo:
-#   Review instalation processo for ZSH
+#   Review installation process for ZSH
 
 { # this ensures the entire script is downloaded #
 
@@ -20,11 +20,24 @@
     ['GIT_BRANCH']="main"
   )
 
+  # Detect OS: Linux | Darwin (macOS) | Windows. WSL reports Linux.
+  efde_get_os() {
+    local os
+    case "$(uname -s 2>/dev/null)" in
+      Linux)   os="Linux" ;;
+      Darwin)  os="Darwin" ;;
+      MINGW*|MSYS*|CYGWIN*) os="Windows" ;;
+      *)       os="Unknown" ;;
+    esac
+    printf '%s' "$os"
+  }
+
   efde_sets_variables(){
     INSTALL['PROJECT_FOLDER']="${INSTALL['PROJECT_NAME'],,}"
     INSTALL['GIT_REPOSITORY']="${INSTALL['PROJECT_NAME'],,}"
     INSTALL['GIT_URL_REPOSITORY']="https://github.com/${INSTALL['GIT_USER']}/${INSTALL['GIT_REPOSITORY']}"
     INSTALL['PROJECT_LAST_VERSION']="$(efde_latest_version)"
+    INSTALL['OS']="$(efde_get_os)"
   }
 
   efde_echo() {
@@ -97,7 +110,7 @@
 
   # Get a y/n from the user, return yes=0, no=1 enter=$2
   # Prompt using $1.
-  # If set, return $2 on pressing enter, useful for cancel or defualting
+  # If set, return $2 on pressing enter, useful for cancel or defaulting
   efde_get_yes_keypress() {
     local prompt="$(efde_echo warning "${1:-Are you sure [y/n]? }")"
     local enter_return=$2
@@ -141,9 +154,10 @@
   #----------------------------------------------------------------------
   efde_has() {
     local command_to_check="$1"
-    if [ "$command_to_check" == "docker-compose" ]; then
-      local command_result=$(type "$command_to_check" 2>/dev/null)
-      [ $? -eq 0 ] && type "$command_to_check" >/dev/null 2>&1 || type "compose" >/dev/null 2>&1
+    if [ "$command_to_check" = "docker-compose" ]; then
+      type "$command_to_check" >/dev/null 2>&1 || \
+      type "compose" >/dev/null 2>&1 || \
+      (type "docker" >/dev/null 2>&1 && docker compose version >/dev/null 2>&1)
     else
       type "$command_to_check" >/dev/null 2>&1
     fi
@@ -165,10 +179,10 @@
       fi
     fi
 
-    # Disable the optional which check, https://www.shellcheck.net/wiki/SC2230
-    # shellcheck disable=SC2230
-    if efde_has xcode-select && [ $(xcode-select -p >/dev/null 2>/dev/null; echo $?) = '2' ] && \
-      [ "$(which git)" = '/usr/bin/git' ] && [ "$(which curl)" = '/usr/bin/curl' ]; then
+    # macOS: require Xcode CLI tools when git/curl are the system ones
+    if [ "${INSTALL['OS']}" = "Darwin" ] && efde_has xcode-select && \
+      [ "$(xcode-select -p >/dev/null 2>/dev/null; echo $?)" = '2' ] && \
+      [ "$(command -v git 2>/dev/null)" = '/usr/bin/git' ] && [ "$(command -v curl 2>/dev/null)" = '/usr/bin/curl' ]; then
       efde_echo warning 'You may be on a Mac, and need to install the Xcode Command Line Developer Tools.'
       # shellcheck disable=SC2016
       efde_echo warning 'If so, run `xcode-select --install` and try again. If not, please report this!'
@@ -178,8 +192,18 @@
 
   efde_check_requirements() {
     efde_print_step requirements
-    local errors=""
 
+    if [ "${INSTALL['OS']}" = "Windows" ]; then
+      efde_tree "$(efde_msg danger "[ERROR]") Native Windows is not supported." 2 0
+      efde_tree "Please use WSL2 (Windows Subsystem for Linux) and run this script inside WSL." 2 1
+      exit 1
+    fi
+
+    if [ "${INSTALL['OS']}" = "Unknown" ]; then
+      efde_tree "$(efde_msg warning "[WARNING]") Unknown OS ($(uname -s)). Trying Linux flow." 2 1
+    fi
+
+    local errors=""
     check_and_install() {
       local tool_name="$1"
       local install_command="$2"
@@ -198,9 +222,15 @@
     }
 
     efde_tree "Check " 2 0
-    check_and_install "git" "efde_install_git"
-    check_and_install "docker" "efde_install_docker"
-    check_and_install "docker-compose" "efde_install_docker_compose" true
+    if [ "${INSTALL['OS']}" = "Darwin" ]; then
+      check_and_install "git" "efde_install_git_macos"
+      check_and_install "docker" "efde_install_docker_macos"
+      check_and_install "docker-compose" "efde_install_docker_compose_macos" true
+    else
+      check_and_install "git" "efde_install_git_linux"
+      check_and_install "docker" "efde_install_docker_linux"
+      check_and_install "docker-compose" "efde_install_docker_compose_linux" true
+    fi
 
     if [ -n "$errors" ]; then
       efde_tree "$(efde_msg danger "[ERROR]") The following problems were detected: " 2 1
@@ -210,11 +240,20 @@
     efde_tree "$(efde_msg success "[DONE]") All Requirements verified" 2 1
   }
 
-  efde_install_git() {
+  efde_install_git_linux() {
     sudo apt install -y git-all
   }
 
-  efde_install_docker() {
+  efde_install_git_macos() {
+    if efde_has brew; then
+      brew install git
+    else
+      efde_echo warning "Homebrew not found. Install from https://brew.sh then run this script again."
+      return 1
+    fi
+  }
+
+  efde_install_docker_linux() {
     # https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
     sudo apt install -y ca-certificates curl gnupg lsb-release
     sudo mkdir -p /etc/apt/keyrings
@@ -233,15 +272,35 @@
     sudo groupadd docker
     sudo usermod -aG docker $USER
     newgrp docker
-    sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+    sudo chown "$USER":"$USER" "$HOME/.docker" -R
     sudo chmod g+rwx "$HOME/.docker" -R
 
     sudo systemctl restart docker
   }
 
-  efde_install_docker_compose() {
+  efde_install_docker_macos() {
+    if efde_has brew; then
+      brew install --cask docker
+      efde_echo info "Docker Desktop installed. Start it from Applications if needed."
+    else
+      efde_echo warning "Homebrew not found. Install Docker Desktop from https://www.docker.com/products/docker-desktop/"
+      return 1
+    fi
+  }
+
+  efde_install_docker_compose_linux() {
     # https://docs.docker.com/compose/install/linux/
     sudo apt-get install docker-compose-plugin
+  }
+
+  efde_install_docker_compose_macos() {
+    # On macOS, Docker Desktop includes Compose; otherwise install via brew
+    if efde_has brew; then
+      brew install docker-compose
+    else
+      efde_echo warning "Install Docker Desktop (includes Compose) from https://www.docker.com/products/docker-desktop/ or install Homebrew first."
+      return 1
+    fi
   }
 
   #######################################################################
@@ -310,9 +369,17 @@ Install'
 
     mkdir -p $BIN_DIR
     efde_tree "In $BIN_FILE FROM $INSTALL_DIR_FILE" 3 0
-    if ! ln -sfT "$INSTALL_DIR_FILE" "$BIN_FILE"; then
-      efde_tree "$(efde_msg danger "[ERROR]") Cannot create symbolic link. Please report this!" 4 1
-      exit 1
+    # GNU ln uses -T; BSD (macOS) ln does not support -T
+    if [ "${INSTALL['OS']}" = "Darwin" ]; then
+      ln -sf "$INSTALL_DIR_FILE" "$BIN_FILE" || {
+        efde_tree "$(efde_msg danger "[ERROR]") Cannot create symbolic link. Please report this!" 4 1
+        exit 1
+      }
+    else
+      ln -sfT "$INSTALL_DIR_FILE" "$BIN_FILE" || {
+        efde_tree "$(efde_msg danger "[ERROR]") Cannot create symbolic link. Please report this!" 4 1
+        exit 1
+      }
     fi
 
     if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
@@ -340,7 +407,7 @@ Install'
       efde_project_install_clone_project
     fi
 
-    efde_project_install_optimization
+    efde_project_install_optimization "$INSTALL_DIR"
     efde_create_bin
 
     efde_print_step end
@@ -354,7 +421,7 @@ Install'
     if (command cd $INSTALL_DIR; git checkout main; git reset --hard origin/${INSTALL['GIT_BRANCH']}; git pull origin ${INSTALL['GIT_BRANCH']}) >/dev/null 2>&1; then
       efde_tree "$(efde_msg success "[SUCCESS]") Updated repository!" 4 1
       efde_print_step end
-      exit 1
+      exit 0
     else
       efde_tree "$(efde_msg danger "[ERROR]") Failed to updated ${INSTALL['PROJECT_NAME']} repo. Please report this!" 4 1
     fi
@@ -407,6 +474,7 @@ Install'
   }
 
 efde_project_install_optimization() {
+    local INSTALL_DIR="${1:?INSTALL_DIR required}"
     efde_tree "Repository optimization" 2 0
     local action cmd
     declare -A actions=(
@@ -433,11 +501,13 @@ efde_project_install_optimization() {
   # during the execution of the install script
   #----------------------------------------------------------------------
   efde_reset() {
-    unset -f efde_echo efde_msg efde_tree efde_sets_variables \
+    unset -f efde_get_os efde_echo efde_msg efde_tree efde_sets_variables \
       efde_get_keypress efde_get_yes_keypress efde_confirm_default_no efde_confirm_default_yes \
       efde_input_response efde_latest_version \
       efde_has efde_check_environment efde_check_requirements \
-      efde_install_git efde_install_docker efde_install_docker_compose \
+      efde_install_git_linux efde_install_git_macos \
+      efde_install_docker_linux efde_install_docker_macos \
+      efde_install_docker_compose_linux efde_install_docker_compose_macos \
       efde_source efde_default_install_dir efde_install_dir efde_create_bin efde_print_step \
       efde_do_install efde_project_install_from_git \
       efde_project_install_existing_folder efde_project_install_recovery_project efde_project_install_clone_project \
