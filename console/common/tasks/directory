@@ -13,29 +13,27 @@ _mod_.create_recursive() {
 #
 # common.tasks.directory.remove "$PATH"
 _mod_.remove() {
-  local FORCE PATH
-  FORCE=false
-  [[ "$1" == "force" ]] && { FORCE=true; shift; PATH="$1"; }
-
-  local PATH="$1"
-  if [[ -z "$PATH" ]]; then
+  local FORCE=false DIR_PATH
+  [[ "$1" == "force" ]] && { FORCE=true; shift; }
+  DIR_PATH="$1"
+  if [[ -z "$DIR_PATH" ]]; then
     common.tasks.message.info "Usage: _mod_.remove [force] <path directory>"
     return 1
   fi
 
-  if [[ ! -e "$PATH" ]]; then
-    common.tasks.message.danger "Error: Path '$PATH' does not exist."
+  if [[ ! -e "$DIR_PATH" ]]; then
+    common.tasks.message.danger "Error: Path '$DIR_PATH' does not exist."
     return 1
   fi
 
   local CONFIRM="Delete FOLDER"
   local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
   local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR':")
-  common.tasks.message.warning "We are about to delete the directory $(common.tasks.message.msg_color info $PATH)"
+  common.tasks.message.warning "We are about to delete the directory $(common.tasks.message.msg_color info "$DIR_PATH")"
   local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
   if [[ "$RESPONSE" == "$CONFIRM" ]]; then
-    [[ "$FORCE" == true ]] && /bin/rm -rf "$PATH" || /bin/rm -r "$PATH"
-    common.tasks.message.success "Removed: $PATH"
+    [[ "$FORCE" == true ]] && /bin/rm -rf "$DIR_PATH" || /bin/rm -r "$DIR_PATH"
+    common.tasks.message.success "Removed: $DIR_PATH"
   else
     common.tasks.message.warning "Removal aborted."
   fi

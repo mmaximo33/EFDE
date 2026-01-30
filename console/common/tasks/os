@@ -23,7 +23,8 @@ _mod_.console_clear() {
   fi
 
   case "${EFDE_CONFIG_HOST['HOST_SO']}" in
-    Linux) COMMAND="clear" ;;
+    Linux)   COMMAND="clear" ;;
+    macOS|Darwin) COMMAND="clear" ;;
     *)
       common.tasks.message.danger "Operating system not configured"
       return 1

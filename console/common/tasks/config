@@ -124,7 +124,7 @@ _mod_.i18n_check(){
 # CONFIG_CORE
 _mod_.get_core_config(){
   local KEY="$1"
-  echo $(common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_CORE")
+  common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_CORE"
 }
 
 _mod_.set_core_config(){
@@ -177,7 +177,7 @@ _mod_.get_core_i18n_default(){
 # CONFIG_HOST
 _mod_.get_host_config(){
   local KEY="$1"
-  echo $(common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_HOST")
+  common.tasks.env_variable.get_variable "$KEY" "$CONFIG_PATH_HOST"
 }
 
 _mod_.set_host_config(){

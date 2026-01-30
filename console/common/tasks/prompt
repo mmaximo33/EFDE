@@ -39,7 +39,7 @@ _mod_.get_keypress() {
 
 # Get a y/n from the user, return yes=0, no=1 enter=$2
 # Prompt using $1.
-# If set, return $2 on pressing enter, useful for cancel or defualting
+# If set, return $2 on pressing enter, useful for cancel or defaulting
 _mod_.get_yes_keypress() {
   local prompt="${1:-Are you sure [y/n]? }"
   local enter_return=$2

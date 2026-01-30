@@ -24,6 +24,7 @@ set -euo pipefail
     local PARAM="$1"
     common.tasks.message.info "But we found some that may match the desired action:\n"
 
+    local PATTERN=""
     local PARTS=(${PARAM//:/ })
     for ((i = 0; i < ${#PARTS[@]}; i++)); do
       PATTERN+="${PARTS[i]}"
@@ -52,12 +53,12 @@ set -euo pipefail
       fi
 
       local SHORTCUT=$(common.tasks.message.success $(_mod_.trim ${VALUES[0]}))
-      local DESCRPTION=$(common.tasks.message.echo $(_mod_.trim ${VALUES[3]:-${VALUES[2]}}))
+      local DESCRIPTION=$(common.tasks.message.echo $(_mod_.trim ${VALUES[3]:-${VALUES[2]}}))
       if common.tasks.config.get_efde_mode_debug; then
         local FUNCTION=$(common.tasks.message.echo debug $(_mod_.trim ${VALUES[1]}))
         printf "  %-45s %-55s\n" "$SHORTCUT" "$FUNCTION"
       else
-        printf "  %-45s %-55s\n" "$SHORTCUT" "$DESCRPTION"
+        printf "  %-45s %-55s\n" "$SHORTCUT" "$DESCRIPTION"
       fi
     done
   }

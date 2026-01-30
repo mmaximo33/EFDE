@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usaged
+# Usage
 # Obtener la fecha y hora actual en el formato AAAA-MM-DD HH:MM:SS
 # formatted_datetime=$(get_formatted_datetime)
 # echo "Fecha y hora actual: $formatted_datetime"

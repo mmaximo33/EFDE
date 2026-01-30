@@ -310,7 +310,8 @@ _mod_.history_add(){
 }
 
 _mod_.history_get_last() {
-  local HISTORY_ARRAY=($(_mod_.history_get_array))
+  local -a HISTORY_ARRAY
+  read -ra HISTORY_ARRAY <<< "$(_mod_.history_get_array)"
 
   if [[ -z "$(_mod_.get_core_history)" ]]; then
     echo "null"
@@ -321,7 +322,8 @@ _mod_.history_get_last() {
 }
 
 _mod_.history_remove_last() {
-  local HISTORY_ARRAY=($(_mod_.history_get_array))
+  local -a HISTORY_ARRAY
+  read -ra HISTORY_ARRAY <<< "$(_mod_.history_get_array)"
   local HISTORY_NEW
   if [[ ${#HISTORY_ARRAY[@]} -gt 0 ]]; then
     unset "HISTORY_ARRAY[-1]"
@@ -332,7 +334,8 @@ _mod_.history_remove_last() {
 }
 
 _mod_.history_check_return(){
-  local HISTORY_ARRAY=($(_mod_.history_get_array))
+  local -a HISTORY_ARRAY
+  read -ra HISTORY_ARRAY <<< "$(_mod_.history_get_array)"
 
   if (( ${#HISTORY_ARRAY[@]} > 1 )); then
     return 0

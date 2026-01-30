@@ -61,7 +61,7 @@ _mod_.get_variable() {
         #echo $(common.tasks.module.debug_function_moment) >&2
         common.tasks.message.danger "[Error]: File $file does not exist " >&2
         common.tasks.message.danger "- Function: $FUNCNAME" >&2
-        common.tasks.message.danger "- CallFunction: $FUNCNAME" >&2
+        common.tasks.message.danger "- Caller: $(caller 0 2>/dev/null || echo 'unknown')" >&2
         return 1
     fi
 }
