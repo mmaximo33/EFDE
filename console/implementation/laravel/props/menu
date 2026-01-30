@@ -11,7 +11,7 @@
     "$PREFIX_TASKS.menu.config_show,                    Project config,                 Settings established in the project"
     "$PREFIX_TASKS.menu.console,                        Artisan,                        $IMPLEMENT Console"
     "docker.tasks.menu.main,                            Docker,                         Dockerization management in the project"
-    "$PREFIX_TASKS.menu.fix_permissions,                Fix permissions,                Apply permissions"
+    "$PREFIX_TASKS.menu.permissions_fix,                Fix permissions,                Apply permissions"
     "mysql.tasks.menu.main,                             Database,                       Database Manager"
   )
 

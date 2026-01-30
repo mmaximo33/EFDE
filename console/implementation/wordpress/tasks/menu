@@ -34,7 +34,7 @@ set -euo pipefail
     _mod_.main
   }
 
-  _mod_.cli(){
+  _mod_.console(){
     wordpress.tasks.main.console_run_command
     _mod_.main
   }

@@ -72,8 +72,7 @@ _mod_.clone_repository(){
 
   [ -e ./app/wp-config.php ] && mv ./app/wp-config.php ./app/wp-config.php.bkp
 
-  # shellcheck disable=SC2072
-  if [[ "${GLOBAL_SETUP_IMPLEMENTATION['PHP_VERSION']}" > "8.1" ]]; then
+  if [[ $(printf "%s\n8.1" "${GLOBAL_SETUP_IMPLEMENTATION['PHP_VERSION']}" | sort -V | head -1) == "8.1" ]]; then
       [ ! -e ./app/wp-config-docker.php ] && docker.tasks.main.dp_command_run --cli "exec app_fpm cp /usr/src/wordpress/wp-config-docker.php /var/www/html/"
       cp -f ./app/wp-config-docker.php ./app/wp-config.php
   fi

@@ -2,8 +2,8 @@
 set -euo pipefail
 
 _mod_.see_compatibility_versions(){
-  url="https://make.wordpress.org/core/handbook/references/php-compatibility-and-wordpress-versions/"
-  common.tasks.command_line.run false false "xdg-open $url"
+  local url="https://make.wordpress.org/core/handbook/references/php-compatibility-and-wordpress-versions/"
+  common.tasks.os.open_url "$url"
 }
 
 _mod_.run_command_app_cli(){

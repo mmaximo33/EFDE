@@ -30,7 +30,7 @@ _mod_.choose_php_versions(){
 }
 
 _mod_.question_type(){
-    # Type Instalation API or WEBAPP
+    # Type Installation API or WEBAPP
     common.tasks.message.info "${GLOBAL_SYMFONY_INSTALL['MESSAGE_WARNING']}"
     if common.tasks.prompt.confirm_default_yes "${GLOBAL_SYMFONY_INSTALL['MESSAGE_ASK']}" ; then
       GLOBAL_SYMFONY_INSTALL['INSTALL_WEBAPP']=true

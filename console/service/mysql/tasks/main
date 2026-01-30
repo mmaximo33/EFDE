@@ -59,7 +59,7 @@ set -euo pipefail
   }
 
   _mod_.env_show(){
-    symfony.tasks.menu.show_config_project
+    symfony.tasks.menu.config_show
   }
 
   _mod_.run_query(){

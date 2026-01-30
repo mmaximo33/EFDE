@@ -8,7 +8,7 @@
   _mod_TITLE="$IMPLEMENT https://symfony.com/ \nSelect an option:"
 
   _mod_MAIN=(
-    "$PREFIX_TASKS.menu.show_config_project,          Project config,                 Settings established in the project"
+    "$PREFIX_TASKS.menu.config_show,                 Project config,                 Settings established in the project"
     "$PREFIX_TASKS.menu.console,                      Console,                        $IMPLEMENT Console"
     "docker.tasks.menu.main,                          Docker,                         Dockerization management in the project"
     "$PREFIX_TASKS.menu.permissions_fix,              Fix permissions,                Apply permissions"

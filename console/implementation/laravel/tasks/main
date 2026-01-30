@@ -2,8 +2,8 @@
 set -euo pipefail
 
 _mod_.see_compatibility_versions(){
-  url="https://laravel.com/docs/releases"
-  common.tasks.command_line.run false false "xdg-open $url"
+  local url="https://laravel.com/docs/releases"
+  common.tasks.os.open_url "$url"
 }
 
 _mod_.run_command_app_cli(){
@@ -11,7 +11,7 @@ _mod_.run_command_app_cli(){
   docker.tasks.main.dp_command_run --cli "run --rm app_cli ${@}"
 }
 
-# ToDo: Review oficial documentation
+# ToDo: Review official documentation
 _mod_.permissions_fix(){
   local PATH_APP="./app"
   ! common.tasks.directory.exists "$PATH_APP" && common.tasks.directory.create_recursive "$PATH_APP"

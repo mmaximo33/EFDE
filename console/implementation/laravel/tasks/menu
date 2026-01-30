@@ -29,7 +29,7 @@ set -euo pipefail
     fi
   }
 
-  _mod_.fix_permissions(){
+  _mod_.permissions_fix(){
     laravel.tasks.main.permissions_fix
     _mod_.main
   }
