@@ -373,13 +373,57 @@ _mod_.load_shortcuts_file() {
     exit 1
   fi
 }
-# MMTodo:
-# Improve this feature so that
-#   - Take all characters enclosed in double quotes (\n or \")
-#   - Do not consider spaces between origin and destination ("origin",              "destination")
 ###########################################################
-# I18N TRANSLATIONS
+# I18N TRANSLATIONS (CSV parse + sed escape)
 ###########################################################
+# Parse one line of i18n CSV: "origin","translation" (supports "" and commas inside fields)
+_mod_.i18n_parse_csv_line() {
+  local line="$1"
+  text_old="" text_new=""
+  [[ "$line" != \"* ]] && return 1
+  line="${line#\"}"
+  while [[ -n "$line" ]]; do
+    if [[ "$line" == \"* ]]; then
+      if [[ "$line" == \"\",* || "$line" == \"\" ]]; then
+        text_old+="\""
+        line="${line#\"\"}"
+      else
+        line="${line#\"}"
+        break
+      fi
+    else
+      text_old+="${line:0:1}"
+      line="${line:1}"
+    fi
+  done
+  [[ "$line" != ,\"* ]] && return 1
+  line="${line#,\"}"
+  while [[ -n "$line" ]]; do
+    if [[ "$line" == \"* ]]; then
+      if [[ "$line" == \"\",* || "$line" == \"\" ]]; then
+        text_new+="\""
+        line="${line#\"\"}"
+      else
+        break
+      fi
+    else
+      text_new+="${line:0:1}"
+      line="${line:1}"
+    fi
+  done
+  return 0
+}
+
+# Escape string for sed s/// pattern (left side)
+_mod_.sed_escape_pattern() {
+  printf '%s\n' "$1" | sed 's/\\/\\\\/g; s/\[/\\[/g; s/\]/\\]/g; s/\*/\\*/g; s/\./\\./g; s/\^/\\^/g; s/\$/\\$/g; s/#/\\#/g'
+}
+
+# Escape string for sed s/// replacement (right side)
+_mod_.sed_escape_replacement() {
+  printf '%s\n' "$1" | sed 's/\\/\\\\/g; s/&/\\&/g; s/#/\\#/g'
+}
+
 _mod_.generate_translation(){
   local PATH_TO_INSPECT="${EFDE_CORE_PATH['CONSOLE']}"
   local IS_INIT=true
@@ -413,23 +457,21 @@ _mod_.generate_translation(){
       if [[ ! -d "$PATH_TASKS_EXISTS" ]]; then
         _mod_.generate_translation --path "$PATH_TARGET" --isinit false
       else
-        local FILE_I18N="$PATH_TARGET/i18n/$LANGUAGE_CONFIG"
+        local FILE_I18N="$PATH_TARGET/i18n/${LANGUAGE_CONFIG}.csv"
         _mod_.debug_msg --type "I18N" --msg "CHECK DIRECTORY $PATH_TARGET" --level 1
         _mod_.debug_msg --type "I18N" --msg "TRANSLATIONS FILE $FILE_I18N" --level 2
 
         if common.tasks.file.exists "$FILE_I18N"; then
           while IFS= read -r line || [[ -n "$line" ]]; do
-            [ -z "$line" ] && continue
-
-            line=${line//\"/}
-            text_old=${line%%,*}
-            text_new=${line##*,}
-
-            if [[ -n "$text_old" && -n "$text_new" ]]; then
+            [[ -z "$line" ]] && continue
+            if _mod_.i18n_parse_csv_line "$line" && [[ -n "$text_old" && -n "$text_new" ]]; then
               _mod_.debug_msg --type "I18N" --msg "$text_old > $text_new" --level 3
-              for file_tmp in $(find "$DIRECTORY_TMP" -type f -name "$DIRECTORY.*"); do
-                _mod_.sed_inplace "s#$text_old#$text_new#g" "$file_tmp"
-              done
+              local pattern repl
+              pattern=$(_mod_.sed_escape_pattern "$text_old")
+              repl=$(_mod_.sed_escape_replacement "$text_new")
+              while IFS= read -r -d '' file_tmp; do
+                _mod_.sed_inplace "s#$pattern#$repl#g" "$file_tmp"
+              done < <(find "$DIRECTORY_TMP" -type f -name "$DIRECTORY.*" -print0 2>/dev/null)
             fi
           done < "$FILE_I18N"
         fi

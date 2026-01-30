@@ -3,7 +3,7 @@
 "Show (start) containers of project","Mostrar (iniciar) contêineres do projeto"
 "Start containers of project","Iniciar contêineres do projeto"
 "Stop containers of project","Parar contêineres do projeto"
-"Inspect environment logs","Inspeccionar logs do ambiente"
+"Inspect environment logs","Inspecionar logs do ambiente"
 "Enter the indicated container","Entrar no contêiner indicado"
 "Run command in container. Example: bash, cp, rm","Executar comando no contêiner. Exemplo: bash, cp, rm"
 "Stops all containers running on the computer","Para todos os contêineres em execução no computador"
@@ -17,9 +17,6 @@
 "Find another value or ENTER","Encontre outro valor ou ENTER"
 "Log monitor","Monitor de logs"
 "Enter service name:","Digite o nome do serviço:"
-"You want to open a new instance? RUN=Y or EXEC=N","Deseja abrir uma nova instância? EXEC=N ou EXEC=N"
+"You want to open a new instance? RUN=Y or EXEC=N","Deseja abrir uma nova instância? RUN=Y ou EXEC=N"
 "What command do you want to run?","Qual comando deseja executar?"
 "Do you want to run another command?","Deseja executar outro comando?"
-
-
-

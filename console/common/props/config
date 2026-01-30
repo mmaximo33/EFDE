@@ -13,9 +13,11 @@ set -euo pipefail
   )
 
   _mod_SET_LANGUAGE=(
-    "es_ES,   es_ES,    Spanish"
     "en_US,   en_US,    English"
-    "pt_PT,   pt_PT,    Portuguese"
+    "es_ES,   es_ES,    Spanish"
+    "fr_FR,   fr_FR,    French"
+    "pt_BR,   pt_BR,    Portuguese"
+    "de_DE,   de_DE,    German"
   )
 
   _mod_SET_EDITOR=(

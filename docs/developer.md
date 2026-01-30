@@ -140,16 +140,10 @@ The file must contain the following format, where each column represents a piece
 ```
 
 ### Translations
-- Translations must be incorporated into each implementation with the **i18n** directory
-- The languages available so far are
-    - en_US (Default)
-    - es_ES
-    - pt_PT
-- They must follow the following pattern `
-"text_en_us","text_translations"`
-
-> [!IMPORTANT]
-> You cannot use characters like `\ \"`
+- Translations must be incorporated into each implementation and service with the **i18n** directory.
+- Languages: **en_US** (default), **es_ES**, **fr_FR**, **pt_BR**, **de_DE** (códigos con guión bajo: idioma_PAÍS).
+- Format: one file per locale with extension `.csv` (e.g. `es_ES.csv`, `pt_PT.csv`) in `console/<module>/i18n/`. Each line has two quoted fields: `"text_in_english","translated_text"`. The first field must match the string in the code exactly (including variables like `$DIR_PATH`, `$FILE_PATH`). Commas and quotes inside a field are supported (use `""` for a literal quote).
+- Full documentation: [i18n.md](i18n.md) (format, parsing, when applied, adding strings, debugging).
 
 ### Boot sequence | Workflow
 
@@ -178,10 +172,8 @@ Taking into account the installation carried out previously.
   - Generate the shortcuts
     - Finds all files in `../props/shortcuts` locations and merges them into `~/Domains/bin/.tmp/common.props.shortcuts` to improve speed on future runs
   - Apply translations
-    - Translations apply only if
-      - The language set in `bin/cfg.host` (variable `HOST_I18N`) is different from the default `en_US`
-      - Or the variable `DEBUG` in `bin/cfg.core` is true (debug mode)
-    - It goes through all the files looking for text matches and replacing them with the established ones, when finished it restarts EFDE 
+    - Translations apply only if the language set in `bin/cfg.host` (variable `HOST_I18N`) is different from the default in `bin/cfg.core` (`I18N_DEFAULT`). With `DEBUG=true`, I18N steps are shown. See [i18n.md](i18n.md).
+    - The system parses each module's `i18n/<locale>` file (CSV format), escapes strings for `sed`, and replaces origin strings with translations in the generated files under `bin/.tmp`; when done it restarts EFDE. 
 
 
 - Determines whether the launch directory in the `efdev` command console has a project created by it or not (search for `$PATH_PROJECT/.efde/`)
