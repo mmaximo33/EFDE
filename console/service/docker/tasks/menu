@@ -49,6 +49,7 @@ _mod_.down(){
 
 _mod_.logs(){
   docker.tasks.main.dp_logs
+  _mod_.main
 }
 
 _mod_.entry(){
@@ -58,6 +59,7 @@ _mod_.entry(){
 
 _mod_.command(){
   docker.tasks.main.container_run_command
+  _mod_.main
 }
 
 _mod_.recipe_see(){

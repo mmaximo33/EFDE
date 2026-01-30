@@ -2,7 +2,6 @@
 set -euo pipefail
 {
   _mod_.main(){
-    common.tasks.os.console_clear
     common.tasks.menu.show \
       --title "$efde_props_menu_TITLE" \
       --data "${efde_props_menu_MAIN[@]}"
@@ -38,5 +37,6 @@ set -euo pipefail
 
   _mod_.shortcuts_show(){
     common.tasks.shortcuts.show
+    _mod_.main
   }
 }

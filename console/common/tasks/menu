@@ -125,6 +125,7 @@ _mod_.set_validate(){
 ##########################
 _mod_.show(){
   _mod_.validate_params "$@"
+  common.tasks.os.console_clear
   _mod_.history_add
   _mod_.print_options
   _mod_.choice_options
@@ -238,10 +239,8 @@ _mod_.choice_options() {
       else
         common.tasks.os.console_clear
         common.tasks.message.danger "The '$choice' option is not in the list."
-        _mod_.show \
-          --title "$QUESTION" \
-          --data "${OPTIONS[@]}" \
-          --isfunction "$(_mod_.get_core_isfunction && echo true || echo false)"
+        _mod_.print_options
+        _mod_.choice_options
       fi
       ;;
   esac

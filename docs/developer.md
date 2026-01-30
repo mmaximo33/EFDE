@@ -155,6 +155,9 @@ The file must contain the following format, where each column represents a piece
 - Apply translations
 - Load menu
 
+#### Menu flow (entry, history, return)
+- Full documentation: [menu-flow.md](menu-flow.md) (entry point, which menu is shown, `common.tasks.menu.show`, choice_options, [R]eturn/[Q]uit/[I]nfo, history, and how actions return to menu).
+
 #### Details
 Taking into account the installation carried out previously.
 
