@@ -32,7 +32,8 @@ init.load_essential(){
   [ ! -d "${EFDE_INIT['TMP']}" ] && mkdir -p "${EFDE_INIT['TMP']}"; chmod +x "${EFDE_INIT['TMP']}"
 
   if [[ ! -f "$PATH_TARGET" ]]; then
-      sed "/sed/! s/_mod_/$MODULE_NAME.$IMPORT_FILE/g" "$PATH_SOURCE" > "$PATH_TARGET"
+      # Only skip replacement on lines that invoke sed (e.g. sed -E, sed 's/), not on names like sed_inplace
+      sed -e '/sed[[:space:]][-\x27"]/b' -e "s/_mod_/$MODULE_NAME.$IMPORT_FILE/g" "$PATH_SOURCE" > "$PATH_TARGET"
   fi
 
   init.load_scripts "$PATH_TARGET"
