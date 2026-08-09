@@ -44,6 +44,16 @@ La lógica de requisitos e instalación ramifica según `INSTALL['OS']` (por eje
 3. **Enlaces simbólicos:** En macOS/BSD, `ln -sfT` no existe; para compatibilidad futura usar algo como: `ln -sf "$INSTALL_DIR_FILE" "$BIN_FILE"` (o detectar SO y usar la forma adecuada).
 4. **Instalación de dependencias:** La lógica actual (`efde_install_git`, `efde_install_docker`, etc.) es Debian/Ubuntu. Para macOS haría falta una rama con `brew`; para Windows nativo, otra estrategia (instaladores o Chocolatey), o indicar uso de WSL.
 
+## Post-clone / post-install: bats-core submodule
+
+EFDE ships `bats-core` as a git submodule under `test/bats/` (used by the QA skill). On a fresh clone, initialise the submodule before running the test harness:
+
+```bash
+git submodule update --init --recursive
+```
+
+Without this step, `./test/run_all.sh` exits with a clear "bats-core not installed" hint. `bin/install.sh` does NOT run the submodule init automatically (the install step targets the runtime, not the contributor test rig).
+
 ## Servicios que dependen del SO
 
 En `console/service/`, si un script usa comandos específicos de Linux (p. ej. `systemctl`, `service apache2`), debe comprobar antes que existan para no fallar en macOS:
