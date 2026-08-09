@@ -30,7 +30,7 @@ git switch develop
 git pull origin master
 git checkout -b <issue-new-feature> # example 31-description-of-new-feature
 git add <files>
-git commit "feat/fix (environment): feature description" # See https://www.conventionalcommits.org/en/v1.0.0/
+git commit -m "feat(core): feature description" # See [agents/git/SKILL.md](../agents/git/SKILL.md) for the EFDE commit convention
 
 # Confirm that it is up to date with other updates
 git rebase origin/develop
@@ -38,7 +38,7 @@ git rebase origin/develop
 git status
 # If there are, resolve them, add the changes and commit.
 # git add <files>
-# git commit "fix (environment):  resolved conflicts"
+# git commit -m "fix(core): resolved conflicts"
 # git rebase --continue
 
 # Upload your changes
@@ -91,13 +91,15 @@ The file must contain the following format, where each column represents a piece
 
 ### Boot sequence | Workflow
 
-#### Basic 
-- **Phase 1 — Essentials:** `console/init` loads `common/core` (stub) and then `console/init_essential`; the latter holds the bootstrap logic (check, load, message) used by the core. See refactor [#49](https://github.com/mmaximo33/EFDE/issues/49).
-- Load `bin/cfg.core` and `bin/cfg.host` configuration
-- Load modules
-- Build shortcuts
-- Apply translations
-- Load menu
+EFDE boots in two stages: first `bin/efde.sh` loads the config files into memory, then `console/init` runs three explicit phases.
+
+#### Configuration (in `bin/efde.sh`, before `console/init`)
+- `bin/efde.sh` reads `bin/cfg.core` (DEBUG, UPDATE_CHECK_*) and `bin/cfg.host` (HOST_*) into associative arrays. This happens **before** `console/init` is sourced, so `console/init` and `console/init_essential` can already read those values. See [debug-workflow.md](debug-workflow.md) for the DEBUG flags.
+
+#### Phases (in `console/init`, after config is loaded)
+- **Phase 1 — Essentials:** `console/init` sources `common/core` (stub delegating to `init_essential`) and then `console/init_essential`; the latter holds the bootstrap logic (check, load, message) used by the core. See refactor [#49](https://github.com/mmaximo33/EFDE/issues/49).
+- **Phase 2 — Modules:** `console/init.load_modules` walks `console/` recursively and sources every module (efde, implementation/*, service/*) except `common/` (which is already loaded).
+- **Phase 3 — Generate + Updates:** `common.core.generate_extra_elements` merges all per-module shortcuts into `bin/.tmp/common.props.shortcuts` and applies i18n translations when `HOST_I18N != I18N_DEFAULT`; `common.tasks.config.updates_availables` checks for upstream updates.
 
 #### Menu flow (entry, history, return)
 - Full documentation: [menu-flow.md](menu-flow.md) (entry point, which menu is shown, `common.tasks.menu.show`, choice_options, [R]eturn/[Q]uit/[I]nfo, history, and how actions return to menu).
@@ -141,7 +143,7 @@ git merge <issue-new-feature>
 
 # Remember to update the docs CHANGELOG.md, README.md 
 git add CHANGELOG.md 
-git commit -m "fix (doc): update changelog" 
+git commit -m "fix(docs): update changelog"
 
 git push origin develop --force-with-lease
 ```

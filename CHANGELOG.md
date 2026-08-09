@@ -11,12 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Boot (#49)**: Validación en `bin/check.sh`: comprueba que `console/init_essential` existe y que `console/init` lo carga. Documentación en `docs/developer.md` (Boot sequence) de la Fase 1 — essentials e `init_essential`.
 - **Docker**: Detección de raíz del proyecto (`docker-compose.yml` o `.efde`) hacia arriba desde el CWD; `docker compose` se ejecuta con `--project-directory` y `-f`; menú Docker y `recipe_see` usables desde la raíz o cualquier subdirectorio del proyecto; mensaje claro si no se detecta proyecto. Documentación en `docs/developer.md` (Docker and project directory) y en `agents/efde/module/SKILL.md`.
+- **QA (efde:qa, 74ac39b)**: Nuevo script `bin/check.sh` (read-only; valida estructura / portabilidad / naming / boot en `console/`) y atajo `efde:qa` que lo invoca; el chequeo de boot verifica que `console/init_essential` exista y que `console/init` lo cargue.
+- **Install (3bdda0f)**: `bin/install.sh` detecta el SO host y ramifica el flujo de instalación para Linux, macOS, WSL y Windows (Git Bash); el chequeo de requisitos se adapta por plataforma.
+- **Menu (bd9e522)**: Mejoras de flujo y documentación en el menú principal de `console/efde/` (entry/exit/history); el path de retorno es ahora estable entre implementaciones.
+- **Rename (82e31c4)**: Carpeta `console/implemention` renombrada a `console/implementation`; referencias en scripts y docs actualizadas al nuevo path.
 
 ### Changed
 
 - **Boot (#49)**: Refactor essential common.elements: `console/init_essential` creado con la lógica de bootstrap (check, load, message); `console/common/core` pasa a ser stubs que delegan en `init_essential`; `console/init` usa fases explícitas (Fase 1: essentials) y renombra `check_construct` a `load_essential`.
 - **i18n**: Idiomas unificados (es_ES, fr_FR, pt_BR, de_DE), archivos `.csv`, parseo CSV robusto y documentación en `docs/i18n.md`.
 - **Docker**: Prefijo de funciones renombrado de `dp_` a `dc_` (docker compose): `dc_project_root`, `dc_command_run`, `dc_build`, `dc_start`, `dc_stop`, `dc_restart`, `dc_all_stop`, `dc_down`, `dc_logs`, `dc_show_container`.
+- **Developer / i18n docs (599d99f)**: `docs/developer.md` y `docs/i18n.md` actualizados (pt_BR); sección `[Unreleased]` de `CHANGELOG.md` reestructurada siguiendo Keep-a-Changelog.
+- **Debug workflow (d03c46c)**: `docs/debug-workflow.md` consolidado como doc de uso (config en `bin/cfg.core`, qué hace cada flag, imágenes de referencia); referencias consolidadas entre `docs/`, `AGENTS.md` y skills.
 
 ### Fixed
 

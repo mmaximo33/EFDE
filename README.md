@@ -5,15 +5,15 @@
 ![efde version](https://img.shields.io/badge/status-Active-green.svg)
 ![efde_lastcommin](https://img.shields.io/github/last-commit/mmaximo33/efde.svg)
 ![efde_release](https://img.shields.io/github/release/mmaximo33/efde.svg)
-![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/2.2.0.svg)
-![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/1.2.0.svg)
+![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/2.3.1.svg)
+![efde_since release](https://img.shields.io/github/commits-since/mmaximo33/efde/2.3.0.svg)
 
 ![issue-open](https://img.shields.io/github/issues/mmaximo33/efde.svg)
 ![issue-close](https://img.shields.io/github/issues-closed/mmaximo33/efde.svg)
 ![pull-open](https://img.shields.io/github/issues-pr/mmaximo33/efde.svg)
 ![pull-close](https://img.shields.io/github/issues-pr-closed/mmaximo33/efde.svg)
 
-![efde translations](https://img.shields.io/badge/language-grey.svg) ![en_US](https://img.shields.io/badge/en.US-blue.svg) ![es_ES](https://img.shields.io/badge/es.ES-blue.svg) ![pt_PT](https://img.shields.io/badge/pt.PT-blue.svg)
+![efde translations](https://img.shields.io/badge/language-grey.svg) ![en_US](https://img.shields.io/badge/en.US-blue.svg) ![es_ES](https://img.shields.io/badge/es.ES-blue.svg) ![pt_BR](https://img.shields.io/badge/pt.BR-blue.svg)
 
 ### If you like the project, give us a little star ⭐.
 #### It really helps us a lot. Thank you! 💪
@@ -51,9 +51,6 @@ The objective of the project is to be able to manage implementations with docker
 [![Prestashop](https://img.shields.io/badge/prestashop-%23DF0067.svg?&style=for-the-badge&logo=prestashop&logoColor=white)](docs/developer.md)
 
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](docs/developer.md)
-[![Install React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](docs/developer.md)
-[![Install Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)](docs/developer.md)
-[![Install Vue.js](https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vue.js&logoColor=4FC08D)](docs/developer.md)
 
 [![Install Python](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)](docs/developer.md)
 [![Install Django](https://img.shields.io/badge/django-113527?style=for-the-badge&logo=django&logoColor=white)](docs/developer.md)
