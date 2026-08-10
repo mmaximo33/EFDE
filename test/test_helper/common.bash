@@ -54,6 +54,43 @@ skip_if_no_docker() {
   if ! command -v docker >/dev/null 2>&1; then
     skip "docker not available on PATH"
   fi
+  if ! docker compose version >/dev/null 2>&1; then
+    skip "docker compose plugin not available"
+  fi
+}
+
+# Poll <url> with curl -sf until it returns HTTP 2xx or <max_seconds> elapses.
+# Returns 0 on success, 1 on timeout. Logs each attempt to stderr.
+wait_for_url() {
+  local url="${1:?wait_for_url requires <url>}"
+  local max="${2:-30}"
+  local i
+  for i in $(seq 1 "$max"); do
+    if curl -sf --max-time 2 "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "wait_for_url: timed out after ${max}s waiting for ${url}" >&2
+  return 1
+}
+
+# Run <compose_args...> from <project_dir>; runs `docker compose down -v` on EXIT
+# regardless of success/failure. Use as `compose_up <project_dir> up -d --wait`.
+compose_up() {
+  local project_dir="${1:?compose_up requires <project_dir>}"
+  shift
+  (
+    cd "$project_dir" && docker compose "$@"
+  )
+}
+
+# Force teardown of a docker-compose project (used in bats teardown hooks).
+compose_down() {
+  local project_dir="${1:?compose_down requires <project_dir>}"
+  if [[ -f "${project_dir}/docker-compose.yml" ]]; then
+    (cd "$project_dir" && docker compose down -v 2>/dev/null) || true
+  fi
 }
 
 # Skip the test if the bats-core binary is missing (submodule not initialised).

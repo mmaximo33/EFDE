@@ -43,7 +43,18 @@ EFDE ahora cubre QA en dos capas:
 | Capa | Herramienta | Comando | Cubre |
 |---|---|---|---|
 | **Estática (linting)** | `bin/check.sh` | `./bin/check.sh` (alias: `efde:qa`) | Estructura, portabilidad, naming, boot, i18n CSV, props/shortcuts, props/menu, frontmatter de skills, `chmod +x` de sí mismo. Excluye `console/service/traefik` (WIP). |
-| **End-to-end (comportamiento)** | `bats-core` + `test/run_all.sh` | `./test/run_all.sh` | Atajos globales (`efde:qa`, `efde:version`, `efde:shortcuts`) e instalación de frameworks (wordpress, laravel, symfony) y servicios (mysql, docker). Requiere `git submodule update --init` post-clone. |
+| **End-to-end (comportamiento)** | `bats-core` + `test/run_all.sh` | `./test/run_all.sh` | Atajos globales (`efde:qa`, `efde:version`, `efde:shortcuts`), instalación de frameworks (wordpress, laravel, symfony) y servicios (mysql, docker), bug #1 stdin/tty regression guard. Requiere `git submodule update --init` post-clone. |
+
+### Layout modular de bats
+
+Los tests bats se organizan en dos raíces con auto-discovery (`run_all.sh` usa `find`):
+
+| Raíz | Contenido | Ejemplos |
+|---|---|---|
+| `test/*.bats` | Genéricos (cross-cutting, no atan a una sola impl) | `shortcuts.bats`, `bug-1-prompt.bats`, `docker-root.bats`, `mysql-root.bats` |
+| `console/<scope>/test/*.bats` | Específicos por implementación o servicio | `console/efde/test/lifecycle.bats`, `console/implementation/laravel/test/install.bats`, `console/service/mysql/test/export-import.bats` |
+
+Helpers globales viven en `test/test_helper/` (common.bash, efde_pty.bash) y se importan vía `load '<path>'` desde ambos roots.
 
 Detalle y convenciones en [agents/efde/qa/SKILL.md](agents/efde/qa/SKILL.md).
 
