@@ -34,7 +34,11 @@ _mod_.read_input() {
 _mod_.get_keypress() {
   local REPLY IFS=
 
-  printf >/dev/tty "%b" "$*"
+  if [[ -t 0 && -r /dev/tty ]]; then
+    printf >/dev/tty "%b" "$*"
+  else
+    printf "%b" "$*" >&2
+  fi
   [[ $BASH_VERSION ]] && _mod_.read_input -rn1
   printf '%s' "$REPLY"
 }
