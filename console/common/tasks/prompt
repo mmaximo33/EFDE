@@ -22,24 +22,23 @@ set -euo pipefail
 #  fi
 ###################################################################################################################
 
-# Read a single char from /dev/tty, prompting with "$*"
-# Note: pressing enter will return a null string. Perhaps a version terminated with X and then remove it in caller?
-# See https://unix.stackexchange.com/a/367880/143394 for dealing with multi-byte, etc.
+# Read input from the active terminal when stdin is interactive, otherwise from stdin
+_mod_.read_input() {
+  if [[ -t 0 ]]; then
+    read -r "$@" </dev/tty
+  else
+    read -r "$@"
+  fi
+}
+
 _mod_.get_keypress() {
   local REPLY IFS=
 
-  #printf >/dev/tty '%s' "$*" #MMTodo: Original
-  printf >/dev/tty "%b" "$*"  #MMTodo: apply color
-
-  #[[ $ZSH_VERSION ]] && read -rk1 # Use -u0 to read from STDIN
-  # See https://unix.stackexchange.com/q/383197/143394 regarding '\n' -> ''
-  [[ $BASH_VERSION ]] && read </dev/tty -rn1
+  printf >/dev/tty "%b" "$*"
+  [[ $BASH_VERSION ]] && _mod_.read_input -rn1
   printf '%s' "$REPLY"
 }
 
-# Get a y/n from the user, return yes=0, no=1 enter=$2
-# Prompt using $1.
-# If set, return $2 on pressing enter, useful for cancel or defaulting
 _mod_.get_yes_keypress() {
   local prompt="${1:-Are you sure [y/n]? }"
   local enter_return=$2
@@ -74,6 +73,6 @@ _mod_.confirm_default_yes() {
 
 _mod_.request_input() {
   local prompt="$*"
-  read -r -p "$(printf "%b" "$prompt") "  value
+  _mod_.read_input -r -p "$(printf "%b" "$prompt") " value
   echo "$value"
 }

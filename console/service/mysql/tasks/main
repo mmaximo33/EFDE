@@ -104,44 +104,72 @@ set -euo pipefail
     local PATH_FILES_SEARCH=("$PATH_DUMPS"/*.sql)
     local FILE_NAME FILE_PATH
     local MYSQL_QUERY_BASE="exec -T database mariadb $(_mod_.get_env_var)"
+    local IMPORT_FILE=""
+    local CONFIRM_IMPORT=false
 
-    if ! common.tasks.directory.exists "$PATH_DUMPS"; then
-        common.tasks.message.danger "Directory not found $PATH_DUMPS\n"
-        return
-    fi
-
-    if ! ls "${PATH_FILES_SEARCH}" > /dev/null 2>&1; then
-        common.tasks.message.danger "No files with .sql extension were found $PATH_FILES_SEARCH\n"
-        return
-    fi
-
-    for FILE in $(ls -1t "${PATH_FILES_SEARCH[@]}"); do
-        FILE_NAME=$(basename "$FILE")
-        MENU_FILES+=("$FILE_NAME,$FILE_NAME, ")
+    while [[ "$#" -gt 0 ]]; do
+      case "$1" in
+        --file)
+          [[ "$#" -ge 2 ]] || { common.tasks.message.danger "Missing value for --file"; return 1; }
+          IMPORT_FILE="$2"
+          shift 2
+          ;;
+        --yes)
+          CONFIRM_IMPORT=true
+          shift
+          ;;
+        *)
+          common.tasks.message.danger "Unknown option: $1"
+          return 1
+          ;;
+      esac
     done
 
-    common.tasks.menu.show \
-      --title "$mysql_props_menu_TITLE" \
-      --data "${MENU_FILES[@]}" \
-      --isfunction false
-
-    FILE_NAME=$(common.tasks.menu.get_selected_value)
-    FILE_PATH="$PATH_DUMPS/$FILE_NAME"
-
-    local CONFIRM="Import DATABASE"
-    local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
-    local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR':")
-    common.tasks.message.warning "We are about to import the database from the file $(common.tasks.message.msg_color info "$FILE_PATH")"
-    local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
-    if [[ "$RESPONSE" == "$CONFIRM" ]]; then
-      #_mod_.database_drop
-      _mod_.database_create
-      docker.tasks.main.dc_command_run -i true -o true -c "${MYSQL_QUERY_BASE} < $FILE_PATH"
-      common.tasks.message.success "Success: Import file $FILE_PATH\n"
+    if [[ -n "$IMPORT_FILE" ]]; then
+      FILE_PATH="$IMPORT_FILE"
+      [[ -f "$FILE_PATH" ]] || { common.tasks.message.danger "File not found $FILE_PATH\n"; return 1; }
     else
-      common.tasks.message.warning "Aborted action."
+      if ! common.tasks.directory.exists "$PATH_DUMPS"; then
+          common.tasks.message.danger "Directory not found $PATH_DUMPS\n"
+          return
+      fi
+
+      if ! ls "${PATH_FILES_SEARCH[@]}" > /dev/null 2>&1; then
+          common.tasks.message.danger "No files with .sql extension were found $PATH_FILES_SEARCH\n"
+          return
+      fi
+
+      for FILE in $(ls -1t "${PATH_FILES_SEARCH[@]}"); do
+          FILE_NAME=$(basename "$FILE")
+          MENU_FILES+=("$FILE_NAME,$FILE_NAME, ")
+      done
+
+      common.tasks.menu.show \
+        --title "$mysql_props_menu_TITLE" \
+        --data "${MENU_FILES[@]}" \
+        --isfunction false
+
+      FILE_NAME=$(common.tasks.menu.get_selected_value)
+      FILE_PATH="$PATH_DUMPS/$FILE_NAME"
     fi
+
+    if [[ "$CONFIRM_IMPORT" != true ]]; then
+      local CONFIRM="Import DATABASE"
+      local CONFIRM_COLOR=$(common.tasks.message.msg_color danger "$CONFIRM")
+      local QUESTION=$(common.tasks.message.msg_color warning "Confirm this action by writing '$CONFIRM_COLOR':")
+      common.tasks.message.warning "We are about to import the database from the file $(common.tasks.message.msg_color info "$FILE_PATH")"
+      local RESPONSE=$(common.tasks.prompt.request_input "$QUESTION")
+      if [[ "$RESPONSE" != "$CONFIRM" ]]; then
+        common.tasks.message.warning "Aborted action."
+        return
+      fi
+    fi
+
+    _mod_.database_create
+    docker.tasks.main.dc_command_run -i true -o true -c "${MYSQL_QUERY_BASE} < $FILE_PATH"
+    common.tasks.message.success "Success: Import file $FILE_PATH\n"
   }
+
 
   _mod_.permissions(){
     local PATH_ENV="$(efde.tasks.implementation.get_current_path_env_file)"
