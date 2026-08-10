@@ -39,8 +39,59 @@ Knowledge area for `bin/check.sh`, the read-only EFDE console validator (shortcu
 - Via shortcut: `efde efde:qa` from any project that has EFDE installed.
 - CI: wire the same command into your pipeline before merging. The script is self-contained Bash and needs only standard POSIX tools.
 
+## End-to-end tests (bats-core)
+
+EFDE ships a [bats-core](https://github.com/bats-core/bats-core) test rig under `test/` for runtime validation of the most-used shortcuts and the framework/service install flows. The linting harness above covers structural correctness; the E2E rig covers "does the shortcut actually run".
+
+### Layout
+
+```
+test/
+├── run_all.sh                    # wrapper: runs every *.bats and prints [PASS]/[FAIL]
+├── shortcuts.bats                # pilot: efde:qa, efde:version, efde:shortcuts
+├── wordpress.bats                # E2E: wordpress:install:new
+├── laravel.bats                  # E2E: laravel:install:new
+├── symfony.bats                  # E2E: symfony:install:new
+├── mysql.bats                    # E2E: mysql:db:export
+├── docker.bats                   # E2E: docker compose config
+├── test_helper/
+│   ├── common.bash               # setup_project, teardown, assert_file_*
+│   └── efde_pty.bash             # PTY wrapper for interactive prompts
+└── bats/                          # git submodule (bats-core)
+```
+
+### Running
+
+```bash
+# Initialise bats-core once per fresh clone
+git submodule update --init --recursive
+
+# Run everything
+./test/run_all.sh
+
+# Run a single suite
+./test/bats/bin/bats test/wordpress.bats
+```
+
+`run_all.sh` exits 0 only if every suite passes. Each suite prints `[PASS] <name>.bats (N/N)` or `[FAIL] <name>.bats (X/N)` plus a captured output dump on failure.
+
+### Conventions for new `.bats` files
+
+1. `load 'test_helper/common'` for assertions and fixture helpers.
+2. `load 'test_helper/efde_pty'` if the shortcut is interactive (uses `script -qefc` to allocate a PTY so `common.tasks.prompt` reads from `/dev/tty`).
+3. Set up a fixture under `${TEST_FIXTURE_ROOT:-/tmp/efde-test}/<domain>/` via `setup_project <domain>` in `setup()`. Clean it up in `teardown()` via `project_teardown`.
+4. Skip with `skip_if_no_docker` or `skip_if_no_pty` rather than failing when the environment can't support the test.
+5. NEVER fix bugs found in E2E — record them in the apply summary and open a separate change. The E2E rig surfaces truth; it doesn't patch it.
+
+### Known limitations
+
+- EFDE's `common.tasks.prompt` reads from `/dev/tty`, not stdin. Tests that drive interactive shortcuts rely on `script(1)` to allocate a PTY. Some terminal configurations still hang; the tests skip with a clear message when they do.
+- `*:install:new` shortcuts run `docker compose build` which can take minutes. The tests cap the install at `EFDE_PTY_TIMEOUT` (default 120s) and only assert on the artefacts written before the build step (`.efde/.env`).
+- The environment assumes Docker is available on the host. Production CI should also wire `docker info` as a precondition.
+
 ## References
 
 - **Boot**: [../boot/SKILL.md](../boot/SKILL.md) — what `check.sh` validates under "Boot (init_essential)".
 - **Core**: [../core/SKILL.md](../core/SKILL.md) — `_mod_` naming that the validator enforces.
 - **Portability**: [../portability/SKILL.md](../portability/SKILL.md) — forbidden-pattern list and their portable alternatives.
+- **Install**: [../install/SKILL.md](../install/SKILL.md) — `git submodule update --init` post-clone step.

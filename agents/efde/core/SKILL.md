@@ -28,6 +28,18 @@ Reglas fundamentales y arquitectura del núcleo de EFDE.
 
 6. **Modo debug**: Documentación de uso (configuración, flags, imágenes) en [docs/debug-workflow.md](../../docs/debug-workflow.md). No duplicar en skills; referenciar ese doc.
 
+## Dependencias opcionales
+
+EFDE no requiere dependencias externas para ejecutarse como atajos. Sin embargo, el rig de tests E2E (bajo `test/`) y el linter ampliado (`bin/check.sh`) sí las necesitan:
+
+| Dependencia | ¿Obligatoria? | Cómo se obtiene | Uso |
+|---|---|---|---|
+| `bats-core` | **Opcional** (solo E2E) | Submodule: `git submodule update --init --recursive` bajo `test/bats/` | Test runner para `test/*.bats`. Ver [qa](../qa/SKILL.md). |
+| `script` (util-linux) | **Opcional** (solo E2E interactivos) | Paquete del sistema (`util-linux` en Linux, `bsdmainutils` en macOS) | Asigna PTY para automatizar prompts de `efde:wordpress:install:new` etc. |
+| Docker | **Opcional** (solo si se ejecutan flujos de instalación) | `bin/install.sh` en Linux/apt; `brew install --cask docker` en macOS | Lo usan los shortcuts `*:install:new`, `docker:build`, `mysql:db:export`. Ninguno de estos es necesario para usar EFDE como capa de menú. |
+
+Las dependencias opcionales se documentan aquí (no son parte del binario EFDE). Si falta una, los tests saltan con un mensaje claro en vez de fallar.
+
 ## Patrones de Código
 
 ### Definición de funciones

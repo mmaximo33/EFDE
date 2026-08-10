@@ -20,20 +20,31 @@ Usa estas skills para obtener patrones detallados bajo demanda (ver [README](age
 ### EFDE Skills
 | Skill | Descripción | URL |
 |-------|-------------|-----|
-| `core` | Estructura del proyecto, ciclo de vida y convención `_mod_` | [SKILL.md](agents/efde/core/SKILL.md) |
+| `core` | Estructura del proyecto, ciclo de vida y convención `_mod_`. Dependencias opcionales (bats-core, Docker). | [SKILL.md](agents/efde/core/SKILL.md) |
 | `portability` | Reglas de portabilidad y compatibilidad (sed, date, find, readlink, which, xdg-open, systemctl) | [SKILL.md](agents/efde/portability/SKILL.md) |
 | `module` | Creación de nuevas implementaciones (Laravel, Symfony) o servicios | [SKILL.md](agents/efde/module/SKILL.md) |
 | `i18n` | Sistema de traducciones y soporte multi-idioma | [SKILL.md](agents/efde/i18n/SKILL.md) |
 | `shortcuts` | Gestión de atajos (shortcuts) globales y por proyecto | [SKILL.md](agents/efde/shortcuts/SKILL.md) |
-| `install` | Script de instalación: rutas, compatibilidad Linux/macOS/WSL/Windows | [SKILL.md](agents/efde/install/SKILL.md) |
+| `install` | Script de instalación: rutas, compatibilidad Linux/macOS/WSL/Windows. Post-clone `git submodule update --init`. | [SKILL.md](agents/efde/install/SKILL.md) |
 | `git` | Convención de commits usada en el proyecto | [SKILL.md](agents/git/SKILL.md) |
 | `boot` | Secuencia de arranque: `init_essential` + 3 fases (essentials → modules → generate + updates) | [SKILL.md](agents/efde/boot/SKILL.md) |
 | `impl-laravel` | Convención de la implementación Laravel (PHP 8.2 default, menú 5+2+5, 7 atajos) | [SKILL.md](agents/efde/impl-laravel/SKILL.md) |
 | `impl-symfony` | Convención de la implementación Symfony (`webapp`/`api`, menú 5+2+4, 7 atajos) | [SKILL.md](agents/efde/impl-symfony/SKILL.md) |
 | `impl-wordpress` | Convención de la implementación WordPress (`wordpress:${DOCKER_APP_FPM_VERSION}`, menú 5+2+12, 7 atajos) | [SKILL.md](agents/efde/impl-wordpress/SKILL.md) |
-| `qa` | Contrato de `bin/check.sh` (estructura, portabilidad, naming, boot) | [SKILL.md](agents/efde/qa/SKILL.md) |
+| `qa` | `bin/check.sh` (linter ampliado) + bats-core E2E (`test/run_all.sh`). Convenciones CSV, shortcuts, props, skills. | [SKILL.md](agents/efde/qa/SKILL.md) |
 | `service-docker` | Servicio Docker (`dc_*`, root detection, 12 opciones, 12 atajos) | [SKILL.md](agents/efde/service-docker/SKILL.md) |
 | `service-mysql` | Servicio MySQL (import/export, 7 opciones, 7 atajos) | [SKILL.md](agents/efde/service-mysql/SKILL.md) |
+
+## QA & Tests
+
+EFDE ahora cubre QA en dos capas:
+
+| Capa | Herramienta | Comando | Cubre |
+|---|---|---|---|
+| **Estática (linting)** | `bin/check.sh` | `./bin/check.sh` (alias: `efde:qa`) | Estructura, portabilidad, naming, boot, i18n CSV, props/shortcuts, props/menu, frontmatter de skills, `chmod +x` de sí mismo. Excluye `console/service/traefik` (WIP). |
+| **End-to-end (comportamiento)** | `bats-core` + `test/run_all.sh` | `./test/run_all.sh` | Atajos globales (`efde:qa`, `efde:version`, `efde:shortcuts`) e instalación de frameworks (wordpress, laravel, symfony) y servicios (mysql, docker). Requiere `git submodule update --init` post-clone. |
+
+Detalle y convenciones en [agents/efde/qa/SKILL.md](agents/efde/qa/SKILL.md).
 
 ## Auto-invocación de Skills
 
@@ -48,7 +59,7 @@ Cuando realices las siguientes acciones, invoca SIEMPRE la skill correspondiente
 | Añadir nuevos comandos o atajos | `shortcuts` |
 | Crear un nuevo commit | `git` — invocar la skill y respetar: issue `#XX` al **inicio** de la descripción; scope solo de la lista (p. ej. `core` para init, no `boot`). [SKILL.md](agents/git/SKILL.md) |
 | Modificar el boot sequence (`console/init`, `init_essential`, fases) | `boot` |
-| Modificar o ampliar el chequeo estático de `bin/check.sh` | `qa` |
+| Modificar o ampliar el chequeo estático de `bin/check.sh` o tests bats (`test/`) | `qa` |
 | Trabajar en el servicio Docker (`console/service/docker/`, `dc_*`) | `service-docker` |
 | Trabajar en el servicio MySQL (`console/service/mysql/`) | `service-mysql` |
 | Trabajar en la implementación Laravel (`console/implementation/laravel/`) | `impl-laravel` |
