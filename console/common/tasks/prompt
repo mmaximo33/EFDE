@@ -24,7 +24,7 @@ set -euo pipefail
 
 # Read input from the active terminal when stdin is interactive, otherwise from stdin
 _mod_.read_input() {
-  if [[ -t 0 ]]; then
+  if [[ -t 0 && -r /dev/tty ]]; then
     read -r "$@" </dev/tty
   else
     read -r "$@"
