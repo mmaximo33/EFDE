@@ -146,7 +146,13 @@
 
   # MMToDo: Review install for version
   efde_latest_version() {
-    echo $(curl -s "https://api.github.com/repos/${INSTALL['GIT_USER']}/${INSTALL['GIT_REPOSITORY']}/releases/latest" | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4)
+    local TAG
+    TAG=$(curl -s "https://api.github.com/repos/${INSTALL['GIT_USER']}/${INSTALL['GIT_REPOSITORY']}/releases/latest" | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4)
+    if [[ -z "$TAG" ]]; then
+      # Fallback: tag pushed without GitHub Release (footgun mitigation)
+      TAG=$(curl -s "https://api.github.com/repos/${INSTALL['GIT_USER']}/${INSTALL['GIT_REPOSITORY']}/tags?per_page=1" | grep -o '"name": *"v\?[^"]*"' | head -n1 | cut -d'"' -f4)
+    fi
+    echo "$TAG"
   }
 
   #######################################################################

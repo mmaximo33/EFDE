@@ -34,6 +34,7 @@ Usa estas skills para obtener patrones detallados bajo demanda (ver [README](age
 | `qa` | `bin/check.sh` (linter ampliado) + bats-core E2E (`test/run_all.sh`). Convenciones CSV, shortcuts, props, skills. | [SKILL.md](agents/efde/qa/SKILL.md) |
 | `service-docker` | Servicio Docker (`dc_*`, root detection, 12 opciones, 12 atajos) | [SKILL.md](agents/efde/service-docker/SKILL.md) |
 | `service-mysql` | Servicio MySQL (import/export, 7 opciones, 7 atajos) | [SKILL.md](agents/efde/service-mysql/SKILL.md) |
+| `release` | Proceso de release: pre-flight checks, semver, CHANGELOG, manual steps, validaciones. | [SKILL.md](agents/efde/release/SKILL.md) |
 
 ## QA & Tests
 
@@ -65,6 +66,7 @@ Cuando realices las siguientes acciones, invoca SIEMPRE la skill correspondiente
 | Trabajar en la implementación Laravel (`console/implementation/laravel/`) | `impl-laravel` |
 | Trabajar en la implementación Symfony (`console/implementation/symfony/`) | `impl-symfony` |
 | Trabajar en la implementación WordPress (`console/implementation/wordpress/`) | `impl-wordpress` |
+| Preparar o documentar un release (tag, GitHub Release, CHANGELOG, badges) | `release` |
 
 ---
 

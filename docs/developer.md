@@ -149,14 +149,13 @@ git push origin develop --force-with-lease
 ```
 
 ### To Main (Release)
+
+Quick reference (full procedure: [agents/efde/release/SKILL.md](../../agents/efde/release/SKILL.md)):
+
 ```sh
-# See https://semver.org/
+# See https://semver.org/ for version bump rules
 git fetch --tags
-
-git tag -a <major.minor.patch> -m "<major.minor.patch> comments" 
-# git tag -a 1.0.0 -m "1.0.0 comments" 
-
+git tag -a <major.minor.patch> -m "<major.minor.patch> comments"
 git push origin <major.minor.patch>
-
-# Create new pull request in github
+# Then create the GitHub Release (gh release create or web UI).
 ```
