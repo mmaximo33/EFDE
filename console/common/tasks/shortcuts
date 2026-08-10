@@ -7,7 +7,11 @@ set -euo pipefail
   # GENERAL
   _mod_.show(){
     _mod_.show_efde
-    _mod_.show_custom
+
+    local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implementation.get_current_path_efde)/$PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS_LIST"
+    if [[ -f "$PATH_ABSOLUTE_SHORTCUTS" ]]; then
+      _mod_.show_custom
+    fi
   }
 
   _mod_.target() {
@@ -82,16 +86,24 @@ set -euo pipefail
   # CUSTOM
   _mod_.load_custom_shortcuts() {
     local PATH_ABSOLUTE_SHORTCUTS="$(efde.tasks.implementation.get_current_path_efde)/$PATH_IMPLEMENTATION_CUSTOM_SHORTCUTS_LIST"
-    if [[ -f "$PATH_ABSOLUTE_SHORTCUTS" ]]; then
-      source "$PATH_ABSOLUTE_SHORTCUTS"
+    if [[ ! -f "$PATH_ABSOLUTE_SHORTCUTS" ]]; then
+      return 0
+    fi
 
-      if [[ -z "${CUSTOM_SHORTCUTS+x}" ]]; then
-        common.tasks.message.warning "The CUSTOM_SHORTCUTS variable is not defined in the file: $PATH_ABSOLUTE_SHORTCUTS"
-        exit 1
-      fi
-    else
-      common.tasks.message.warning "The shortcuts file was not found in the path: $PATH_ABSOLUTE_SHORTCUTS"
-      exit 1
+    source "$PATH_ABSOLUTE_SHORTCUTS"
+
+    # `declare -p` is the only test that distinguishes unset from empty array:
+    # after `source` of a file containing `CUSTOM_SHORTCUTS=()` the variable
+    # is set in the file scope but appears unset in the parent (so
+    # `[[ -z "${VAR+x}" ]]` returns TRUE, a false positive). `declare -p`
+    # succeeds in both "set, empty" and "set, populated" cases.
+    if ! declare -p CUSTOM_SHORTCUTS &>/dev/null; then
+      common.tasks.message.warning "The CUSTOM_SHORTCUTS variable is not defined in the file: $PATH_ABSOLUTE_SHORTCUTS"
+      return 0
+    fi
+
+    if [[ ${#CUSTOM_SHORTCUTS[@]} -eq 0 ]]; then
+      return 0
     fi
   }
 
