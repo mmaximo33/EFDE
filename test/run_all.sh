@@ -33,8 +33,9 @@ if [[ $# -gt 0 ]]; then
   suites=( "$@" )
 else
   # Auto-discover: generic tests in test/ + scope-specific in console/<scope>/test/.
+  # test/pkg-check/*.bats is included for the extensible package manager layer.
   # shellcheck disable=SC2207
-  GENERIC=( "${ROOT}"/test/*.bats )
+  GENERIC=( "${ROOT}"/test/*.bats "${ROOT}"/test/pkg-check/*.bats )
   # shellcheck disable=SC2207
   SPECIFIC=( $(find "${ROOT}/console" -path '*/test/*.bats' -type f 2>/dev/null) )
   suites=( "${GENERIC[@]:-}" "${SPECIFIC[@]:-}" )

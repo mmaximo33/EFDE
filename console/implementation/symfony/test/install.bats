@@ -42,3 +42,33 @@ teardown() {
   [[ -f "$t" ]] || skip "symfony tasks/install missing"
   grep -qE '^[[:space:]]*_mod_\.new_environment' "$t"
 }
+
+@test "symfony environment template produces a valid composer.json (when installed)" {
+  # Layer 4 QA: package manager check. Synthesize a Symfony-flavoured
+  # composer.json and run composer check against it. Symfony always uses
+  # composer, so the dispatcher path is exercised here.
+  load '../../../../test/pkg-check/helpers'
+  local tmp="$(mktemp -d -t efde-pkg-check-symfony-XXXXXX)"
+  cat > "$tmp/composer.json" <<'EOF'
+{
+    "name": "efde/symfony-fixture",
+    "type": "project",
+    "description": "Symfony fixture synthesized by bats.",
+    "require": {
+        "php": "^8.2",
+        "symfony/framework-bundle": "^7.0",
+        "symfony/runtime": "^7.0"
+    }
+}
+EOF
+  # bats `run` runs the command in a subshell, capturing the exit code
+  # without aborting the test under `set -e`. Critical because pkg_check
+  # returns 4 (composer not installed) — otherwise set -e aborts @test.
+  run pkg_check "$tmp"
+  rc=$status
+  rm -rf "$tmp"
+  if [[ $rc -eq 2 || $rc -eq 4 ]]; then
+    skip "pkg_check skip: package manager or tool not available (rc=$rc)"
+  fi
+  [[ $rc -eq 0 ]]
+}

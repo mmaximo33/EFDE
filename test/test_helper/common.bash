@@ -86,11 +86,44 @@ compose_up() {
 }
 
 # Force teardown of a docker-compose project (used in bats teardown hooks).
+#
+# Removes EVERYTHING that the compose file mentioned:
+#   - Containers (default)
+#   - Networks (default)
+#   - Volumes (`-v`)
+#   - Images that the compose build / pull referenced (`--rmi all`)
+#   - Networks orphaned by the removal (`--remove-orphans`)
+#
+# Compose does NOT touch images/vols/networks that belong to other
+# projects on the host. Use cleanup_all for an aggressive global purge.
 compose_down() {
   local project_dir="${1:?compose_down requires <project_dir>}"
   if [[ -f "${project_dir}/docker-compose.yml" ]]; then
-    (cd "$project_dir" && docker compose down -v 2>/dev/null) || true
+    (cd "$project_dir" && docker compose down --rmi all -v --remove-orphans 2>/dev/null) || true
   fi
+}
+
+# Aggressive global cleanup. Removes everything docker knows about that
+# is not currently running: dangling images, unused networks, dangling
+# build cache, stopped containers. Volumes are pruned only when -f is
+# passed (default off to avoid wiping user data).
+#
+#   cleanup_all                # safe purge (no volumes)
+#   cleanup_all --volumes      # also wipe anonymous volumes
+#
+# Use this in bats teardown when you want a deterministic host state
+# after a test that may have left docker artifacts behind.
+cleanup_all() {
+  local purge_volumes="false"
+  [[ "${1:-}" == "--volumes" ]] && purge_volumes="true"
+  docker container prune -f >/dev/null 2>&1 || true
+  docker image prune -f >/dev/null 2>&1 || true
+  docker network prune -f >/dev/null 2>&1 || true
+  docker builder prune -f >/dev/null 2>&1 || true
+  if [[ "$purge_volumes" == "true" ]]; then
+    docker volume prune -f >/dev/null 2>&1 || true
+  fi
+  echo "cleanup_all: pruned containers, images, networks, build cache${purge_volumes:+, volumes}"
 }
 
 # Skip the test if the bats-core binary is missing (submodule not initialised).

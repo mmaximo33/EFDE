@@ -42,3 +42,18 @@ teardown() {
   [[ -f "$t" ]] || skip "wordpress tasks/install missing"
   grep -qE '^[[:space:]]*_mod_\.new_environment' "$t"
 }
+
+@test "wordpress template does not require composer by default (WordPress core does not ship composer.json)" {
+  # WordPress core does not ship a composer.json by default. The dispatcher
+  # should detect this and skip gracefully (rc=2). If a future implementation
+  # of EFDE ever swaps WP for a composer-based stack (e.g. johnpbloch/wordpress),
+  # this test would need to be updated to assert a valid composer.json exists.
+  load '../../../../test/pkg-check/helpers'
+  local tmp="$(mktemp -d -t efde-pkg-check-wp-XXXXXX)"
+  # No manifest files created on purpose.
+  # bats `run` captures the exit code so the test does not abort on rc 2.
+  run pkg_check "$tmp"
+  rc=$status
+  rm -rf "$tmp"
+  [ "$rc" -eq 2 ]
+}
